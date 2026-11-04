@@ -1,0 +1,18 @@
+server {
+    listen 8080;
+    server_name _;
+
+    # 请替换成解压后的实际绝对路径，Windows 下可使用 D:/demo/path
+    root /absolute/path/to/西藏网格通APP-DEMO-离线交付版-v1.0.0-20261104;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(js|png|ico|ttf|json)$ {
+        try_files $uri =404;
+        expires 7d;
+        add_header Cache-Control "public";
+    }
+}
