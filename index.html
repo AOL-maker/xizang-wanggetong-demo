@@ -32,6 +32,54 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+    <!-- AI 经营报告（日报 / 周报 / 月报）增强版页面容器 -->
+    <div id="reportLayer" style="position:fixed;inset:0;z-index:9999;background:#F2F3F5;display:none;">
+      <iframe id="reportFrame" src="about:blank" title="AI 经营报告" style="border:0;width:100%;height:100%;display:block;background:#F2F3F5"></iframe>
+    </div>
+    <script>
+      (function () {
+        var layer = document.getElementById('reportLayer');
+        var frame = document.getElementById('reportFrame');
+        var opened = false;
+
+        function openReport() {
+          if (opened) return;
+          opened = true;
+          frame.src = './report.html';
+          layer.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        }
+        function closeReport() {
+          if (!opened) return;
+          opened = false;
+          layer.style.display = 'none';
+          frame.src = 'about:blank';
+        }
+        window.addEventListener('message', function (e) {
+          if (e && e.data && e.data.type === 'closeReport') closeReport();
+        });
+
+        function isReportEntry(el) {
+          for (var i = 0; i < 4 && el; i++, el = el.parentElement) {
+            var t = (el.innerText || '').trim();
+            if (t && t.length < 26 && (t.indexOf('AI 日报') >= 0 || t.indexOf('AI日报') >= 0)) return true;
+          }
+          return false;
+        }
+
+        document.addEventListener('click', function (e) {
+          if (isReportEntry(e.target)) {
+            e.preventDefault();
+            e.stopPropagation();
+            openReport();
+          }
+        }, true);
+
+        if (location.hash === '#report') openReport();
+        window.__openReport = openReport;
+        window.__closeReport = closeReport;
+      })();
+    </script>
   <script src="./_expo/static/js/web/index-e5486770e6826986028274e1fb05f670.js" defer></script>
 </body>
 </html>

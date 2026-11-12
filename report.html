@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>AI 经营报告 · 日报周报月报</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+    background: #F2F3F5;
+    color: #1A1D26;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+  #app { height: 100%; display: flex; flex-direction: column; }
+  .hdr {
+    flex: none; background: #fff; padding: 10px 14px 0;
+    border-bottom: .5px solid #E8E9EC; position: relative; z-index: 20;
+  }
+  .hdr-row { display: flex; align-items: center; height: 34px; }
+  .back { width: 28px; font-size: 20px; color: #1A1D26; display: flex; align-items: center; }
+  .hdr-title { flex: 1; font-size: 17px; font-weight: 600; text-align: center; margin-right: -28px; }
+  .role-chip {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; color: #0B62D6;
+    background: #EAF2FE; border-radius: 12px; padding: 4px 9px;
+  }
+  .tabs { display: flex; gap: 8px; padding: 10px 0 10px; }
+  .tab {
+    flex: none; padding: 6px 16px; border-radius: 9px; background: #F2F3F5;
+    color: #4B5563; font-size: 13px; font-weight: 500;
+  }
+  .tab.on { background: #EAF2FE; color: #0B62D6; font-weight: 600; }
+  .body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 12px 96px; }
+  .date-bar { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 10px; }
+  .date-btn { font-size: 12px; color: #0B62D6; background: #EAF2FE; border-radius: 8px; padding: 5px 12px; }
+  .date-btn.off { color: #B6BCC6; background: #F2F3F5; }
+  .date-cur { font-size: 13px; color: #374151; font-weight: 500; }
+  .card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .card-hd { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .card-title { font-size: 15px; font-weight: 600; color: #111827; }
+  .card-sub { font-size: 11px; color: #9CA3AF; }
+  .muted { color: #6B7280; font-size: 12px; }
+  .tiny { color: #9CA3AF; font-size: 11px; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .grow { flex: 1; min-width: 0; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 10px; font-size: 13px; font-weight: 500; padding: 9px 14px;
+    background: #EAF2FE; color: #0B62D6; border: 0;
+  }
+  .btn.ghost { background: #F4F5F7; color: #4B5563; }
+  .btn.main {
+    background: linear-gradient(96deg, #7055DB 0%, #4665E6 100%); color: #fff;
+    box-shadow: 0 4px 12px rgba(70,101,230,.22);
+  }
+  .btn.sm { padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+  .btn:active { opacity: .82; }
+  .tag { font-size: 10.5px; padding: 1px 6px; border-radius: 5px; flex: none; line-height: 16px; }
+  .t-red { background: #FDECEC; color: #C0392B; }
+  .t-amber { background: #FEF3E2; color: #B26A00; }
+  .t-green { background: #E8F7EE; color: #17803D; }
+  .t-blue { background: #EAF2FE; color: #0B62D6; }
+  .t-gray { background: #F3F4F6; color: #6B7280; }
+  .alert {
+    background: #FFF1F0; border: .5px solid #FAD4D0; border-radius: 12px;
+    padding: 10px 12px; margin-bottom: 10px;
+  }
+  .alert-hd { display: flex; align-items: center; gap: 6px; }
+  .alert-hd b { font-size: 13.5px; color: #B42318; font-weight: 600; }
+  .alert-groups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .ag { display: flex; align-items: center; gap: 4px; background: #fff; border-radius: 8px; padding: 4px 8px; font-size: 11.5px; color: #4B5563; border: .5px solid #F5D9D5; }
+  .ag b { color: #B42318; font-weight: 600; }
+  .mgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #EDEEF1; border-radius: 10px; overflow: hidden; }
+  .mcell { background: #FAFBFC; padding: 9px 10px; }
+  .mcell .k { font-size: 10.5px; color: #8A919E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mcell .v { font-size: 17px; font-weight: 600; letter-spacing: -.2px; margin-top: 1px; }
+  .mcell .d { font-size: 10.5px; margin-top: 1px; }
+  .neg { color: #D92D20; } .pos { color: #17803D; } .warn { color: #B26A00; } .neutral { color: #6B7280; }
+  .grp { border: .5px solid #ECEDF0; border-radius: 11px; margin-bottom: 8px; overflow: hidden; background: #fff; }
+  .grp-hd { display: flex; align-items: center; gap: 6px; padding: 10px 11px; background: #FAFBFC; }
+  .grp-hd .nm { font-size: 12.5px; font-weight: 600; }
+  .grp-hd .cnt { font-size: 11px; color: #8A919E; }
+  .grp-hd .arw { margin-left: auto; font-size: 11px; color: #9CA3AF; transition: transform .18s; }
+  .grp.open .arw { transform: rotate(90deg); }
+  .grp-bd { display: none; padding: 2px 11px 6px; }
+  .grp.open .grp-bd { display: block; }
+  .item { padding: 9px 0 9px 10px; border-left: 2.5px solid #E5E7EB; margin: 6px 0; }
+  .item.risk { border-left-color: #E5484D; }
+  .item.amber { border-left-color: #F5A524; }
+  .item.ok { border-left-color: #16A34A; }
+  .item-t { font-size: 12.5px; color: #1F2430; line-height: 1.45; }
+  .item-m { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+  .item-a { display: flex; gap: 6px; margin-top: 7px; }
+  .pill { font-size: 11px; border-radius: 7px; padding: 3px 9px; border: .5px solid #DCE0E6; color: #4B5563; background: #fff; }
+  .pill.act { border-color: #0B62D6; color: #0B62D6; background: #EAF2FE; }
+  .pill.done { color: #17803D; border-color: #BBE5C8; background: #E8F7EE; }
+  .seg3 { display: flex; align-items: center; gap: 6px; }
+  .kv { display: flex; font-size: 12px; padding: 3px 0; }
+  .kv .k { color: #8A919E; width: 74px; flex: none; }
+  .bar { height: 6px; border-radius: 3px; background: #EFEFF2; overflow: hidden; }
+  .bar > i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg,#7055DB,#4665E6); transition: width .3s; }
+  .todo { display: flex; gap: 10px; padding: 10px 0; border-bottom: .5px solid #F1F2F4; align-items: flex-start; }
+  .todo:last-child { border-bottom: 0; }
+  .ck {
+    width: 20px; height: 20px; border-radius: 50%; border: 1.6px solid #C7CCD4;
+    flex: none; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 11px; transition: all .2s; background: #fff;
+  }
+  .ck.on { background: #16A34A; border-color: #16A34A; }
+  .todo.done .tt { color: #A0A6B1; text-decoration: line-through; }
+  .tt { font-size: 13px; color: #1F2430; }
+  .tm { font-size: 11px; color: #9CA3AF; margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .foot {
+    position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.97);
+    border-top: .5px solid #E8E9EC; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    display: flex; gap: 8px; z-index: 30;
+  }
+  .foot .btn { flex: 1; padding: 11px 8px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%) translateY(8px);
+    background: rgba(26,29,38,.92); color: #fff; font-size: 12.5px; padding: 9px 16px;
+    border-radius: 10px; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; max-width: 84%;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .sheet-mask { position: fixed; inset: 0; background: rgba(17,20,26,.42); z-index: 50; display: none; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 16px 16px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .sheet h4 { margin: 0 0 4px; font-size: 15px; }
+  .opt { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: .5px solid #F1F2F4; font-size: 13px; }
+  .rolemenu { position: absolute; right: 12px; top: 46px; background: #fff; border-radius: 12px; box-shadow: 0 8px 28px rgba(17,20,26,.16); padding: 6px; display: none; z-index: 40; width: 132px; }
+  .rolemenu.on { display: block; }
+  .rolemenu div { padding: 8px 10px; border-radius: 8px; font-size: 12.5px; color: #374151; }
+  .rolemenu div.on { background: #EAF2FE; color: #0B62D6; font-weight: 600; }
+  .sp-sec { margin-top: 8px; }
+  .sp-sec .h { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .sp-sec .t { font-size: 12.5px; color: #374151; margin-top: 3px; line-height: 1.65; }
+  .sp-src { font-size: 10px; color: #8A919E; background: #F4F5F7; border-radius: 4px; padding: 1px 5px; font-weight: 400; }
+  .empty { text-align: center; color: #9CA3AF; font-size: 12px; padding: 14px 0; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .chips::-webkit-scrollbar { display: none; }
+  .plan { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-bottom: .5px solid #F1F2F4; }
+  .plan:last-child { border-bottom: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div class="back" id="back">‹</div>
+      <div class="hdr-title">经营报告</div>
+      <div class="role-chip" id="roleChip"><span id="roleName">网格长</span><span style="font-size:9px">▾</span></div>
+    </div>
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-p="day">日报</div>
+      <div class="tab" data-p="week">周报</div>
+      <div class="tab" data-p="month">月报</div>
+    </div>
+    <div class="rolemenu" id="roleMenu">
+      <div data-r="网格长" class="on">网格长视图</div>
+      <div data-r="网格经理">网格经理视图</div>
+    </div>
+  </div>
+  <div class="body" id="body"></div>
+  <div class="foot" id="foot"></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="sheet-mask" id="mask"><div class="sheet" id="sheet"></div></div>
+
+<script>
+(function(){
+  var LS_ROLE = 'wanggetong-preferences-v1';
+  var LS_MINE = 'wgt-report-view-v1';
+
+  function readRole(){
+    try {
+      var raw = localStorage.getItem(LS_ROLE);
+      if (raw) { var r = JSON.parse(raw); if (r && r.state && r.state.role) return r.state.role; }
+    } catch(e){}
+    return '网格长';
+  }
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(LS_MINE) || '{}'); } catch(e){ saved = {}; }
+
+  var S = {
+    role: saved.role || readRole(),
+    period: 'day',
+    openGroups: {},
+    confirmed: {},
+    generated: saved.generated !== false,
+    todos: null,
+    plan: null,
+    planDeleted: {}
+  };
+
+  var SPEECH = {
+    day: [
+      { k: '一、完成情况', src: '指标速览 ①②③', c: '#0B62D6',
+        t: '昨日收入完成率 86%，手机入网 45 户、超目标 5 户；客户接触 87 人次、超目标 7 人次；投诉回访 6 件全部闭环。整体看，存量维系与到店转化稳定，规模类指标承压。' },
+      { k: '二、主要问题', src: '异常识别 ①-⑤', c: '#C0392B',
+        t: '一是宽带新增缺口 8 单，完成率低于周均 23%；二是移动新增份额月环比 -3.93%，低于 2% 考核线；三是刘总集团商机停滞 7 天，专线故障率同比 +120%；四是李四团队完成率 65%、受理类待办积压 8 件。' },
+      { k: '三、工作安排', src: '异常 → 任务', c: '#B26A00',
+        t: '张三今日攻坚宽带 8 单缺口，走小区摆摊 + 物业团购；李四上午闭环 2 件超时投诉，下午补录商机需求；王五改期执行摆摊活动；本人 10:00 上门拜访刘总集团，同步倒三角工单闭环。' }
+    ],
+    week: [
+      { k: '一、本周期指标完成情况', src: '指标速览 ①-⑥', c: '#0B62D6',
+        t: '本周收入完成率 91%（周目标 100%），宽带新增 148/160 单，手机入网 286 户超目标 16 户，商机录入 41 条、转化 12 条，客户拜访 512 人次达标，投诉回访 36 件闭环率 94%。' },
+      { k: '二、本周期重点工作', src: '重点工作清单', c: '#0B62D6',
+        t: '完成 3 个小区宽带团购攻坚、11 家楼宇企业建档；推进顺达物流 AIoT 智能运维项目部署（当前部署率 62%）；组织 2 场社区场景营销，触客 2100 人、办理 480 户。' },
+      { k: '三、AI 提炼亮点', src: '亮点组 ①②', c: '#17803D',
+        t: '手机入网连续 3 周超额，王五单周转化 6 单为团队最高；场景营销单场收入 4.78 万，投入产出比 1:3.4；投诉一次解决率 94%，高于全网均值 6 个百分点。' },
+      { k: '四、AI 提炼问题', src: '问题组 ①-④', c: '#C0392B',
+        t: '宽带新增连续两周缺口（累计 -26 单）；移动新增份额环比 -3.93%，跌破 2% 考核线；市场基础能力维度得分 4.80、排名下滑 3 位；李四完成率 65%，为团队最低。' },
+      { k: '五、原因分析', src: '异常归因', c: '#B26A00',
+        t: '客户侧：竞品低价融合套餐分流；产品侧：千兆宽带安装时段受限；渠道侧：社会渠道活跃门店仅 6/12；人员侧：李四新接手 2 个小区、客情未建立；区域侧：如美片区入住率下降 4%。' },
+      { k: '六、下周期计划', src: '任务队列 + 缺口推算', c: '#0B62D6',
+        t: '宽带补缺口 26 单（小区摆摊 4 场 + 物业团购 2 家）；完成 8 家楼宇企业有线渗透；顺达物流 AIoT 部署率提至 85%；对李四开展 3 次陪访带教。' },
+      { k: '七、风险与请求支持', src: '协同申请', c: '#B26A00',
+        t: '申请网络侧支撑千兆装机排班（周末增开 2 个时段）；申请市场部提供竞品应对话术；如美片区需区县协调物业进场许可。' }
+    ],
+    month: [
+      { k: '一、本月指标完成情况', src: '指标速览 ①-⑥', c: '#0B62D6',
+        t: '本月收入完成率 94%，宽带新增 602/640 单，手机入网 1148 户，商机录入 168 条、转化 46 条，客户拜访 2043 人次，投诉闭环率 96%，考核综合得分 44.55、全区排名第 99。' },
+      { k: '二、本月重点工作', src: '重点工作清单', c: '#0B62D6',
+        t: '完成楼宇攻坚 23 家、有线渗透率提升至 81%；落地 2 个集团客户 AIoT 项目；完成 6 场社区场景营销；倒三角工单 110 件、完结 100 件。' },
+      { k: '三、AI 提炼亮点', src: '亮点组 ①②', c: '#17803D',
+        t: '楼宇有线业务本月新增 12 万，为片区第一；高价值商机储备 8 条、金额占比 32%；团队任务完成率 91%，高于全区均值 4 个百分点。' },
+      { k: '四、AI 提炼问题', src: '问题组 ①-④', c: '#C0392B',
+        t: '宽带主动离网携出 21.55%（同比 +17.06%）；市场基础能力得分 4.80、排名 6；考核综合排名较上月下降 6 位；受理类待办月均积压 8 件。' },
+      { k: '五、原因分析', src: '异常归因', c: '#B26A00',
+        t: '离网携出集中于 2 年以上老套餐用户，缺乏续约触点；基础能力失分项为建档完整率与走访达标率；受理积压源于月底集中受理与人员轮休叠加。' },
+      { k: '六、下周期计划', src: '任务队列 + 缺口推算', c: '#0B62D6',
+        t: '启动老套餐续约专项（目标覆盖 1200 户）；补齐建档完整率至 95%；建立受理日清机制（当日积压 ≤2 件）；顺达物流项目部署率提至 85%。' },
+      { k: '七、风险与请求支持', src: '协同申请', c: '#B26A00',
+        t: '申请续约专项政策包（折扣/权益）；申请 2 名装维支撑月底装机高峰；区县协调 3 家物业进场。' }
+    ]
+  };
+
+  var METRICS = {
+    day: [
+      { k: '收入完成率', v: '86%', d: '差距 -14pp', s: 'neg' },
+      { k: '宽带新增', v: '24/32', d: '缺口 8 单', s: 'neg' },
+      { k: '新增用户', v: '32 户', d: '达标', s: 'pos' },
+      { k: '5G套包渠道达成', v: '8/12', d: '4 渠道未达', s: 'warn' },
+      { k: '新增商机', v: '8 条', d: '1 条停滞', s: 'warn' },
+      { k: '投诉未闭环', v: '5 件', d: '2 件临期', s: 'neg' },
+      { k: '任务完成率', v: '91%', d: '李四 65%', s: 'warn' },
+      { k: '客户份额环比', v: '-3.93%', d: '低于 2% 口径', s: 'neg' },
+      { k: '宽带离网携出', v: '21.55%', d: '同比 +17.06%', s: 'neg' },
+      { k: '日必达达成率', v: '78%', d: '3 渠道未达', s: 'neg' },
+      { k: '考核综合得分', v: '44.55', d: '排名 99 · -6', s: 'neg' },
+      { k: '攻坚日均新增', v: '68/81', d: '缺口 13 单', s: 'warn' }
+    ],
+    week: [
+      { k: '收入完成率', v: '91%', d: '差距 -9pp', s: 'neg' },
+      { k: '宽带新增', v: '148/160', d: '缺口 12 单', s: 'warn' },
+      { k: '手机入网', v: '286 户', d: '超目标 16 户', s: 'pos' },
+      { k: '商机转化', v: '12/41', d: '转化率 29%', s: 'warn' },
+      { k: '客户拜访', v: '512 人次', d: '达标 103%', s: 'pos' },
+      { k: '投诉闭环率', v: '94%', d: '高于均值 6pp', s: 'pos' },
+      { k: '重点产品达成', v: '8/12', d: '4 渠道未达', s: 'warn' },
+      { k: '份额环比', v: '-3.93%', d: '连续 2 周下滑', s: 'neg' },
+      { k: '楼宇渗透率', v: '81%', d: '目标 85%', s: 'warn' },
+      { k: '任务完成率', v: '91%', d: '李四 65%', s: 'warn' },
+      { k: '考核排名', v: '第 99', d: '较上周 -3', s: 'neg' },
+      { k: '攻坚摘牌', v: '3/5', d: '2 项未达', s: 'warn' }
+    ],
+    month: [
+      { k: '收入完成率', v: '94%', d: '差距 -6pp', s: 'neg' },
+      { k: '宽带新增', v: '602/640', d: '缺口 38 单', s: 'neg' },
+      { k: '手机入网', v: '1148 户', d: '超目标 48 户', s: 'pos' },
+      { k: '商机转化', v: '46/168', d: '转化率 27%', s: 'warn' },
+      { k: '客户拜访', v: '2043', d: '达标 101%', s: 'pos' },
+      { k: '投诉闭环率', v: '96%', d: '达标', s: 'pos' },
+      { k: '离网携出', v: '21.55%', d: '同比 +17.06%', s: 'neg' },
+      { k: '有线新增', v: '12 万', d: '片区第一', s: 'pos' },
+      { k: '楼宇渗透率', v: '81%', d: '目标 85%', s: 'warn' },
+      { k: '考核得分', v: '44.55', d: '排名 99 · -6', s: 'neg' },
+      { k: '团队完成率', v: '91%', d: '高于均值 4pp', s: 'pos' },
+      { k: '工单闭环', v: '100/110', d: '10 件处理中', s: 'warn' }
+    ]
+  };
+
+  var GROUPS = {
+    day: [
+      { id: 'g1', name: '经营指标异常', lvl: 'risk', items: [
+        { t: '宽带新增缺口 8 单（24/32，完成率 75%）', m: '口径：完成率低于周均 23%；责任人：张三', act: 'task' },
+        { t: '移动新增通信客户份额月环比 -3.93%', m: '口径：环比低于 2% 触发预警', act: 'task' },
+        { t: '高价值商机储备不足（储备 8 条 / 落单 2 条）', m: '口径：储备低于 10 条', act: 'task' }
+      ]},
+      { id: 'g2', name: '考核预警', lvl: 'amber', items: [
+        { t: '考核综合得分 44.55，排名第 99（-6）', m: '四项维度中 3 项排名下滑' },
+        { t: '市场基础能力维度 4.80 分，排名 6（↓3）', m: '失分项：建档完整率 82%、走访达标率 88%' }
+      ]},
+      { id: 'g3', name: '攻坚摘牌进度', lvl: 'amber', items: [
+        { t: '农村攻坚日均新增 68 单，未达目标 81 单', m: '缺口 13 单 · 连续 3 天未达' },
+        { t: '楼宇有线渗透率 81%，本月新增 12 万', m: '目标 15 万，缺口 3 万' }
+      ]},
+      { id: 'g4', name: '团队任务完成', lvl: 'risk', items: [
+        { t: '李四任务完成率 65%，低于团队均值 26pp', m: '在办 4 项，2 项超期' },
+        { t: '突击任务 AIoT 部署率缺口 38%', m: '任务时限至 07-13，剩余 40 天' },
+        { t: '受理类待办积压 8 件（营销 2 / 服务 4）', m: '其中 3 件超过 48 小时' }
+      ]},
+      { id: 'g5', name: '客户与商机风险', lvl: 'risk', items: [
+        { t: '李*龙（全球通钻石卡）高危 3 级未回访', m: '最后接触：未接回访电话 · 已 11 天' },
+        { t: '刘总集团商机停滞 7 天，专线故障率 +120%', m: '建议今日上门，转协同跟进' }
+      ]},
+      { id: 'g6', name: '工单与 SLA', lvl: 'amber', items: [
+        { t: '倒三角工单未闭环 3 件，1 件剩余不足 24 小时', m: '工单总数 110 / 已完结 100' },
+        { t: '投诉工单 2 件今日 12:00 超时风险', m: '责任：李四 · 需上午闭环' }
+      ]}
+    ],
+    week: [
+      { id: 'w1', name: '亮点（AI 提炼）', lvl: 'ok', items: [
+        { t: '手机入网连续 3 周超额，王五单周转化 6 单为团队最高', m: '支撑：入网 286 户 / 转化 6 单' },
+        { t: '场景营销单场收入 4.78 万，投入产出比 1:3.4', m: '触客 2100 → 办理 480 户' }
+      ]},
+      { id: 'w2', name: '问题（AI 提炼）', lvl: 'risk', items: [
+        { t: '宽带新增连续两周缺口，累计 -26 单', m: '周均达成 92.5%' },
+        { t: '移动新增份额环比 -3.93%，跌破 2% 考核线', m: '竞品低价融合分流' },
+        { t: '市场基础能力 4.80 分，排名下滑 3 位', m: '建档完整率 82%' },
+        { t: '李四完成率 65%，团队最低', m: '新接手 2 个小区' }
+      ]},
+      { id: 'w3', name: '考核与攻坚', lvl: 'amber', items: [
+        { t: '考核综合排名第 99（-3）', m: '距区县均值 6.2 分' },
+        { t: '攻坚摘牌 3/5 完成，楼宇渗透率 81%', m: '目标 85%' }
+      ]},
+      { id: 'w4', name: '协同与风险', lvl: 'amber', items: [
+        { t: '顺达物流 AIoT 部署率 62%，缺口 23%', m: '需网络侧支撑排班' },
+        { t: '如美片区物业进场许可未获批', m: '影响 2 场摆摊计划' }
+      ]}
+    ],
+    month: [
+      { id: 'm1', name: '亮点（AI 提炼）', lvl: 'ok', items: [
+        { t: '楼宇有线业务本月新增 12 万，片区第一', m: '渗透率提升至 81%' },
+        { t: '团队任务完成率 91%，高于全区均值 4pp', m: '倒三角工单完结 100/110' }
+      ]},
+      { id: 'm2', name: '问题（AI 提炼）', lvl: 'risk', items: [
+        { t: '宽带主动离网携出 21.55%，同比 +17.06%', m: '集中于 2 年以上老套餐用户' },
+        { t: '考核综合排名下滑 6 位至第 99', m: '基础能力维度失分' },
+        { t: '受理类待办月均积压 8 件', m: '月底高峰 + 人员轮休' }
+      ]},
+      { id: 'm3', name: '考核与攻坚', lvl: 'amber', items: [
+        { t: '宽带新增 602/640，缺口 38 单', m: '月度达成 94%' },
+        { t: '楼宇渗透率 81%，未达 85% 目标', m: '缺口 4pp' }
+      ]},
+      { id: 'm4', name: '风险与支持', lvl: 'amber', items: [
+        { t: '老套餐续约触点缺失，离网风险持续', m: '建议申请续约专项政策包' },
+        { t: '月底装机高峰，装维排班不足', m: '申请 2 名装维支撑' }
+      ]}
+    ]
+  };
+
+  var TODO_DEFAULT = [
+    { id: 1, t: '拜访小区物业谈宽带团购', meta: '情景营销 · 已反馈成交 3 户', done: true, tag: '' },
+    { id: 2, t: '投诉回访 2 件', meta: '服务闭环 · 已回访', done: true, tag: '' },
+    { id: 3, t: '李老板续约谈判', meta: '重点客户 · 截止 11/12 17:00', done: false, tag: '重点' },
+    { id: 4, t: '工单 #C2081 上门处理', meta: '倒三角工单 · 截止 11/12 18:00', done: false, tag: 'SLA 18:00' },
+    { id: 5, t: '商机补录：餐饮连锁客户需求', meta: '商机管理 · 今日必须补录', done: false, tag: '' },
+    { id: 6, t: '宽带临期客户回访 3 户', meta: '客户维系 · AI 推荐', done: false, tag: '' },
+    { id: 7, t: '日终日报确认并提交', meta: '日报 · 21:00 前', done: false, tag: '' },
+    { id: 8, t: '装维工单 #CH-235-01 进度确认', meta: '协同 · 预计 06-14 完成', done: false, tag: '' }
+  ];
+
+  var PLAN_DEFAULT = [
+    { t: '李老板续约谈判（顺延）', meta: '明日 10:00 · 顺延自今日未完成', tag: '顺延' },
+    { t: '工单 #C2081 二次上门处理', meta: '明日 15:00 · SLA 剩余 26 小时', tag: '顺延' },
+    { t: '晨会指派：陪同拜访刘总集团', meta: '网格长安排 · 明日 09:30', tag: '新增' },
+    { t: 'AI 推荐：3 户宽带临期客户回访', meta: '临期 7 天内 · 优先高价值', tag: '新增' },
+    { t: '补录餐饮连锁客户商机需求', meta: '今日未完成 · 自动顺延', tag: '顺延' }
+  ];
+
+  if (!S.todos) S.todos = TODO_DEFAULT.map(function(x){ var o = {}; for (var k in x) o[k]=x[k]; if (saved.todos && saved.todos[x.id] !== undefined) o.done = saved.todos[x.id]; return o; });
+  if (!S.plan) S.plan = PLAN_DEFAULT.map(function(x,i){ var o = {}; for (var k in x) o[k]=x[k]; o.i=i; o.gone = !!(saved.planGone && saved.planGone[i]); return o; });
+
+  function save(){
+    var st = { role: S.role, generated: S.generated, todos: {}, planGone: {} };
+    S.todos.forEach(function(t){ st.todos[t.id] = t.done; });
+    S.plan.forEach(function(p){ if (p.gone) st.planGone[p.i] = 1; });
+    try { localStorage.setItem(LS_MINE, JSON.stringify(st)); } catch(e){}
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var toastTimer;
+  function toast(msg){
+    var el = $('toast'); el.textContent = msg; el.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.classList.remove('on'); }, 1800);
+  }
+
+  var PERIOD_LABEL = { day: '日报', week: '周报', month: '月报' };
+  function dateText(){
+    if (S.period === 'day') return '2026-11-12';
+    if (S.period === 'week') return '2026-11-06 ~ 11-12';
+    return '2026-11-01 ~ 11-12';
+  }
+
+  function headCard(){
+    var title = S.role === '网格长'
+      ? (S.period === 'day' ? '网格工作日报' : S.period === 'week' ? '网格工作周报' : '网格月度复盘')
+      : (S.period === 'day' ? '我的工作日报' : S.period === 'week' ? '我的工作周报' : '我的月度复盘');
+    var sub = S.role === '网格长'
+      ? (S.period === 'day' ? '拉萨城东网格 · 经营总览 · 异常盯办 · 发言框架' : '拉萨城东网格 · 指标完成 · 亮点问题 · 下期计划')
+      : (S.period === 'day' ? '客户走访 · 服务闭环 · 业务办理' : '执行反馈 · 成果汇总 · 下期安排');
+    var desc = S.role === '网格长'
+      ? (S.period === 'day'
+          ? '本期聚合 12 项经营指标、6 组异常事项、团队 10 人执行情况，AI 已生成异常清单与发言框架。'
+          : '本期聚合 12 项经营指标、亮点与问题清单、团队执行情况，AI 已生成七段式汇报框架。')
+      : (S.period === 'day'
+          ? '本期客户接触 87 次、有效完成任务 5 项、业务开通 3 笔，AI 已按作业轨迹生成日报草稿。'
+          : '本期客户接触 512 次、有效完成任务 41 项、业务开通 26 笔，AI 已汇总执行反馈与下期建议。');
+    return '<div class="card">' +
+      '<div class="row" style="margin-bottom:6px"><div class="grow"><div class="card-title">' + title + '</div>' +
+      '<div class="tiny" style="margin-top:2px">' + dateText() + ' · 北京时间 · ' + (S.role === '网格长' ? '网格长 张明' : '网格经理 张伟') + '</div></div>' +
+      '<span class="tag t-blue">AI 生成 ' + (S.period === 'day' ? '06:30' : '自动汇总') + '</span></div>' +
+      '<div class="muted" style="margin:4px 0 8px">' + sub + '</div>' +
+      '<div style="background:#F7F8FA;border-radius:9px;padding:9px 11px;color:#4B5563;font-size:12px;line-height:1.6">' + desc + '</div>' +
+      '<div class="row" style="margin-top:10px;gap:8px">' +
+      '<button class="btn main grow" data-act="regen">' + (S.generated ? '重新生成报告' : '生成报告') + '</button>' +
+      '<button class="btn ghost" data-act="evidence">查看依据</button></div></div>';
+  }
+
+  function alertBar(){
+    var gs = GROUPS[S.period];
+    var n = gs.reduce(function(a,g){ return a + g.items.length; }, 0);
+    var chips = gs.map(function(g){
+      return '<span class="ag" data-jump="' + g.id + '">' + g.name + ' <b>' + g.items.length + '</b></span>';
+    }).join('');
+    return '<div class="alert"><div class="alert-hd"><b>AI 识别 ' + n + ' 项' + (S.period === 'day' ? '异常' : '事项') + '</b>' +
+      '<span class="tiny" style="margin-left:auto">' + (S.period === 'day' ? '按规则+风险优先级排序' : '含亮点与问题') + '</span></div>' +
+      '<div class="alert-groups">' + chips + '</div></div>';
+  }
+
+  function metricCard(){
+    var ms = METRICS[S.period];
+    return '<div class="card"><div class="card-hd"><div class="card-title">指标速览</div>' +
+      '<span class="card-sub" style="margin-left:auto">完成 / 目标 / 差距</span></div>' +
+      '<div class="mgrid">' + ms.map(function(m){
+        return '<div class="mcell"><div class="k">' + m.k + '</div><div class="v">' + m.v + '</div>' +
+          '<div class="d ' + m.s + '">' + m.d + '</div></div>';
+      }).join('') + '</div>' +
+      '<div class="tiny" style="margin-top:7px">红色为异常、橙色为预警、绿色为达标；点指标卡可下钻明细</div></div>';
+  }
+
+  function anomalyCard(){
+    var gs = GROUPS[S.period];
+    var total = gs.reduce(function(a,g){ return a + g.items.length; }, 0);
+    var done = Object.keys(S.confirmed).filter(function(k){ return S.confirmed[k]; }).length;
+    var html = '<div class="card"><div class="card-hd"><div class="card-title">AI 异常识别与重点工作</div>' +
+      '<span class="card-sub" style="margin-left:auto">已确认 ' + done + '/' + total + '</span></div>' +
+      '<div class="tiny" style="margin-bottom:8px">逐项确认后可纳入发言框架；「转任务」直接生成明日待办</div>';
+    gs.forEach(function(g){
+      var isOpen = S.openGroups[g.id] !== undefined ? S.openGroups[g.id] : (g.lvl === 'ok' || g === gs[0]);
+      html += '<div class="grp' + (isOpen ? ' open' : '') + '" data-g="' + g.id + '">' +
+        '<div class="grp-hd"><span class="tag ' + (g.lvl === 'ok' ? 't-green' : g.lvl === 'amber' ? 't-amber' : 't-red') + '">' +
+        (g.lvl === 'ok' ? '亮点' : g.lvl === 'amber' ? '预警' : '异常') + '</span>' +
+        '<span class="nm">' + g.name + '</span><span class="cnt">' + g.items.length + ' 项</span>' +
+        '<span class="arw">›</span></div><div class="grp-bd">';
+      g.items.forEach(function(it, idx){
+        var key = g.id + '-' + idx;
+        var st = S.confirmed[key];
+        html += '<div class="item ' + (g.lvl === 'ok' ? 'ok' : g.lvl === 'amber' ? 'amber' : 'risk') + '">' +
+          '<div class="item-t">' + esc(it.t) + '</div><div class="item-m">' + esc(it.m) + '</div>' +
+          '<div class="item-a"><span class="pill' + (st ? ' done' : '') + '" data-confirm="' + key + '">' + (st ? '已确认' : '确认') + '</span>' +
+          '<span class="pill" data-task="' + key + '">转任务</span>' +
+          '<span class="pill" data-evidence="' + key + '">查看依据</span></div></div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function speechCard(){
+    if (S.role !== '网格长') return '';
+    var secs = SPEECH[S.period];
+    var body = S.generated
+      ? secs.map(function(s){
+          return '<div class="sp-sec"><div class="h" style="color:' + s.c + '">' + s.k +
+            '<span class="sp-src">' + s.src + '</span></div><div class="t">' + esc(s.t) + '</div></div>';
+        }).join('')
+      : '<div class="empty">尚未生成发言框架<br><span style="font-size:11px">点击下方按钮，AI 将按当前报告生成三段式发言稿</span></div>';
+    return '<div class="card" style="border:1px solid #DDE6FB"><div class="card-hd">' +
+      '<div class="card-title">AI 发言框架</div>' +
+      '<span class="card-sub" style="margin-left:auto">来源：本期报告 V20261112</span></div>' +
+      '<div class="tiny" style="margin-bottom:2px">完成情况 / 主要问题 / 工作安排，内容与指标、异常逐条对应</div>' +
+      body +
+      '<div class="row" style="margin-top:12px;gap:8px">' +
+      '<button class="btn sm" data-act="speech">' + (S.generated ? '重新生成' : '生成发言框架') + '</button>' +
+      '<button class="btn sm ghost" data-act="editSpeech">编辑</button>' +
+      '<button class="btn sm ghost" data-act="copy">复制稿件</button></div></div>';
+  }
+
+  function leaderExtra(){
+    return '<div class="card"><div class="card-hd"><div class="card-title">团队执行概览</div>' +
+      '<span class="card-sub" style="margin-left:auto">10 人 · 已提交 8 份</span></div>' +
+      '<div class="row" style="gap:10px;margin-top:6px">' +
+      '<div style="flex:1"><div class="tiny">任务完成率</div><div style="font-size:18px;font-weight:600">91%</div></div>' +
+      '<div style="flex:1"><div class="tiny">人均拜访</div><div style="font-size:18px;font-weight:600">8.7 次</div></div>' +
+      '<div style="flex:1"><div class="tiny">团队转化</div><div style="font-size:18px;font-weight:600">23 单</div></div></div>' +
+      '<div style="margin-top:10px">' + [
+        { n: '王五', v: 100, d: '转化 6 单 · 团队第一', c: '#16A34A' },
+        { n: '张三', v: 96, d: '拜访 12 次 · 续约 1 单', c: '#16A34A' },
+        { n: '李四', v: 65, d: '在办 4 项 · 2 项超期', c: '#E5484D' }
+      ].map(function(p){
+        return '<div style="margin:8px 0"><div class="row" style="gap:8px"><span style="font-size:12px;width:34px">' + p.n + '</span>' +
+          '<div class="bar grow"><i style="width:' + p.v + '%;background:' + p.c + '"></i></div>' +
+          '<span style="font-size:11.5px;color:#6B7280;width:32px;text-align:right">' + p.v + '%</span></div>' +
+          '<div class="tiny" style="margin-left:42px">' + p.d + '</div></div>';
+      }).join('') + '</div></div>';
+  }
+
+  function progressCard(){
+    var total = S.todos.length;
+    var done = S.todos.filter(function(t){ return t.done; }).length;
+    var pct = Math.round(done / total * 100);
+    return '<div class="card"><div class="card-hd"><div class="card-title">今日计划进度</div>' +
+      '<span class="card-sub" style="margin-left:auto">截至 16:10 实时</span></div>' +
+      '<div class="row" style="margin:4px 0 6px"><div style="font-size:15px;font-weight:600">今日计划完成 ' + done + ' / ' + total + '</div>' +
+      '<span style="margin-left:auto;font-size:12px;color:#0B62D6">' + pct + '%</span></div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="tiny" style="margin-top:6px">勾选完成或提交反馈后，完成数量、进度与日报「今日完成」段落同步更新</div></div>';
+  }
+
+  function todoCard(){
+    var total = S.todos.length, done = S.todos.filter(function(t){ return t.done; }).length;
+    return '<div class="card"><div class="card-hd"><div class="card-title">今日待办 · 重点任务</div>' +
+      '<span class="card-sub" style="margin-left:auto">完成 ' + done + '/' + total + '</span></div>' +
+      '<div class="tiny" style="margin-bottom:2px">按计划日期与截止时间排序，历史积压不计入今日分母</div>' +
+      S.todos.map(function(t){
+        var tags = t.tag ? '<span class="tag ' + (t.tag === '重点' ? 't-red' : 't-amber') + '">' + t.tag + '</span>' : '';
+        return '<div class="todo' + (t.done ? ' done' : '') + '" data-todo="' + t.id + '">' +
+          '<div class="ck' + (t.done ? ' on' : '') + '">' + (t.done ? '✓' : '') + '</div>' +
+          '<div class="grow"><div class="tt">' + esc(t.t) + ' ' + tags + '</div>' +
+          '<div class="tm"><span>' + esc(t.meta) + '</span></div></div>' +
+          '<span class="tag ' + (t.done ? 't-green' : 't-gray') + '">' + (t.done ? '已完成' : '待处理') + '</span></div>';
+      }).join('') +
+      '<div style="margin-top:8px"><button class="btn ghost" style="width:100%" data-act="feedback">提交反馈 / 补充说明</button></div></div>';
+  }
+
+  function gapCard(){
+    var rows = [
+      { k: '客户接触', v: 25, a: 1, b: 4 },
+      { k: '有效完成任务', v: 33, a: 1, b: 3 },
+      { k: '业务已开通', v: 50, a: 1, b: 2 }
+    ];
+    return '<div class="card"><div class="card-hd"><div class="card-title">个人指标与目标差距</div>' +
+      '<span class="card-sub" style="margin-left:auto">时间进度 70%</span></div>' +
+      rows.map(function(r){
+        return '<div style="margin-top:10px"><div class="row"><span style="font-size:12.5px">' + r.k + '</span>' +
+          '<span style="margin-left:auto;font-size:12.5px;color:#D92D20;font-weight:600">' + r.v + '%</span></div>' +
+          '<div class="bar" style="margin-top:5px"><i style="width:' + r.v + '%"></i></div>' +
+          '<div class="tiny" style="margin-top:4px">已完成 ' + r.a + ' / 目标 ' + r.b + ' · 差距 ' + (r.b - r.a) + ' · 落后时间进度超过 10 个百分点</div></div>';
+      }).join('') + '</div>';
+  }
+
+  function planCard(){
+    var alive = S.plan.filter(function(p){ return !p.gone; });
+    return '<div class="card" style="border:1px solid #CFEBDA"><div class="card-hd">' +
+      '<div class="card-title">AI 明日计划</div>' +
+      '<span class="card-sub" style="margin-left:auto">未完成 3 + 新增 2</span></div>' +
+      '<div class="tiny" style="margin-bottom:2px">依据今日未完成事项、网格长晨会指派与 AI 推荐生成，可逐条调整</div>' +
+      (alive.length ? alive.map(function(p){
+        return '<div class="plan"><span class="tag ' + (p.tag === '新增' ? 't-green' : 't-blue') + '">' + p.tag + '</span>' +
+          '<div class="grow"><div style="font-size:12.5px">' + esc(p.t) + '</div><div class="tiny">' + esc(p.meta) + '</div></div>' +
+          '<span class="pill" data-plan-edit="' + p.i + '">调整</span>' +
+          '<span class="pill" data-plan-del="' + p.i + '">删除</span></div>';
+      }).join('') : '<div class="empty">计划已清空，可重新生成</div>') +
+      '<div class="row" style="margin-top:10px;gap:8px">' +
+      '<button class="btn sm ghost" data-act="planRegen">重新生成</button>' +
+      '<button class="btn sm ghost" data-act="planAdd">手动添加</button>' +
+      '<button class="btn sm" style="margin-left:auto" data-act="planSave">保存计划</button></div></div>';
+  }
+
+  function confirmCard(){
+    return '<div class="card" style="background:#FFFBF2;border:1px solid #F6E3BF"><div class="card-hd">' +
+      '<div class="card-title" style="color:#8A5A00">提交前确认（2 项）</div></div>' +
+      '<div style="font-size:12px;color:#6B5316;line-height:1.7;margin-top:2px">' +
+      '① 李老板客户已拜访，但未检出订单或商机，请选择结果：<br>' +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' +
+      ['已完成未转化', '客户拒绝', '下次跟进', '补充说明'].map(function(x){
+        return '<span class="pill" data-choice="' + x + '">' + x + '</span>';
+      }).join('') + '</span>' +
+      '<div style="margin-top:8px">② 今日有无特殊事项需要上报？<span class="pill" style="margin-left:6px" data-choice="无特殊事项">无</span>' +
+      '<span class="pill" style="margin-left:6px" data-choice="填写说明">有，填写说明</span></div></div></div>';
+  }
+
+  function render(){
+    $('roleName').textContent = S.role;
+    $('roleMenu').querySelectorAll('div').forEach(function(d){
+      d.classList.toggle('on', d.getAttribute('data-r') === S.role);
+    });
+    Array.prototype.forEach.call($('tabs').children, function(t){
+      t.classList.toggle('on', t.getAttribute('data-p') === S.period);
+    });
+
+    var html = '<div class="date-bar"><span class="date-btn off">‹ 上一期</span>' +
+      '<span class="date-cur">' + dateText() + '</span><span class="date-btn">下一期 ›</span></div>';
+    html += headCard();
+    if (S.role === '网格长') {
+      html += alertBar();
+      html += metricCard();
+      html += anomalyCard();
+      html += speechCard();
+      html += leaderExtra();
+    } else {
+      html += progressCard();
+      html += todoCard();
+      html += gapCard();
+      html += planCard();
+      html += confirmCard();
+      html += anomalyCard();
+    }
+    $('body').innerHTML = html;
+    $('body').scrollTop = 0;
+
+    $('foot').innerHTML = S.role === '网格长'
+      ? '<button class="btn ghost" data-act="toTask">一键转任务</button>' +
+        '<button class="btn main" data-act="export">导出晨会简报</button>'
+      : '<button class="btn ghost" data-act="draft">保存草稿</button>' +
+        '<button class="btn main" data-act="submit">确认并一键提交日报</button>';
+  }
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-p],[data-r],[data-g],[data-confirm],[data-task],[data-evidence],[data-todo],[data-choice],[data-plan-del],[data-plan-edit],[data-act],[data-jump]');
+    if (!el) return;
+
+    if (el.hasAttribute('data-p')) { S.period = el.getAttribute('data-p'); S.confirmed = {}; render(); return; }
+    if (el.hasAttribute('data-r')) {
+      S.role = el.getAttribute('data-r');
+      $('roleMenu').classList.remove('on');
+      save(); render(); toast('已切换为' + S.role + '视图'); return;
+    }
+    if (el.hasAttribute('data-g')) {
+      var gid = el.getAttribute('data-g');
+      var cur = S.openGroups[gid] !== undefined ? S.openGroups[gid] : (GROUPS[S.period].filter(function(g){ return g.id === gid; })[0].lvl === 'ok');
+      S.openGroups[gid] = !cur;
+      el.classList.toggle('open', !cur);
+      return;
+    }
+    if (el.hasAttribute('data-jump')) {
+      var jid = el.getAttribute('data-jump');
+      var target = document.querySelector('[data-g="' + jid + '"]');
+      if (target) { S.openGroups[jid] = true; target.classList.add('open'); target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      return;
+    }
+    if (el.hasAttribute('data-confirm')) {
+      var k = el.getAttribute('data-confirm');
+      S.confirmed[k] = !S.confirmed[k];
+      el.classList.toggle('done', !!S.confirmed[k]);
+      el.textContent = S.confirmed[k] ? '已确认' : '确认';
+      if (S.confirmed[k]) toast('已确认，将纳入发言框架');
+      updateCounts();
+      return;
+    }
+    if (el.hasAttribute('data-task')) { toast('已转为明日任务，可在「我的待办」查看'); return; }
+    if (el.hasAttribute('data-evidence')) { toast('依据：指标明细 + 数据快照（演示）'); return; }
+    if (el.hasAttribute('data-todo')) {
+      var tid = parseInt(el.getAttribute('data-todo'), 10);
+      var td = S.todos.filter(function(t){ return t.id === tid; })[0];
+      td.done = !td.done;
+      save(); render();
+      toast(td.done ? '已完成 1 项，进度与日报同步更新' : '已取消完成，进度已回退');
+      return;
+    }
+    if (el.hasAttribute('data-choice')) { el.classList.toggle('act'); toast('已选择：' + el.getAttribute('data-choice')); return; }
+    if (el.hasAttribute('data-plan-del')) {
+      var pi = parseInt(el.getAttribute('data-plan-del'), 10);
+      S.plan.forEach(function(p){ if (p.i === pi) p.gone = true; });
+      save(); render(); toast('已删除该条计划'); return;
+    }
+    if (el.hasAttribute('data-plan-edit')) { toast('可调整执行时间与责任人（演示）'); return; }
+
+    var act = el.getAttribute('data-act');
+    if (act === 'regen') { S.generated = true; save(); render(); toast('已按当前数据重新生成报告'); return; }
+    if (act === 'evidence') { toast('已打开数据依据：指标快照 / 业务明细（演示）'); return; }
+    if (act === 'speech') { S.generated = true; save(); render(); toast('已按当前报告生成发言框架（3 段）'); return; }
+    if (act === 'editSpeech') { toast('发言框架进入编辑模式（演示）'); return; }
+    if (act === 'copy') { toast('发言稿已复制到剪贴板'); return; }
+    if (act === 'toTask') { toast('已将 3 项异常转为今日任务'); return; }
+    if (act === 'export') { toast('晨会简报已导出（演示）'); return; }
+    if (act === 'feedback') { toast('已打开反馈填写：结果 / 说明 / 下一步'); return; }
+    if (act === 'planRegen') { S.plan.forEach(function(p){ p.gone = false; }); save(); render(); toast('已重新生成明日计划'); return; }
+    if (act === 'planAdd') { toast('可手动添加一条明日计划（演示）'); return; }
+    if (act === 'planSave') { toast('明日计划已保存，明早自动转为待办'); return; }
+    if (act === 'draft') { toast('已保存草稿'); return; }
+    if (act === 'submit') {
+      var left = S.todos.filter(function(t){ return !t.done; }).length;
+      toast('日报已提交，剩 ' + left + ' 项未完成已顺延至明日');
+      return;
+    }
+  });
+
+  function updateCounts(){
+    var total = GROUPS[S.period].reduce(function(a,g){ return a + g.items.length; }, 0);
+    var done = Object.keys(S.confirmed).filter(function(k){ return S.confirmed[k]; }).length;
+    var el = document.querySelector('.card-hd .card-sub');
+    var hs = document.querySelectorAll('.card-hd .card-sub');
+    for (var i = 0; i < hs.length; i++) {
+      if (hs[i].textContent.indexOf('已确认') === 0) hs[i].textContent = '已确认 ' + done + '/' + total;
+    }
+  }
+
+  $('roleChip').addEventListener('click', function(e){
+    e.stopPropagation();
+    $('roleMenu').classList.toggle('on');
+  });
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('#roleChip') && !e.target.closest('#roleMenu')) $('roleMenu').classList.remove('on');
+  });
+  $('back').addEventListener('click', function(){
+    if (window.parent !== window) { window.parent.postMessage({ type: 'closeReport' }, '*'); }
+    else if (history.length > 1) history.back();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
