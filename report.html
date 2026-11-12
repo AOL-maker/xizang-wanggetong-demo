@@ -144,20 +144,16 @@
   .plan { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-bottom: .5px solid #F1F2F4; }
   .plan:last-child { border-bottom: 0; }
 
-  /* 桌面/平板浏览器打开时，保持手机宽度居中，避免被拉伸成宽屏版 */
-  @media (min-width: 560px) {
-    body { background: #E6E8ED; }
+  /* 桌面浏览器打开时，与 App 外壳（600px 居中）完全对齐，避免被拉伸成宽屏 */
+  @media (min-width: 601px) {
+    body { background: #DEE7F1; }
     #app {
-      width: 430px; max-width: 430px; margin: 0 auto;
+      width: 600px; max-width: 600px; margin: 0 auto;
       background: #F2F3F5; position: relative;
-      box-shadow: 0 0 0 1px rgba(17,20,26,.06), 0 20px 56px rgba(17,20,26,.14);
     }
-    .foot {
-      left: 50%; right: auto; width: 430px; transform: translateX(-50%);
-      box-shadow: 0 -6px 16px rgba(17,20,26,.05);
-    }
-    .sheet { left: 50%; right: auto; width: 430px; transform: translateX(-50%); }
-    .toast { max-width: 380px; }
+    .foot { left: 50%; right: auto; width: 600px; transform: translateX(-50%); }
+    .sheet { left: 50%; right: auto; width: 600px; transform: translateX(-50%); }
+    .toast { max-width: 520px; }
   }
 </style>
 </head>
