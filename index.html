@@ -22,6 +22,18 @@
         height: 100%;
         flex: 1;
       }
+      /* 演示态：隐藏所有滚动条（仍可滚动） */
+      *,
+      *::before,
+      *::after {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      *::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+      }
     </style>
   <link rel="icon" href="./favicon.ico"/></head>
 
