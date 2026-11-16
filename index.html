@@ -35,6 +35,62 @@
         display: none !important;
       }
     </style>
+    <!-- 设计 token：贵州统一工作台手机端 UI 规范（phone-ui-standard） -->
+    <style id="ui-tokens">
+      :root {
+        /* 品牌 / 主要 */
+        --color-primary: #1361ff;
+        --color-primary-hover: #0062d6;
+        --color-primary-active: #004fb3;
+        --color-primary-disabled: #98cdfd;
+        --color-primary-bg: #eaf5ff;
+        --color-primary-bg-hover: #cbe7fe;
+        /* 功能色 */
+        --color-success: #3bb346;
+        --color-success-bg: #f6ffed;
+        --color-warning: #fc8800;
+        --color-warning-bg: #fff8ea;
+        --color-danger: #f93920;
+        --color-danger-bg: #fef2ed;
+        /* 文本 */
+        --color-text-1: #1d2129;
+        --color-text-2: #434c59;
+        --color-text-3: #868c9c;
+        --color-text-4: #c9cdd4;
+        /* 填充 / 描边 */
+        --color-fill-1: #434c59;
+        --color-fill-3: #eaecef;
+        --color-fill-4: #f2f3f5;
+        --color-fill-5: #f7f8fa;
+        --color-line: #eaecef;
+        --color-border: #d8dce4;
+        --color-mask: rgba(29, 33, 41, 0.6);
+        /* 圆角 */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-pill: 999px;
+        /* 阴影 */
+        --shadow-1: 0 2px 5px rgba(0, 0, 0, 0.1);
+        --shadow-2: 0 4px 10px rgba(0, 0, 0, 0.1);
+        --shadow-3: 0 6px 15px rgba(0, 0, 0, 0.1);
+        /* 字号 / 行高 */
+        --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC',
+          Roboto, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+        --font-size-body: 14px;
+        --line-height-body: 22px;
+      }
+      /* 字体族按规范：iOS San Francisco / Android Roboto，中文回落 PingFang / 雅黑 */
+      body,
+      #root {
+        font-family: var(--font-family);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      body {
+        background-color: var(--color-fill-4);
+      }
+    </style>
   <link rel="icon" href="./favicon.ico"/></head>
 
   <body>
