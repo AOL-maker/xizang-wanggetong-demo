@@ -3,6 +3,7 @@
    - 小区 · 总览：在管小区/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
    - 园楼 · 总览：在管园楼/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
    - 家庭 · 总览：在管家庭/宽带家庭/融合家庭 + 三环图 + 脚注 → 6 卡
+   - 集团 · 总览：集团数量/AB集团/集团成员/全球通客户 + 三环图 + 脚注 → 6 卡
    其余区域（标题行、稳定度得分、快捷查询、列表）保持原样。 */
 (function () {
   var STYLE_ID = 'krStatStyle';
@@ -111,6 +112,21 @@
         ['融合渗透率', '89.01%', 'p'],
         ['宽带覆盖率', '89.01%', 'r']
       ]
+    },
+    {
+      key: 'grp',
+      start: '集团数量',
+      must: ['AB集团数量', '集团成员数量', '全球通客户数量'],
+      cardMark: '看管覆盖率',
+      hideFoot: true,
+      data: [
+        ['在管集团数', '2378', 'p'],
+        ['AB集团数量', '2378', 'r'],
+        ['集团成员数', '1,600', 'p'],
+        ['全球通客户数', '2378', 'r'],
+        ['合约客户数', '1,600', 'p'],
+        ['看管覆盖率', '89.01%', 'r']
+      ]
     }
   ];
 
@@ -140,7 +156,7 @@
   /* 当前一级页签（个人/小区/园楼/集团/家庭）→ 对应配置 key
      注意：RN 会把其它页签的页面留在 DOM 里（隐藏），必须靠高亮色判断当前页，
      否则切换页签后会把上一页的 grid 当成当前页的而不再重建。 */
-  var TYPE_KEY = { '个人': 'per', '小区': 'xq', '园楼': 'yl', '家庭': 'ji' };
+  var TYPE_KEY = { '个人': 'per', '小区': 'xq', '园楼': 'yl', '集团': 'grp', '家庭': 'ji' };
   var TOP_NAMES = ['个人', '小区', '园楼', '集团', '家庭'];
 
   function activeTopType() {
@@ -218,7 +234,7 @@
         return;
       }
     }
-    if (want === null) return;                 /* 该页签暂无配置（集团）*/
+    if (want === null) return;                 /* 该页签暂无配置 */
 
     var root = document.getElementById('root');
     if (!root) return;
@@ -272,5 +288,5 @@
     new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
   setInterval(apply, 900);
-  window.__krStatHook = 'v4';
+  window.__krStatHook = 'v5';
 })();
