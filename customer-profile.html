@@ -91,7 +91,7 @@
         <div class="cust-head">
           <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2.1c-3.9 0-7.2 2.4-7.2 5.4 0 .5.4.9.9.9h12.6c.5 0 .9-.4.9-.9 0-3-3.3-5.4-7.2-5.4Z"/></svg></div>
           <div class="cust-main">
-            <div class="cust-name">张三<span class="sep">|</span><span class="num">130****0241</span></div>
+            <div class="cust-name"><span id="custName">张三</span><span class="sep">|</span><span class="num" id="custPhone">130****0241</span></div>
             <div class="grid-line">归属网格:昌都市-芒康县-芒康县片区-如美网格</div>
             <div class="tags"><span>5G网络用户</span><span>家庭套餐主卡</span><span>家庭套餐主卡</span></div>
             <div class="guardian">看护人: <a href="javascript:void(0)" id="guardianLink">张明</a><span class="sep">|</span>198****8981<span class="sep">|</span>网格经理</div>
@@ -115,7 +115,7 @@
           <div class="row"><span class="k">入网时间:</span><span class="v">2025年10月30日</span></div>
           <div class="row"><span class="k">全球通级别:</span><span class="v"><span class="badge">全球通钻石卡</span></span></div>
           <div class="row"><span class="k">是否外呼敏感:</span><span class="v">否</span></div>
-          <div class="row"><span class="k">用户标识:</span><span class="v">13036780241</span></div>
+          <div class="row"><span class="k">用户标识:</span><span class="v" id="custId">13036780241</span></div>
           <div class="row"><span class="k">常驻地小区:</span><span class="v">板塘安置小区</span></div>
           <div class="row"><span class="k">用户状态:</span><span class="v">欠费预销号</span></div>
         </div>
@@ -195,7 +195,18 @@
 <script>
   const toast=document.getElementById('toast');let toastTimer;function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1900)}
   document.getElementById('backBtn').onclick=()=>parent.postMessage({type:'closeCustomerProfile',back:true},'*');
-  document.getElementById('callBtn').onclick=()=>showToast('正在呼叫 130****0241（模拟演示）');
+  /* 与外部客户卡片保持一致：动态注入姓名/手机号 */
+  let currentPhone='130****0241';
+  window.__setCustomer=function(info){
+    if(!info) return;
+    const nameEl=document.getElementById('custName');
+    const phoneEl=document.getElementById('custPhone');
+    const idEl=document.getElementById('custId');
+    if(info.name){nameEl.textContent=info.name;}
+    if(info.phone){currentPhone=info.phone;phoneEl.textContent=info.phone;idEl.textContent=info.phone;}
+  };
+  (function(){const q=new URLSearchParams(location.search);const n=q.get('name'),p=q.get('phone');if(n||p)window.__setCustomer({name:n,phone:p});})();
+  document.getElementById('callBtn').onclick=()=>showToast('正在呼叫 '+currentPhone+'（模拟演示）');
   document.getElementById('guardianLink').onclick=()=>showToast('已查看看护人 张明 的信息');
   document.querySelectorAll('[data-svc]').forEach(btn=>btn.onclick=()=>parent.postMessage({type:'openCustomerService',service:btn.dataset.svc},'*'));
   document.querySelectorAll('.tabs [data-tab]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.tab==='服务画像'){document.querySelectorAll('.tabs [data-tab]').forEach(b=>b.classList.toggle('active',b===btn));return}showToast(`「${btn.dataset.tab}」画像暂无演示数据`)});
