@@ -14,10 +14,10 @@
     '#ydStatHead .yd-links .sep{color:#d8dee7}',
     '#' + GRID_ID + '{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box;padding:2px 0 0}',
     '#' + GRID_ID + ' .yd-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:6px;box-sizing:border-box;',
-    '  min-height:72px;padding:10px 12px 9px;border-radius:8px;border:1px solid #e9ebf3;cursor:pointer;text-align:left;',
-    '  background:linear-gradient(135deg,#ffffff 0%,#f1f2fa 100%);transition:border-color .16s,box-shadow .16s,background .16s}',
-    '#' + GRID_ID + ' .yd-card:hover{border-color:#c9d8f6}',
-    '#' + GRID_ID + ' .yd-card.on{border-color:#2f7cf6;background:linear-gradient(135deg,#f3f8ff 0%,#e6f0ff 100%);box-shadow:0 0 0 1px #2f7cf6 inset}',
+    '  min-height:72px;padding:10px 12px 9px;border-radius:8px;border:1px solid #fbe3e7;cursor:pointer;text-align:left;',
+    '  background:linear-gradient(90deg,#fffdfd 0%,#fde8ec 100%);transition:border-color .16s,box-shadow .16s,background .16s}',
+    '#' + GRID_ID + ' .yd-card:hover{border-color:#f4bcc3}',
+    '#' + GRID_ID + ' .yd-card.on{border-color:#e8332a;background:linear-gradient(90deg,#fff9fa 0%,#fcdbe1 100%);box-shadow:0 0 0 1px #e8332a inset}',
     '#' + GRID_ID + ' .yd-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}',
     '#' + GRID_ID + ' .yd-name{font-size:13.5px;line-height:1.25;color:#333a45;white-space:nowrap}',
     '#' + GRID_ID + ' .yd-warn{flex:0 0 12px;width:12px;height:12px;display:block;margin-top:2px}',
@@ -28,11 +28,13 @@
     '@media(max-width:420px){#' + GRID_ID + '{gap:8px}#' + GRID_ID + ' .yd-card{min-height:66px;padding:9px 10px 8px}#' + GRID_ID + ' .yd-name{font-size:12.5px}#' + GRID_ID + ' .yd-num{font-size:17px}}'
   ].join('\n');
 
-  /* 图3：红色预警三角 */
+  /* 图3：红色预警三角（内含白色感叹号） */
   var WARN = '<svg class="yd-warn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
     '<defs><linearGradient id="ydWarnG" x1="0" y1="0" x2="0" y2="1">' +
     '<stop offset="0" stop-color="#ff5a63"/><stop offset="1" stop-color="#ef2f38"/></linearGradient></defs>' +
     '<path d="M11.1 3.3a1 1 0 0 1 1.8 0l8.4 16.1a1 1 0 0 1-.9 1.5H3.6a1 1 0 0 1-.9-1.5L11.1 3.3Z" fill="url(#ydWarnG)"/>' +
+    '<rect x="10.7" y="9.2" width="2.6" height="6" rx="1.3" fill="#ffffff"/>' +
+    '<circle cx="12" cy="18.2" r="1.5" fill="#ffffff"/>' +
     '</svg>';
 
   /* 指标 → 名单筛选用关键词（与下方名单同一规则） */
@@ -264,5 +266,5 @@
   else apply();
   try { new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
   setInterval(apply, 900);
-  window.__ydStatHook = 'v1';
+  window.__ydStatHook = 'v2';
 })();
