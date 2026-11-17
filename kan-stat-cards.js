@@ -1,5 +1,7 @@
-/* 客户看管 · 个人 · 总览：「看结果」统计区改版
-   仅替换「客户规模/宽带客户规模/离网客户规模」数字行与三环图，其余保持原样。 */
+/* 客户看管 · 总览：统计区 6 卡化（两列三行）
+   - 个人 · 总览：「看结果」卡片内 客户规模/宽带客户规模/离网客户规模 + 三环图 → 6 卡
+   - 小区 · 总览：在管小区/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
+   其余区域（标题行、稳定度得分、快捷查询、列表）保持原样。 */
 (function () {
   var STYLE_ID = 'krStatStyle';
   var GRID_ID = 'krStatGrid';
@@ -7,17 +9,19 @@
   var CSS = [
     '#' + GRID_ID + '{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box;padding:2px 0}',
     '#' + GRID_ID + ' .kr-card{display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;',
-    '  min-height:68px;padding:11px 12px 11px 14px;border-radius:9px;',
-    '  background:linear-gradient(135deg,#f8fbff 0%,#e4effe 100%);border:1px solid #e8f1fc}',
+    '  min-height:70px;padding:11px 12px 11px 14px;border-radius:10px;',
+    '  background:linear-gradient(135deg,#f9fcff 0%,#e3eefe 100%);border:1px solid #e8f1fc}',
     '#' + GRID_ID + ' .kr-txt{min-width:0}',
-    '#' + GRID_ID + ' .kr-t{font-size:13px;line-height:1.25;color:#3d4753;white-space:nowrap;letter-spacing:.1px}',
-    '#' + GRID_ID + ' .kr-v{font-size:18px;line-height:1.25;color:#1b2430;font-weight:500;margin-top:2px;letter-spacing:.2px}',
-    '#' + GRID_ID + ' .kr-ico{flex:0 0 30px;width:30px;height:30px;display:block}',
-    '@media(max-width:420px){#' + GRID_ID + '{gap:8px}#' + GRID_ID + ' .kr-card{padding:9px 10px;min-height:60px}#' + GRID_ID + ' .kr-t{font-size:12px}#' + GRID_ID + ' .kr-v{font-size:16px}#' + GRID_ID + ' .kr-ico{flex-basis:28px;width:28px;height:28px}}'
+    '#' + GRID_ID + ' .kr-t{font-size:13.5px;line-height:1.25;color:#48525f;white-space:nowrap;letter-spacing:.1px}',
+    '#' + GRID_ID + ' .kr-v{font-size:19px;line-height:1.25;color:#1b2430;font-weight:600;margin-top:3px;letter-spacing:.2px}',
+    '#' + GRID_ID + ' .kr-ico{flex:0 0 34px;width:34px;height:34px;display:block}',
+    '@media(max-width:420px){#' + GRID_ID + '{gap:8px}#' + GRID_ID + ' .kr-card{padding:9px 10px;min-height:62px}',
+    '#' + GRID_ID + ' .kr-t{font-size:12px}#' + GRID_ID + ' .kr-v{font-size:16px}',
+    '#' + GRID_ID + ' .kr-ico{flex-basis:30px;width:30px;height:30px}}'
   ].join('\n');
 
-  /* 五边形 + 人像 + 右下浅蓝手形（个人类客户） */
-  function penta(uid) {
+  /* 五边形 + 人像 + 右下浅蓝手形 */
+  function penta() {
     return '<svg class="kr-ico" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">' +
       '<path d="M20 2.4 37 13.6 30.5 35.4H9.5L3 13.6 20 2.4Z" fill="#1f7bf3"/>' +
       '<circle cx="20" cy="15.6" r="4.7" fill="#b6d8ff"/>' +
@@ -27,8 +31,8 @@
       '</svg>';
   }
 
-  /* 圆形 + 人像 + 右下齿轮（集团/其他类客户） */
-  function round(uid) {
+  /* 圆形 + 人像 + 右下齿轮 */
+  function round() {
     var teeth = '';
     for (var i = 0; i < 8; i += 1) {
       teeth += '<rect x="29.2" y="20.4" width="2.4" height="3.4" rx="1" fill="#ffffff" transform="rotate(' + (i * 45) + ' 30.4 27.8)"/>';
@@ -44,13 +48,38 @@
       '</svg>';
   }
 
-  var DATA = [
-    ['个人全量客户', '2378', 'p'],
-    ['集团AB成员客户', '2378', 'r'],
-    ['新入网(T-6)客户', '1,600', 'p'],
-    ['中高档客户', '2378', 'r'],
-    ['宽带客户', '1,600', 'p'],
-    ['携转挽留中客户', '1,600', 'r']
+  /* 每个页签的配置：如何识别原生统计行、要隐藏哪些行、换成哪 6 张卡 */
+  var TABS = [
+    {
+      key: 'per',
+      start: '客户规模',
+      must: ['宽带客户规模', '离网客户规模'],
+      cardMark: '看结果',
+      hideFoot: false,
+      data: [
+        ['个人全量客户', '2378', 'p'],
+        ['集团AB成员客户', '2378', 'r'],
+        ['新入网(T-6)客户', '1,600', 'p'],
+        ['中高档客户', '2378', 'r'],
+        ['宽带客户', '1,600', 'p'],
+        ['携转挽留中客户', '1,600', 'r']
+      ]
+    },
+    {
+      key: 'xq',
+      start: '在管小区',
+      must: ['关联客户', '异动关注'],
+      cardMark: '小区健康率',
+      hideFoot: true,
+      data: [
+        ['小区(农村)数量', '2378', 'p'],
+        ['移动客户规模', '2378', 'r'],
+        ['宽带客户规模', '1,600', 'p'],
+        ['全球通客户规模', '2378', 'r'],
+        ['千兆小区数量', '1,600', 'p'],
+        ['合约客户规模', '1,600', 'r']
+      ]
+    }
   ];
 
   function injectStyle() {
@@ -61,20 +90,22 @@
     document.head.appendChild(s);
   }
 
-  function buildGrid() {
+  function buildGrid(cfg) {
     var wrap = document.createElement('div');
     wrap.id = GRID_ID;
-    for (var i = 0; i < DATA.length; i += 1) {
+    wrap.setAttribute('data-kr', cfg.key);
+    for (var i = 0; i < cfg.data.length; i += 1) {
       var c = document.createElement('div');
       c.className = 'kr-card';
-      c.innerHTML = '<div class="kr-txt"><div class="kr-t">' + DATA[i][0] + '</div><div class="kr-v">' + DATA[i][1] + '</div></div>' +
-        (DATA[i][2] === 'p' ? penta(i) : round(i));
+      c.innerHTML = '<div class="kr-txt"><div class="kr-t">' + cfg.data[i][0] + '</div>' +
+        '<div class="kr-v">' + cfg.data[i][1] + '</div></div>' +
+        (cfg.data[i][2] === 'p' ? penta() : round());
       wrap.appendChild(c);
     }
     return wrap;
   }
 
-  /* 仅「总览」页生效：总览 tab 选中时文字为蓝色 */
+  /* 仅「总览」生效：总览 tab 选中时文字为蓝色 */
   function isOverviewActive() {
     var els = document.querySelectorAll('#root div, #root span');
     var found = false;
@@ -91,47 +122,90 @@
     return found ? false : true;
   }
 
-  /* 离开「总览」时还原原生内容，避免影响其他标签页 */
+  function isRingRow(n) {
+    if (!n) return false;
+    var t = n.textContent || '';
+    if (t.length > 60) return false;
+    return t.indexOf('保有率') >= 0 || t.indexOf('健康率') >= 0 || t.indexOf('覆盖率') >= 0;
+  }
+
+  function isFootRow(n) {
+    if (!n) return false;
+    var t = (n.textContent || '').trim();
+    return t.indexOf('统计仅包含') === 0 && t.length < 100;
+  }
+
+  /* 离开「总览」/ 换页签时还原原生内容 */
   function restore() {
     var g = document.getElementById(GRID_ID);
     if (!g) return;
-    var row = g.nextElementSibling;
-    var ring = row && row.nextElementSibling;
-    if (row) { row.style.display = ''; row.__krDone = 0; }
-    if (ring && (ring.textContent || '').indexOf('保有率') >= 0) ring.style.display = '';
+    var hidden = g.__krHidden || [];
+    for (var i = 0; i < hidden.length; i += 1) {
+      if (!hidden[i]) continue;
+      if (hidden[i].style) hidden[i].style.display = '';
+      hidden[i].__krDone = 0;   /* 允许切回「总览」时重新注入 */
+    }
+    g.__krHidden = [];
     if (g.parentNode) g.parentNode.removeChild(g);
+  }
+
+  function hideNode(n, store) {
+    if (!n) return;
+    store.push(n);
+    n.style.display = 'none';
   }
 
   function apply() {
     injectStyle();
     if (!isOverviewActive()) { restore(); return; }
+
     var grid = document.getElementById(GRID_ID);
     if (grid) {
-      // 已注入：仅兜底修复原行/环图（React 重设 style 时），不做全量扫描
-      var row = grid.nextElementSibling;
-      if (row && (row.textContent || '').indexOf('离网客户规模') >= 0 && getComputedStyle(row).display !== 'none') row.style.display = 'none';
-      var ring = row && row.nextElementSibling;
-      if (ring && (ring.textContent || '').indexOf('保有率') >= 0 && getComputedStyle(ring).display !== 'none') ring.style.display = 'none';
+      /* 已注入：兜底修复（React 重设 display / 换页签后配置不一致） */
+      var cfg0 = null;
+      for (var c0 = 0; c0 < TABS.length; c0 += 1) if (TABS[c0].key === grid.getAttribute('data-kr')) cfg0 = TABS[c0];
+      if (!cfg0 || !grid.parentNode) { restore(); return; }
+      var hidden0 = grid.__krHidden || [];
+      for (var h = 0; h < hidden0.length; h += 1) {
+        if (hidden0[h] && hidden0[h].parentNode && hidden0[h].style.display !== 'none') hidden0[h].style.display = 'none';
+      }
       return;
     }
+
     var root = document.getElementById('root');
     if (!root) return;
     var nodes = root.querySelectorAll('div');
     for (var i = 0; i < nodes.length; i += 1) {
       var el = nodes[i];
       var t = el.textContent || '';
-      if (t.length > 60) continue;
-      if (t.slice(0, 4) !== '客户规模') continue;          // 仅命中「三列数字」这一行，避免误伤外层卡片
-      if (t.indexOf('宽带客户规模') < 0 || t.indexOf('离网客户规模') < 0) continue;
+      if (t.length > 70) continue;
+      var cfg = null;
+      for (var k = 0; k < TABS.length; k += 1) {
+        var cd = TABS[k];
+        if (t.slice(0, cd.start.length) !== cd.start) continue;
+        var allIn = true;
+        for (var m = 0; m < cd.must.length; m += 1) if (t.indexOf(cd.must[m]) < 0) { allIn = false; break; }
+        if (allIn) { cfg = cd; break; }
+      }
+      if (!cfg) continue;
       var card = el.parentElement;
       if (!card || el.__krDone) continue;
-      if ((card.textContent || '').indexOf('看结果') < 0) continue; // 必须落在「看结果」卡片内
+      if ((card.textContent || '').indexOf(cfg.cardMark) < 0) continue;
+
       el.__krDone = 1;
-      // 隐藏原「三列数字」与「三环图」，保留「看结果」标题行与「稳定度得分」行
-      el.style.display = 'none';
+      var store = [];
+      /* 数字行 + 三环图 +（小区）脚注 */
+      hideNode(el, store);
       var ring = el.nextElementSibling;
-      if (ring && (ring.textContent || '').indexOf('保有率') >= 0) ring.style.display = 'none';
-      card.insertBefore(buildGrid(), el);
+      if (isRingRow(ring)) {
+        hideNode(ring, store);
+        var foot = ring.nextElementSibling;
+        if (cfg.hideFoot && isFootRow(foot)) hideNode(foot, store);
+      }
+
+      var g = buildGrid(cfg);
+      g.__krHidden = store;
+      card.insertBefore(g, el);
       return;
     }
   }
@@ -149,5 +223,5 @@
     new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
   setInterval(apply, 900);
-  window.__krStatHook = 'v1';
+  window.__krStatHook = 'v2';
 })();
