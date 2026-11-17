@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <title>网格通 · 五角色工作台</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
@@ -104,7 +106,104 @@
       <iframe id="leaderReportFrame" src="about:blank" title="如美网格日报" style="border:0;width:100%;height:100%;display:block;background:#fff"></iframe>
     </div>
     <script src="./leader-report-bootstrap.js"></script>
-    <script src="./customer-profile-bootstrap.js"></script>
+    <script>
+      /* 个人客户画像入口（内联 v3：避免外部脚本被浏览器/CDN 缓存） */
+      (function () {
+        var opened = false, layer = null, frame = null, bindTimer = null;
+        function ensureLayer() {
+          layer = document.getElementById('customerProfileLayer');
+          if (!layer) {
+            layer = document.createElement('div');
+            layer.id = 'customerProfileLayer';
+            layer.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#fff;display:none;';
+            frame = document.createElement('iframe');
+            frame.id = 'customerProfileFrame';
+            frame.title = '个人客户画像';
+            frame.style.cssText = 'border:0;width:100%;height:100%;display:block;background:#f5f7fa;';
+            frame.src = 'about:blank';
+            layer.appendChild(frame);
+            document.body.appendChild(layer);
+          } else {
+            frame = document.getElementById('customerProfileFrame') || layer.querySelector('iframe');
+          }
+        }
+        function openProfile() {
+          if (opened) return;
+          ensureLayer();
+          opened = true;
+          frame.src = './customer-profile.html?v=3';
+          layer.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        }
+        function closeProfile() {
+          if (!opened || !layer) return;
+          opened = false;
+          layer.style.display = 'none';
+          frame.src = 'about:blank';
+          document.body.style.overflow = '';
+        }
+        function clickButton(label) {
+          var list = Array.prototype.slice.call(document.querySelectorAll('[role="button"],button'));
+          for (var i = 0; i < list.length; i += 1) {
+            if ((list[i].innerText || '').trim() === label || list[i].getAttribute('aria-label') === label) { list[i].click(); return true; }
+          }
+          return false;
+        }
+        window.addEventListener('message', function (e) {
+          if (!e || !e.data) return;
+          if (e.data.type === 'closeCustomerProfile') { closeProfile(); if (e.data.back) setTimeout(function () { clickButton('返回'); }, 20); }
+          if (e.data.type === 'openCustomerService') { closeProfile(); setTimeout(function () { if (!clickButton('为客户办理业务')) clickButton('业务受理'); }, 60); }
+        });
+        function isAskAi(node) {
+          var n = node;
+          for (var i = 0; i < 4 && n; i += 1, n = n.parentElement) {
+            if (!n.getAttribute) continue;
+            if ((n.getAttribute('role') === 'button' || n.tagName === 'BUTTON') && /询问AI|AI灵犀/.test((n.innerText || '').trim())) return true;
+          }
+          return false;
+        }
+        function handle(node) {
+          if (!node || !node.getAttribute) return false;
+          var n = node, text;
+          for (var i = 0; i < 8 && n; i += 1, n = n.parentElement) {
+            if (!n.getAttribute) continue;
+            text = (n.innerText || '').trim();
+            if (text.indexOf('个人客户画像') >= 0) return false;
+            if (/^客户画像/.test(text) && text.length < 400) {
+              if (isAskAi(node)) return false;
+              setTimeout(openProfile, 60);
+              return true;
+            }
+            if (text.length > 400) break;
+          }
+          return false;
+        }
+        ['click', 'pointerup', 'touchend'].forEach(function (type) {
+          document.addEventListener(type, function (e) { handle(e.target); }, true);
+        });
+        function bind() {
+          var all = document.querySelectorAll('div,span,a');
+          for (var i = 0; i < all.length; i += 1) {
+            var el = all[i];
+            if (el.__cpBound) continue;
+            var t = (el.innerText || '').trim();
+            if (t === '客户画像' || (/^客户画像\n/.test(t) && t.length < 400)) {
+              el.__cpBound = 1;
+              (function (node) {
+                node.addEventListener('click', function (ev) { if (!isAskAi(ev.target)) setTimeout(openProfile, 60); }, true);
+              })(el);
+            }
+          }
+        }
+        function scheduleBind() { if (bindTimer) return; bindTimer = setTimeout(function () { bindTimer = null; bind(); }, 250); }
+        document.addEventListener('DOMContentLoaded', bind);
+        window.addEventListener('load', bind);
+        if (window.MutationObserver) new MutationObserver(scheduleBind).observe(document.documentElement, { childList: true, subtree: true });
+        setInterval(bind, 2500);
+        window.__openCustomerProfile = openProfile;
+        window.__cpHook = 'v3';
+      })();
+    </script>
   <script src="./_expo/static/js/web/index-a5fa2269106122f621fd04202efca946.js" defer></script>
 </body>
 </html>
