@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>如美网格 · 日报</title>
+  <style>
+    :root{--blue:#0878ee;--blue-soft:#eaf5ff;--page:#e9f3ff;--ink:#25282d;--muted:#6f7782;--line:#e7ebef;--danger:#e74a3b;--orange:#ee9b1f;--green:#16a05d;--radius:16px}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#fff}
+    button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
+    .app{width:min(600px,100%);min-height:100vh;margin:0 auto;background:#fff}
+    .topbar{height:72px;display:grid;grid-template-columns:70px 1fr 100px;align-items:center;padding:0 16px;background:#fff}
+    .back{width:44px;height:44px;font-size:28px;color:#8e959d;display:grid;place-items:center}
+    .title{text-align:center;font-size:28px;line-height:1.2;font-weight:500;white-space:nowrap}
+    .records{justify-self:end;color:#4d80ef;font-size:16px;min-height:44px}
+    .filters{height:72px;padding:0 24px;display:grid;grid-template-columns:310px 1fr;align-items:center;gap:16px;background:#fff}
+    .segments{height:40px;background:#f5f6f8;border-radius:7px;display:grid;grid-template-columns:repeat(3,1fr);padding:2px}
+    .segment{border-radius:6px;color:#777;font-size:16px;min-height:36px}
+    .segment.active{background:#fff;color:#333;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+    .date-nav{display:grid;grid-template-columns:36px 1fr 36px;align-items:center;text-align:center;font-size:16px;font-weight:700;white-space:nowrap}
+    .date-nav button{min-width:36px;min-height:44px;color:#888;font-size:22px}
+    .content{background:var(--page);padding:16px;display:flex;flex-direction:column;gap:14px}
+    .card{background:#fff;border-radius:var(--radius);padding:16px}
+    h2{font-size:21px;line-height:1.35;margin:0 0 8px;font-weight:800}
+    .brief h2{color:#d44d3d;font-size:18px}
+    .hint{margin:0 0 10px;color:#737b85;font-size:11px;line-height:1.6}
+    .priority{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:14px 0}
+    .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;margin-top:2px}
+    .num.red{background:var(--danger)}.num.orange{background:var(--orange)}.num.blue{background:#4f80e8}
+    .priority-title{font-weight:800;font-size:13px;line-height:1.6}.priority-title.danger{color:#d94736}
+    .priority-meta,.priority-action{font-size:11px;line-height:1.65;color:#555}
+    .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .metric{min-height:88px;border-radius:9px;padding:9px;background:#f6f8fb;border:1px solid #e9edf2}
+    .metric.warn{background:#fffaf2;border-color:#f2d7a8}
+    .metric-label{font-size:11px;color:#5f6872;margin-bottom:3px;white-space:nowrap}
+    .metric-line{display:flex;align-items:baseline;justify-content:space-between;gap:4px}
+    .metric-value{font-size:19px;font-weight:800;color:#19365a}.metric-target{font-size:11px;font-weight:500;color:#959ca5}.metric-gap{font-size:9px;font-weight:800;color:#e64b40;white-space:nowrap}.metric-gap.ok{color:var(--green)}
+    .track{height:6px;border-radius:4px;background:#e8edf6;overflow:hidden;margin:5px 0}.bar{height:100%;border-radius:4px;background:#6275e8}.warn .bar{background:#e9a126}
+    .metric-foot{font-size:10px;color:#5f6872;white-space:nowrap}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px}
+    .collapse{width:42px;height:42px;position:relative;flex:0 0 auto}
+    .collapse:before,.collapse:after{content:"";position:absolute;top:17px;width:20px;height:5px;background:#000;border-radius:3px;transition:.2s}
+    .collapse:before{left:5px;transform:rotate(45deg)}.collapse:after{right:5px;transform:rotate(-45deg)}
+    .collapsed .collapse:before{transform:rotate(-45deg)}.collapsed .collapse:after{transform:rotate(45deg)}
+    .speech-intro{font-size:11px;color:#737b85;margin:0 0 9px}
+    .speech-body{display:flex;flex-direction:column;gap:10px}
+    .speech-block{background:#e7f1ff;border-radius:11px;padding:11px;font-size:13px;line-height:1.6}
+    .speech-block h3{font-size:13px;color:#5265dc;margin:0 0 6px}.speech-block p{margin:0}.speech-block strong{font-weight:800}
+    .edit-area{width:100%;min-height:120px;border:1px solid #bcd6fa;border-radius:9px;padding:10px;font:inherit;line-height:1.6;resize:vertical;color:var(--ink);background:#fff}
+    .wide-btn,.pair button{min-height:44px;border-radius:10px;background:#e7f4ff;color:#0072ed;font-size:13px;font-weight:700;display:grid;place-items:center}
+    .wide-btn{width:100%;margin-top:10px}.wide-btn.primary{background:#0877da;color:#fff}
+    .anomaly{border:1px solid #ffc2ba;background:#fff8f6;border-radius:11px;padding:11px;margin-top:10px}
+    .tag{display:inline-flex;align-items:center;min-height:22px;padding:2px 9px;border-radius:5px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;margin-right:8px}.tag.red{background:#ed1430}.tag.blue{background:#1689ee}.tag.orange{background:#ef9f25}
+    .anomaly-title,.task-title{font-size:13px;font-weight:800}.small{font-size:10px;color:#626b74;line-height:1.7;margin:6px 0}.desc{font-size:13px;line-height:1.6;margin:7px 0 9px}
+    .pair{display:grid;grid-template-columns:1fr 1fr;gap:38px}.pair.single{grid-template-columns:1fr;gap:0}
+    .pair button.white{background:#fff}
+    .task{border:1px solid #5fa3ff;background:#e7f2ff;border-radius:11px;padding:11px;margin-top:10px}.task.urgent{border-color:#ffc1b9;background:#fff8f6}
+    .quick-link{color:#0878ee;font-size:12px;white-space:nowrap}
+    .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+    .quick{min-height:112px;border-radius:11px;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;color:#999}
+    .quick strong{font-size:24px;color:#111;margin:6px 0}.quick em{font-style:normal;font-size:15px}.up{color:#79c84b}.down{color:#e55e65}.good{color:#70c54e}.bad{color:#ef6c61}
+    .footer-actions{padding:34px 35px 24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff}
+    .footer-actions button{min-height:50px;border-radius:11px;background:#e7f4ff;color:#0072ed;font-size:14px;font-weight:700}.footer-actions .submit{background:#0877d8;color:#fff}
+    .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:rgba(25,31,40,.9);color:#fff;padding:11px 18px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:10;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .subpage{display:none;min-height:100vh;background:#f6f8fb}.subpage.active{display:block}.report-page.hidden{display:none}.sub-head{height:64px;display:grid;grid-template-columns:60px 1fr 60px;align-items:center;background:#fff;padding:0 12px;border-bottom:1px solid #eee}.sub-head h1{text-align:center;font-size:20px;margin:0}.sub-content{padding:16px}.history-row,.team-row{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px}.history-row b,.team-row b{font-size:15px}.history-row p,.team-row p{font-size:12px;color:#707782;margin:6px 0 0}
+    @media(max-width:520px){.topbar{grid-template-columns:54px 1fr 82px;padding:0 8px}.title{font-size:21px}.records{font-size:14px}.filters{height:112px;padding:8px 16px;grid-template-columns:1fr;gap:4px}.content{padding:10px;gap:10px}.card{padding:13px}.metric-grid{gap:5px}.metric{padding:7px}.metric-label{font-size:10px}.metric-value{font-size:16px}.metric-foot{font-size:9px}.pair{gap:10px}.quick-grid{gap:5px}.quick{padding:5px}.quick strong{font-size:20px}.footer-actions{padding:24px 16px}.priority-title,.desc,.speech-block{font-size:12px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <section class="report-page" id="reportPage">
+    <header class="topbar"><button class="back" id="backBtn" aria-label="返回">‹</button><div class="title" id="pageTitle">如美网格 · 日报</div><button class="records" data-view="history">报告记录 ›</button></header>
+    <div class="filters">
+      <div class="segments" role="tablist"><button class="segment active" data-period="day">日报</button><button class="segment" data-period="week">周报</button><button class="segment" data-period="month">月报</button></div>
+      <div class="date-nav"><button id="prevDate" aria-label="上一期">‹</button><span id="dateLabel">2026-11-11</span><button id="nextDate" aria-label="下一期">›</button></div>
+    </div>
+    <div class="content">
+      <section class="card brief">
+        <h2>网格长晨会简报</h2><p class="hint">同一快照提炼 · 点击可下钻到指标依据或业务明细</p>
+        <div class="priority"><span class="num red">1</span><div><div class="priority-title danger">指标缺口 · 宽带新增距目标差8</div><div class="priority-meta">已完成24/32，完成率75%，时间进度100%</div><div class="priority-action">核实宽带新增缺口对象与原因，明确当日推进安排</div></div></div>
+        <div class="priority"><span class="num orange">2</span><div><div class="priority-title">指标缺口 · 5G套包达成率距目标差4</div><div class="priority-meta">已完成8/12，完成率67%，时间进度100%</div><div class="priority-action">核实5G套包达成率缺口对象与原因，明确当日推进安排</div></div></div>
+        <div class="priority"><span class="num blue">3</span><div><div class="priority-title">指标缺口 · 宽带保有率距目标差6.6</div><div class="priority-meta">已完成78.4/85，完成率92%，时间进度100%</div><div class="priority-action">核实宽带保有率缺口对象与原因，明确当日推进安排</div></div></div>
+      </section>
+
+      <section class="card"><h2>整体经营情况</h2><div class="metric-grid" id="metricGrid"></div></section>
+
+      <section class="card" id="speechCard">
+        <div class="section-head"><h2>AI 晨会发言框架</h2><button class="collapse" id="speechToggle" aria-label="收起AI晨会发言框架"></button></div>
+        <p class="speech-intro">完成情况、主要问题、工作安排均引用当前报告快照，点击编辑可调整。</p>
+        <div class="speech-body" id="speechBody"></div>
+        <button class="wide-btn" id="editSpeech">编辑</button>
+      </section>
+
+      <section class="card"><h2>AI识别异常指标</h2><div id="anomalies"></div><button class="wide-btn" data-toast="已展开全部6项异常">查看全部6项异常</button></section>
+
+      <section class="card"><h2>团队未完成事项及重点工作</h2><div id="tasks"></div></section>
+
+      <section class="card"><div class="section-head"><h2>团队快速一览</h2><button class="quick-link" data-view="team">→ 点击切换到团队日报看完整汇总</button></div><div class="quick-grid">
+        <div class="quick">团队均值<strong>82%</strong><em class="up">▲ +5%</em></div>
+        <div class="quick">落后成员<strong>2人</strong><em class="down">● 李四<br>65%</em></div>
+        <div class="quick">标杆成员<strong>1人</strong><em class="good">王小明<br>120%</em></div>
+        <div class="quick">待处理异常<strong>3件</strong><em class="bad">P0 3件</em></div>
+      </div></section>
+    </div>
+    <div class="footer-actions"><button class="submit" data-toast="报告已提交">提交报告</button><button id="exportReport">导出报告文本</button></div>
+  </section>
+
+  <section class="subpage" id="historyPage"><header class="sub-head"><button data-back-sub>‹</button><h1>报告记录</h1><span></span></header><div class="sub-content"><div class="history-row"><b>如美网格 · 日报</b><p>2026-11-11 · 已提交</p></div><div class="history-row"><b>如美网格 · 周报</b><p>2026年第45周 · 已提交</p></div><div class="history-row"><b>如美网格 · 月报</b><p>2026年10月 · 已提交</p></div></div></section>
+  <section class="subpage" id="teamPage"><header class="sub-head"><button data-back-sub>‹</button><h1>团队日报完整汇总</h1><span></span></header><div class="sub-content"><div class="team-row"><b>王小明 · 标杆成员</b><p>完成率120% · 宽带转化经验待分享</p></div><div class="team-row"><b>张三 · 网格经理</b><p>1个SLA明日到期 · 处理中60%</p></div><div class="team-row"><b>李四 · 落后成员</b><p>完成率65% · 需重点帮扶</p></div><div class="team-row"><b>赵六 · 网格经理</b><p>今日拜访记录缺失 · 待补录</p></div></div></section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+  const metrics=[['收入完成率','86','100','差14',86,false,true],['宽带新增','24','32','缺8',75,true],['融合保有率','96','95','达标',100,false,true],['5G套包达成率','8','12','缺4',67,true],['客户份额','52.1','52','达标',100,false,true],['宽带保有率','78.4','85','缺6.6',92,true],['日必达达成率','78','100','缺22',78,true],['综合考核得分','44.6','60','缺15.4',74,true],['攻坚日均新增','68','81','缺13',84,true]];
+  document.getElementById('metricGrid').innerHTML=metrics.map(m=>`<div class="metric ${m[5]?'warn':''}"><div class="metric-label">${m[0]}</div><div class="metric-line"><span class="metric-value">${m[1]}<span class="metric-target">/${m[2]}</span></span><span class="metric-gap ${m[6]?'ok':''}">${m[3]}</span></div><div class="track"><div class="bar" style="width:${Math.min(m[4],100)}%"></div></div><div class="metric-foot">${m[4]} % · 时间进度 100 %</div></div>`).join('');
+  const speech=[
+    ['一、完成情况','昨天团队收入完成率86%，融合保有率101%，客户份额100%，这两项达标表现不错。\n但不少指标拖了后腿：宽带新增只完成75%，差了8户；5G套包达成率67%，缺口4户；宽带保有率92%，还差6.6个点；日必达、综合考核、攻坚日均新增都存在不同程度差距。\n这里重点说下人员差距—王小明120%领跑全队，但李四只有65%，比团队均值低了17个百分点，主要差在宽带新增和商机转化上。目前还有28笔欠费催收待分派、3件异常待处理。'],
+    ['二、主要问题','三件事要盯死：第一，宽带新增、5G套包、宽带保有率三大核心指标缺口大，当日必须拿出推进动作补缺口；第二，重点事项闭环风险高，28笔欠费催收今天必须分派到10名网格经理，张三那张SLA工单明天12点前要闭环，刘总集团商机已经停滞7天没进展；第三，团队两极分化明显，李四短板突出，再不跟进会拖整体进度。'],
+    ['三、工作安排','1. 指标攻坚：梳理宽带新增、5G套包、宽带保有缺口客户，现场落实责任人；单独对齐李四，找准卡点、评估帮扶资源。\n2. 风险清收：优先处置逾期工单与任务，补齐 4 份订单资料；保障 SLA 投诉工单按时闭环，避免考核超时。\n3. 重点事项：完成 28 笔欠费催收分派；确定刘总商机对接人，启动区县协同；补齐缺失拜访记录。\n4. 标杆带动：安排王小明准备宽带转化经验，后续团队内分享。']
+  ];
+  const renderSpeech=edit=>{document.getElementById('speechBody').innerHTML=speech.map((s,i)=>`<div class="speech-block"><h3>${s[0]}</h3>${edit?`<textarea class="edit-area" data-speech="${i}">${s[1]}</textarea>`:`<p>${s[1].replaceAll('\n','<br>')}</p>`}</div>`).join('')};renderSpeech(false);
+  const anomalyData=[['指标缺口 · 宽带新增距目标差8','已完成24/32，完成率75%，时间进度100%','核实宽带新增缺口对象与原因，明确当日推进安排'],['指标缺口 · 5G套包达成率距目标差4','已完成8/12，完成率67%，时间进度100%','核实5G套包达成率缺口对象与原因，明确当日推进安排'],['指标缺口 · 宽带保有率距目标差6.6','已完成78.4/85，完成率92%，时间进度100%','核实宽带保有率缺口对象与原因，明确当日推进安排']];
+  document.getElementById('anomalies').innerHTML=anomalyData.map(a=>`<div class="anomaly"><div><span class="tag">高风险</span><span class="anomaly-title">${a[0]}</span></div><div class="small">${a[1]}</div><div class="desc">${a[2]}</div><div class="pair"><button data-toast="已发起攻坚">发起攻坚</button><button class="white" data-toast="已打开指标明细">查看明细</button></div></div>`).join('');
+  const tasks=[
+    {tag:'重点工作',tagClass:'red',title:'欠费催收 28 笔 · 一键分派',desc:'紧急：今日内必须分派给10名网格经理',urgent:true,buttons:['分派']},
+    {tag:'未完成事项',tagClass:'blue',title:'张三 · 1个SLA明日到期',desc:'客户投诉工单(WO20261112)明日12:00前必须闭环,当前状态:处理中60%',buttons:['发起提醒','查看工单详情']},
+    {tag:'未完成事项',tagClass:'blue',title:'刘总集团商机停滞7天',desc:'客户此前表示需等集团总部审批，当前无进展，建议安排区县侧协同推进',buttons:['安排协同','查看商机']},
+    {tag:'未完成事项',tagClass:'blue',title:'赵六 · 今日拜访记录缺失',desc:'检测到签到2次但未提交拜访记录，可能遗漏客户需求',buttons:['发起提醒','查看工单详情']}
+  ];
+  document.getElementById('tasks').innerHTML=tasks.map(t=>`<div class="task ${t.urgent?'urgent':''}"><div><span class="tag ${t.tagClass}">${t.tag}</span><span class="task-title">${t.title}</span></div><div class="desc">${t.desc}</div><div class="pair ${t.buttons.length===1?'single':''}">${t.buttons.map((b,i)=>`<button class="${i?'white':''}" data-toast="${b}操作已记录">${b}</button>`).join('')}</div></div>`).join('');
+  const toast=document.getElementById('toast');let toastTimer;function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}
+  document.addEventListener('click',e=>{const el=e.target.closest('[data-toast]');if(el)showToast(el.dataset.toast)});
+  document.getElementById('speechToggle').onclick=()=>{const card=document.getElementById('speechCard');card.classList.toggle('collapsed');document.getElementById('speechBody').style.display=card.classList.contains('collapsed')?'none':'flex';document.getElementById('editSpeech').style.display=card.classList.contains('collapsed')?'none':'grid'};
+  let editing=false;document.getElementById('editSpeech').onclick=e=>{if(editing){document.querySelectorAll('[data-speech]').forEach(x=>speech[+x.dataset.speech][1]=x.value);editing=false;renderSpeech(false);e.target.textContent='编辑';showToast('发言框架已保存')}else{editing=true;renderSpeech(true);e.target.textContent='保存'}};
+  let period='day';let date=new Date(2026,10,11);const PERIOD_TITLE={day:'日报',week:'周报',month:'月报'};
+  function fmtDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  function isoWeek(dt){const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));const day=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-day+3);const first=new Date(Date.UTC(d.getUTCFullYear(),0,4));const fd=(first.getUTCDay()+6)%7;first.setUTCDate(first.getUTCDate()-fd+3);return{year:d.getUTCFullYear(),week:1+Math.round((d-first)/6048e5)}}
+  function periodLabel(){if(period==='day')return fmtDate(date);if(period==='week'){const w=isoWeek(date);return `${w.year}年第${w.week}周`}return `${date.getFullYear()}年${date.getMonth()+1}月`}
+  function renderPeriod(){document.querySelectorAll('[data-period]').forEach(b=>b.classList.toggle('active',b.dataset.period===period));document.getElementById('dateLabel').textContent=periodLabel();document.getElementById('pageTitle').textContent=`如美网格 · ${PERIOD_TITLE[period]}`;document.title=`如美网格 · ${PERIOD_TITLE[period]}`}
+  function setDate(step){if(period==='day')date.setDate(date.getDate()+step);else if(period==='week')date.setDate(date.getDate()+step*7);else date.setMonth(date.getMonth()+step);renderPeriod()}
+  document.getElementById('prevDate').onclick=()=>setDate(-1);document.getElementById('nextDate').onclick=()=>setDate(1);
+  document.querySelectorAll('[data-period]').forEach(btn=>btn.onclick=()=>{period=btn.dataset.period;renderPeriod()});renderPeriod();
+  function openView(name){document.getElementById('reportPage').classList.add('hidden');document.getElementById(name+'Page').classList.add('active');scrollTo(0,0)}function closeView(){document.querySelectorAll('.subpage').forEach(x=>x.classList.remove('active'));document.getElementById('reportPage').classList.remove('hidden');scrollTo(0,0)}
+  document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>openView(x.dataset.view));document.querySelectorAll('[data-back-sub]').forEach(x=>x.onclick=closeView);
+  document.getElementById('backBtn').onclick=()=>parent.postMessage({type:'closeLeaderReport',back:true},'*');
+  document.getElementById('exportReport').onclick=()=>{const text=[`如美网格 · ${PERIOD_TITLE[period]}`,periodLabel(),'网格长晨会简报',...anomalyData.map(x=>x.join('｜')),...speech.map(x=>x[0]+'\n'+x[1])].join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download=`如美网格${PERIOD_TITLE[period]}_${periodLabel()}.txt`;a.click();URL.revokeObjectURL(a.href);showToast('报告文本已导出')};
+</script>
+</body>
+</html>
