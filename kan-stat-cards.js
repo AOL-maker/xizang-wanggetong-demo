@@ -1,6 +1,7 @@
 /* 客户看管 · 总览：统计区 6 卡化（两列三行）
    - 个人 · 总览：「看结果」卡片内 客户规模/宽带客户规模/离网客户规模 + 三环图 → 6 卡
    - 小区 · 总览：在管小区/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
+   - 园楼 · 总览：在管园楼/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
    其余区域（标题行、稳定度得分、快捷查询、列表）保持原样。 */
 (function () {
   var STYLE_ID = 'krStatStyle';
@@ -79,6 +80,21 @@
         ['千兆小区数量', '1,600', 'p'],
         ['合约客户规模', '1,600', 'r']
       ]
+    },
+    {
+      key: 'yl',
+      start: '在管园楼',
+      must: ['关联客户', '异动关注'],
+      cardMark: '园楼健康率',
+      hideFoot: true,
+      data: [
+        ['楼宇(园区)数量', '2378', 'p'],
+        ['楼宇(园区)企业数', '2378', 'r'],
+        ['建档集团数', '1,600', 'p'],
+        ['企业渗透数', '2378', 'r'],
+        ['企业渗透率', '91.23%', 'p'],
+        ['企业成员数', '1,600', 'r']
+      ]
     }
   ];
 
@@ -103,6 +119,28 @@
       wrap.appendChild(c);
     }
     return wrap;
+  }
+
+  /* 当前一级页签（个人/小区/园楼/集团/家庭）→ 对应配置 key
+     注意：RN 会把其它页签的页面留在 DOM 里（隐藏），必须靠高亮色判断当前页，
+     否则切换页签后会把上一页的 grid 当成当前页的而不再重建。 */
+  var TYPE_KEY = { '个人': 'per', '小区': 'xq', '园楼': 'yl' };
+  var TOP_NAMES = ['个人', '小区', '园楼', '集团', '家庭'];
+
+  function activeTopType() {
+    var btns = document.querySelectorAll('#root button');
+    var found = undefined, foundW = -1;
+    for (var i = 0; i < btns.length; i += 1) {
+      var t = (btns[i].textContent || '').trim();
+      if (TOP_NAMES.indexOf(t) < 0) continue;
+      if (!btns[i].getClientRects().length) continue;
+      var inner = btns[i].querySelector('div') || btns[i];
+      var m = (getComputedStyle(inner).color || '').match(/(\d+),\s*(\d+),\s*(\d+)/);
+      if (!m || !(+m[3] > +m[1] + 40 && +m[3] > 120)) continue;
+      var w = btns[i].parentNode ? btns[i].parentNode.getBoundingClientRect().width : 0;
+      if (w > foundW) { found = t; foundW = w; }
+    }
+    return found;   /* undefined = 识别不到（过渡态），null 不会出现 */
   }
 
   /* 仅「总览」生效：总览 tab 选中时文字为蓝色 */
@@ -159,18 +197,29 @@
     injectStyle();
     if (!isOverviewActive()) { restore(); return; }
 
+    var type = activeTopType();
+    var want;                                  /* undefined = 判断不出当前页，沿用现状 */
+    if (type) want = TYPE_KEY.hasOwnProperty(type) ? TYPE_KEY[type] : null;
+
     var grid = document.getElementById(GRID_ID);
     if (grid) {
-      /* 已注入：兜底修复（React 重设 display / 换页签后配置不一致） */
-      var cfg0 = null;
-      for (var c0 = 0; c0 < TABS.length; c0 += 1) if (TABS[c0].key === grid.getAttribute('data-kr')) cfg0 = TABS[c0];
-      if (!cfg0 || !grid.parentNode) { restore(); return; }
-      var hidden0 = grid.__krHidden || [];
-      for (var h = 0; h < hidden0.length; h += 1) {
-        if (hidden0[h] && hidden0[h].parentNode && hidden0[h].style.display !== 'none') hidden0[h].style.display = 'none';
+      var gridKey = grid.getAttribute('data-kr');
+      /* 当前页与已注入的配置不一致（切了页签）→ 先还原，再按新页签重建 */
+      if (want !== undefined && want !== gridKey) {
+        restore();
+      } else {
+        /* 已注入：兜底修复（React 重设 display） */
+        var cfg0 = null;
+        for (var c0 = 0; c0 < TABS.length; c0 += 1) if (TABS[c0].key === gridKey) cfg0 = TABS[c0];
+        if (!cfg0 || !grid.parentNode) { restore(); return; }
+        var hidden0 = grid.__krHidden || [];
+        for (var h = 0; h < hidden0.length; h += 1) {
+          if (hidden0[h] && hidden0[h].parentNode && hidden0[h].style.display !== 'none') hidden0[h].style.display = 'none';
+        }
+        return;
       }
-      return;
     }
+    if (want === null) return;                 /* 该页签暂无配置（集团/家庭）*/
 
     var root = document.getElementById('root');
     if (!root) return;
@@ -223,5 +272,5 @@
     new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
   setInterval(apply, 900);
-  window.__krStatHook = 'v2';
+  window.__krStatHook = 'v3';
 })();
