@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>个人客户画像</title>
+  <style>
+    :root{--blue:#2e7cf6;--blue-deep:#1a6ef0;--ink:#1d2430;--text:#3c4654;--muted:#8a939e;--line:#eef1f5;--radius:16px}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#f5f7fa}
+    button{font:inherit;border:0;background:none;color:inherit;cursor:pointer;padding:0}
+    .app{width:min(600px,100%);min-height:100vh;margin:0 auto;background:#f5f7fa}
+    .hero{background:linear-gradient(165deg,#dcecfc 0%,#e8f3fe 58%,#eef5fe 100%);padding-bottom:18px}
+    .topbar{height:56px;display:grid;grid-template-columns:64px 1fr 64px;align-items:center;padding:0 8px}
+    .back{width:48px;height:44px;font-size:26px;color:#3c4654;display:grid;place-items:center;margin-left:4px}
+    .title{text-align:center;font-size:19px;font-weight:600}
+    .cust-card{margin:6px 14px 0;background:#fff;border-radius:var(--radius);padding:16px 14px;display:grid;grid-template-columns:1fr 52px;gap:8px;box-shadow:0 6px 18px rgba(26,110,240,.08)}
+    .cust-head{display:flex;gap:12px;align-items:flex-start}
+    .avatar{width:46px;height:46px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 35% 30%,#7db6f9,#2e7cf6 70%);display:grid;place-items:center}
+    .avatar svg{width:26px;height:26px}
+    .cust-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+    .cust-name{display:flex;align-items:baseline;gap:10px;font-size:20px;font-weight:700}
+    .cust-name .sep{color:#c6d2e2;font-weight:400}
+    .cust-name .num{color:var(--blue);font-size:16px;font-weight:500}
+    .grid-line{font-size:12.5px;color:#55606d}
+    .tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tags span{background:#f0f4f9;border-radius:6px;padding:4px 10px;font-size:11.5px;color:#4a5563}
+    .guardian{font-size:13px;color:#4a5563}
+    .guardian a{color:var(--blue);text-decoration:none}
+    .guardian .sep{color:#c6d2e2;margin:0 4px}
+    .call{width:46px;height:46px;border-radius:50%;background:var(--blue);display:grid;place-items:center;align-self:start;margin-top:6px;box-shadow:0 4px 10px rgba(46,124,246,.35);transition:transform .15s}
+    .call:active{transform:scale(.92)}
+    .call svg{width:22px;height:22px}
+    .body{padding:14px;display:flex;flex-direction:column;gap:14px}
+    .card{background:#fff;border-radius:var(--radius);padding:16px 14px}
+    .stats{background:#f7f9fb;border-radius:12px;padding:14px 6px;display:grid;grid-template-columns:repeat(3,1fr)}
+    .stats>div{text-align:center}
+    .stats b{font-size:22px;font-weight:800;letter-spacing:-.3px}
+    .stats small{font-size:11px;color:#8a939e;margin-left:4px}
+    .stats span{display:block;margin-top:5px;font-size:12.5px;color:#6b7480}
+    .card-title{font-size:16px;font-weight:700;margin-bottom:12px}
+    .basic-rows{display:flex;flex-direction:column;gap:13px}
+    .basic-rows .row{display:grid;grid-template-columns:118px 1fr;align-items:center;font-size:13.5px}
+    .basic-rows .k{color:#2b3440;font-weight:600}
+    .basic-rows .v{color:#4a5563}
+    .badge{display:inline-block;background:#dcebfc;color:#3a7bd5;border-radius:6px;padding:3px 9px;font-size:12px}
+    .bar-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;margin-bottom:13px}
+    .bar-title:before{content:"";width:4px;height:16px;border-radius:2px;background:var(--blue)}
+    .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+    .svc-grid button{min-height:38px;border-radius:9px;background:#eff4fa;color:#3c4654;font-size:13px;display:grid;place-items:center;transition:background .15s}
+    .svc-grid button:active{background:#e2ebf5}
+    .tabs{display:flex;align-items:center;gap:22px;border-bottom:1px solid var(--line);padding-bottom:0;margin-bottom:14px}
+    .tabs button{position:relative;padding:10px 0 12px;font-size:14.5px;color:#3c4654;white-space:nowrap}
+    .tabs button.active{color:var(--blue);font-weight:700}
+    .tabs button.active:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:var(--blue)}
+    .tabs .more{margin-left:auto;font-size:13.5px;color:#55606d}
+    .portrait{border-radius:14px;padding:14px 13px;background:linear-gradient(140deg,#e6f1fd 0%,#f3f9ff 45%,#eef5fe 100%);margin-bottom:14px;position:relative;overflow:hidden}
+    .portrait:before{content:"";position:absolute;right:-30px;top:-20px;width:150px;height:150px;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:rotate(0deg)}
+    .p-head{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:700;margin-bottom:13px}
+    .p-head .ico{width:22px;height:22px;display:grid;place-items:center}
+    .p-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;position:relative}
+    .p-grid .item .k{font-size:12.5px;color:#4a5563;line-height:1.5}
+    .p-grid .item .v{font-size:14px;color:#39434f;margin-top:3px}
+    .fold{display:flex;align-items:center;justify-content:center;gap:7px;color:#8a939e;font-size:13.5px;padding:6px 0 2px;width:100%}
+    .fold svg{transition:transform .25s}
+    .folded .fold svg{transform:rotate(180deg)}
+    .folded .portrait-wrap{display:none}
+    .iop-title{font-size:16px;font-weight:700;margin-bottom:12px}
+    .rec-name{font-size:14.5px;font-weight:700;line-height:1.55;margin-bottom:10px}
+    .rec-label{display:flex;align-items:center;gap:6px;color:var(--blue);font-size:13px;font-weight:600;margin-bottom:8px}
+    .rec-label svg{width:15px;height:15px}
+    .rec-text{font-size:13px;line-height:1.85;color:#4a5563;margin:0}
+    .rec-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:10px 0 16px}
+    .apply{background:linear-gradient(180deg,#3f8cfa,#2579f2);color:#fff;font-size:13px;font-weight:600;border-radius:8px;padding:8px 16px;box-shadow:0 3px 8px rgba(37,121,242,.3);transition:transform .15s}
+    .apply:active{transform:scale(.95)}
+    .detail{display:inline-flex;align-items:center;gap:3px;color:#55606d;font-size:13px}
+    .rec-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+    .rec-row .name{flex:1;font-size:14.5px;font-weight:700}
+    .rec-row:first-of-type{border-top:0}
+    .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:rgba(25,31,40,.9);color:#fff;padding:11px 18px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:10;white-space:nowrap;max-width:88vw}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:520px){.topbar{grid-template-columns:48px 1fr 48px}.title{font-size:17.5px}.cust-card{margin:4px 10px 0}.cust-name{font-size:18px}.cust-name .num{font-size:14.5px}.grid-line{font-size:11.5px}.tags span{font-size:10.5px;padding:3px 8px}.guardian{font-size:12px}.stats b{font-size:19px}.stats span{font-size:11px}.basic-rows .row{grid-template-columns:104px 1fr;font-size:12.5px}.svc-grid{gap:8px}.svc-grid button{font-size:12px;min-height:34px}.tabs{gap:14px}.tabs button{font-size:13.5px}.rec-text{font-size:12px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <section class="page" id="profilePage">
+    <div class="hero">
+      <div class="topbar"><button class="back" id="backBtn" aria-label="返回">‹</button><div class="title">个人客户画像</div><span></span></div>
+      <div class="cust-card">
+        <div class="cust-head">
+          <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2.1c-3.9 0-7.2 2.4-7.2 5.4 0 .5.4.9.9.9h12.6c.5 0 .9-.4.9-.9 0-3-3.3-5.4-7.2-5.4Z"/></svg></div>
+          <div class="cust-main">
+            <div class="cust-name">张三<span class="sep">|</span><span class="num">130****0241</span></div>
+            <div class="grid-line">归属网格:昌都市-芒康县-芒康县片区-如美网格</div>
+            <div class="tags"><span>5G网络用户</span><span>家庭套餐主卡</span><span>家庭套餐主卡</span></div>
+            <div class="guardian">看护人: <a href="javascript:void(0)" id="guardianLink">张明</a><span class="sep">|</span>198****8981<span class="sep">|</span>网格经理</div>
+          </div>
+        </div>
+        <button class="call" id="callBtn" aria-label="拨打客户电话"><svg viewBox="0 0 24 24" fill="#fff"><path d="M6.6 3.2c.5-.5 1.3-.6 1.9-.2l2.6 1.7c.7.5.9 1.4.5 2.1l-1 1.7c-.2.4-.2.9.1 1.3a15 15 0 0 0 4.1 4.1c.4.3.9.3 1.3.1l1.7-1c.7-.4 1.6-.2 2.1.5l1.7 2.6c.4.6.3 1.4-.2 1.9l-1.5 1.5c-.8.8-2 1.1-3 .7-2.7-1-5.4-2.8-7.8-5.2S5.5 10.4 4.5 7.7c-.4-1-.1-2.2.7-3l1.4-1.5Z"/></svg></button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="card"><div class="stats">
+        <div><b>0</b><small>MB</small><span>通用流量剩余</span></div>
+        <div><b>12.11</b><small>元</small><span>话费余额</span></div>
+        <div><b>12</b><small>豆</small><span>AI豆</span></div>
+      </div></div>
+
+      <div class="card basic">
+        <div class="card-title">基础信息:</div>
+        <div class="basic-rows">
+          <div class="row"><span class="k">客户套餐:</span><span class="v">199.00套餐</span></div>
+          <div class="row"><span class="k">入网时间:</span><span class="v">2025年10月30日</span></div>
+          <div class="row"><span class="k">全球通级别:</span><span class="v"><span class="badge">全球通钻石卡</span></span></div>
+          <div class="row"><span class="k">是否外呼敏感:</span><span class="v">否</span></div>
+          <div class="row"><span class="k">用户标识:</span><span class="v">13036780241</span></div>
+          <div class="row"><span class="k">常驻地小区:</span><span class="v">板塘安置小区</span></div>
+          <div class="row"><span class="k">用户状态:</span><span class="v">欠费预销号</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="bar-title">客户服务</div>
+        <div class="svc-grid">
+          <button data-svc="账单详情">账单详情</button><button data-svc="订单查询">订单查询</button><button data-svc="办卡记录">办卡记录</button>
+          <button data-svc="缴费记录">缴费记录</button><button data-svc="实名核验">实名核验</button><button data-svc="5G状态">5G状态</button>
+          <button data-svc="近一年办卡情况">近一年办卡情况</button><button data-svc="历史办卡记录">历史办卡记录</button><button data-svc="宽带密码查询">宽带密码查询</button>
+        </div>
+      </div>
+
+      <div class="card" id="portraitCard">
+        <div class="tabs" role="tablist">
+          <button class="active" data-tab="服务画像">服务画像</button>
+          <button data-tab="消费画像">消费画像</button>
+          <button data-tab="家庭画像">家庭画像</button>
+          <button data-tab="产品画像">产品画像</button>
+          <button class="more" data-tab="更多">更多</button>
+        </div>
+        <div class="portrait-wrap">
+          <div class="portrait">
+            <div class="p-head"><span class="ico"><svg viewBox="0 0 24 24" fill="#2e7cf6"><circle cx="12" cy="12" r="4"/><path d="M12 2a10 10 0 0 1 8.6 4.9l-3 1.8A6.5 6.5 0 0 0 12 5.5V2Zm8.6 4.9A10 10 0 0 1 22 12h-3.5a6.5 6.5 0 0 0-1-3.4l3.1-1.7Z" opacity=".55"/></svg></span>看饱和</div>
+            <div class="p-grid">
+              <div class="item"><div class="k">上月语音</div><div class="v">14.25%</div></div>
+              <div class="item"><div class="k">本月语音</div><div class="v">0%</div></div>
+              <div class="item"><div class="k">上月流量</div><div class="v">33%</div></div>
+              <div class="item"><div class="k">本月流量</div><div class="v">0%</div></div>
+            </div>
+          </div>
+          <div class="portrait">
+            <div class="p-head"><span class="ico"><svg viewBox="0 0 24 24" fill="#2e7cf6"><circle cx="12" cy="12" r="4"/><path d="M12 2a10 10 0 0 1 8.6 4.9l-3 1.8A6.5 6.5 0 0 0 12 5.5V2Zm8.6 4.9A10 10 0 0 1 22 12h-3.5a6.5 6.5 0 0 0-1-3.4l3.1-1.7Z" opacity=".55"/></svg></span>看融合</div>
+            <div class="p-grid">
+              <div class="item"><div class="k">融合客户类型</div><div class="v">否</div></div>
+              <div class="item"><div class="k">宽带数量</div><div class="v">1</div></div>
+              <div class="item"><div class="k">电视数量</div><div class="v">1</div></div>
+              <div class="item"><div class="k">是否合约融通客户</div><div class="v">否</div></div>
+              <div class="item"><div class="k">合约类型</div><div class="v">话费合约</div></div>
+              <div class="item"><div class="k">合约名称</div><div class="v">亲情副卡10元</div></div>
+              <div class="item"><div class="k">是否固网融合客户</div><div class="v">否</div></div>
+              <div class="item"><div class="k">是否成员融通</div><div class="v">否</div></div>
+            </div>
+          </div>
+          <div class="portrait">
+            <div class="p-head"><span class="ico"><svg viewBox="0 0 24 24" fill="#2e7cf6"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Zm3.5 1.2a1 1 0 0 0 0 2h3.2a1 1 0 0 0 0-2H7.5Zm0 4.2a1 1 0 0 0 0 2h9a1 1 0 0 0 0-2h-9Zm0 4.2a1 1 0 0 0 0 2h9a1 1 0 0 0 0-2h-9Z"/></svg></span>看卡槽</div>
+            <div class="p-grid">
+              <div class="item"><div class="k">是否5G终端</div><div class="v">0</div></div>
+              <div class="item"><div class="k">终端在网时长（月）</div><div class="v">0</div></div>
+              <div class="item"><div class="k">是否多卡槽终端</div><div class="v">否</div></div>
+              <div class="item"><div class="k">移动单卡</div><div class="v">否</div></div>
+              <div class="item"><div class="k">我主异副</div><div class="v">否</div></div>
+              <div class="item"><div class="k">合约名称</div><div class="v">亲情副卡10元</div></div>
+              <div class="item"><div class="k">是否固网融合客户</div><div class="v">否</div></div>
+              <div class="item"><div class="k">是否成员融通</div><div class="v">否</div></div>
+            </div>
+          </div>
+          </div>
+          <button class="fold" id="foldBtn">收起 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a939e" stroke-width="2.6" stroke-linecap="round"><path d="M5 14l7-6 7 6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="card iop">
+        <div class="iop-title">IOP推荐</div>
+        <div class="rec-name">5G流量权益优享包25元档(15GB)交版合约(预存180元)</div>
+        <div class="rec-label"><svg viewBox="0 0 24 24" fill="#2e7cf6"><path d="M2 10h4v11H2a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1Zm6 .6 4.6-8.2a1.6 1.6 0 0 1 3 1L14.4 8H20a2 2 0 0 1 2 2.3l-1.3 8A2.4 2.4 0 0 1 18.3 21H8V10.6Z"/></svg>推荐话术</div>
+        <p class="rec-text">推荐办理5G流量权益优享包，标准资费25元/月，含15GB国内通用流量/月。现在一次性缴纳12个月的费用可优惠至180元，附赠价值15元/月湖南移动随心换权益黄金版连续月包、9.9元/月咪咕视频黄金会员权益,期间不可退订,且不可降档、携转、退网。第13个月开始按优惠价25元/月收费，附赠权益失效，并可随时续订/退订业务。未使用完流量可转结、可共享,不可转赠。</p>
+        <div class="rec-actions"><button class="apply">立即办理</button><span class="detail">详情 ›</span></div>
+        <div class="rec-row"><span class="name">30元50G快手流量包</span><button class="apply">立即办理</button><span class="detail">详情 ›</span></div>
+        <div class="rec-row"><span class="name">流显年包(2019线下版)10G</span><button class="apply">立即办理</button><span class="detail">详情 ›</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+  const toast=document.getElementById('toast');let toastTimer;function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1900)}
+  document.getElementById('backBtn').onclick=()=>parent.postMessage({type:'closeCustomerProfile',back:true},'*');
+  document.getElementById('callBtn').onclick=()=>showToast('正在呼叫 130****0241（模拟演示）');
+  document.getElementById('guardianLink').onclick=()=>showToast('已查看看护人 张明 的信息');
+  document.querySelectorAll('[data-svc]').forEach(btn=>btn.onclick=()=>parent.postMessage({type:'openCustomerService',service:btn.dataset.svc},'*'));
+  document.querySelectorAll('.tabs [data-tab]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.tab==='服务画像'){document.querySelectorAll('.tabs [data-tab]').forEach(b=>b.classList.toggle('active',b===btn));return}showToast(`「${btn.dataset.tab}」画像暂无演示数据`)});
+  document.getElementById('foldBtn').onclick=()=>{const card=document.getElementById('portraitCard');card.classList.toggle('folded');document.getElementById('foldBtn').childNodes[0].textContent=card.classList.contains('folded')?'展开 ':'收起 '};
+  document.querySelectorAll('.apply').forEach(btn=>btn.onclick=()=>showToast('已提交办理申请（模拟演示）'));
+  document.querySelectorAll('.detail').forEach(btn=>btn.onclick=()=>showToast('打开产品详情（模拟演示）'));
+</script>
+</body>
+</html>
