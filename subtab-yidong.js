@@ -138,6 +138,7 @@
     '#' + PANEL_ID + ' .sy-tags{display:flex;flex-wrap:wrap;gap:6px}',
     '#' + PANEL_ID + ' .sy-tag{font-size:11.5px;color:#e0432f;background:#fff2f0;border:1px solid #ffdcd6;border-radius:4px;padding:1px 7px}',
     '#' + PANEL_ID + ' .sy-meta{font-size:12.5px;color:#8a929e}',
+    '#' + PANEL_ID + ' .sy-list{display:flex;flex-direction:column;gap:12px}',
     '#' + PANEL_ID + ' .sy-empty{font-size:13px;color:#98a1ad;padding:22px 0;text-align:center}',
     '@media(max-width:420px){#' + PANEL_ID + ' .sy-grid{gap:8px}',
     '#' + PANEL_ID + ' .sy-card{min-height:66px;padding:9px 10px 8px}',
@@ -161,21 +162,38 @@
     document.head.appendChild(s);
   }
 
-  function isVisible(el) {
-    var r = el.getBoundingClientRect();
-    return r.width > 40 && r.height > 24 && r.top > -200 && r.top < window.innerHeight + 400;
+  /* 只判断「有没有被渲染」，不能用视口位置：页面往下滚后一级页签会滚出视口，
+     若据此判空会触发 cleanup，把子页签重置回「总览」并让滚动位置被夹回顶部。 */
+  function isRendered(el) {
+    if (!el.getClientRects().length) return false;
+    return el.getBoundingClientRect().width > 40;
   }
 
-  function topTabButtons() {
-    var out = [];
+  var rowNode = null;   /* 缓存一级页签行，避免滚动/重渲染时认错 */
+
+  function topTabGroups() {
     var btns = document.querySelectorAll('#root button');
+    var groups = [];
     for (var i = 0; i < btns.length; i += 1) {
       var t = (btns[i].textContent || '').trim();
       if (TOP_TABS.indexOf(t) < 0) continue;
-      if (!isVisible(btns[i])) continue;
-      out.push(btns[i]);
+      if (!isRendered(btns[i])) continue;
+      var p = btns[i].parentNode;
+      if (!p) continue;
+      var g = null;
+      for (var k = 0; k < groups.length; k += 1) {
+        if (groups[k].row === p) { g = groups[k]; break; }
+      }
+      if (!g) { g = { row: p, btns: [] }; groups.push(g); }
+      g.btns.push(btns[i]);
     }
-    return out;
+    groups = groups.filter(function (x) { return x.btns.length >= 4; });
+    groups.sort(function (a, b) {
+      var sa = (a.row === rowNode ? 1000 : 0) + a.btns.length * 10 + a.row.getBoundingClientRect().width;
+      var sb = (b.row === rowNode ? 1000 : 0) + b.btns.length * 10 + b.row.getBoundingClientRect().width;
+      return sb - sa;
+    });
+    return groups;
   }
 
   function activeTopTab(btns) {
@@ -319,6 +337,16 @@
   }
 
   /* ---------- 显隐原生内容 ---------- */
+  function scrollParentOf(n) {
+    var p = n.parentNode;
+    while (p && p !== document.body) {
+      var ov = getComputedStyle(p).overflowY;
+      if (ov === 'auto' || ov === 'scroll' || ov === 'overlay') return p;
+      p = p.parentNode;
+    }
+    return null;
+  }
+
   function hideNative(headerBlock) {
     if (!rowEl) return;
     hiddenNodes = [];
@@ -341,16 +369,26 @@
       if (!after) continue;
       kill(n);
     }
-    /* 2) 标题块之后：搜索框、筛选 chips、计数行、条目卡 */
-    var parent = headerBlock.parentNode;
-    if (!parent) return;
-    var sibs = [].slice.call(parent.children);
-    var passed = false;
-    for (var j = 0; j < sibs.length; j += 1) {
-      var m = sibs[j];
-      if (m === headerBlock) { passed = true; continue; }
-      if (!passed) continue;
-      kill(m);
+    /* 2) 逐级向上直到滚动容器：每一层里「链节点之后」的兄弟都要隐藏
+       （RN 重渲染后条目卡可能被挂到更外层，只扫一层会漏掉） */
+    var scroller = scrollParentOf(headerBlock);
+    var chainNode = headerBlock;
+    var guard = 0;
+    while (chainNode.parentNode && chainNode.parentNode !== scroller && guard < 6) {
+      guard += 1;
+      var parent = chainNode.parentNode;
+      var sibs = [].slice.call(parent.children);
+      var passed = false;
+      for (var j = 0; j < sibs.length; j += 1) {
+        var m = sibs[j];
+        if (m === chainNode) { passed = true; continue; }
+        if (!passed) continue;
+        if (getComputedStyle(m).position === 'fixed') continue;   /* 底部导航等固定层不动 */
+        var mt = m.textContent || '';
+        if (mt.indexOf('工作台') >= 0 && mt.indexOf('营销作战') >= 0) continue;
+        kill(m);
+      }
+      chainNode = parent;
     }
   }
 
@@ -400,16 +438,32 @@
     applyFilter();
   }
 
-  function tick() {
-    var btns = topTabButtons();
-    if (!btns.length) { cleanup(); return; }
-    var type = activeTopTab(btns);
-    if (!type || !DATA[type]) { cleanup(); return; }
+  var missCount = 0;
 
-    var row = btns[0].parentNode;          /* 一级页签行 */
+  function tick() {
+    var groups = topTabGroups();
+    if (!groups.length) {
+      /* 可能是页面切换/重渲染的瞬时状态：连续多次找不到才真正清理 */
+      missCount += 1;
+      if (missCount >= 6) { cleanup(); rowNode = null; missCount = 0; }
+      return;
+    }
+    missCount = 0;
+
+    var g = groups[0];
+    rowNode = g.row;
+    var type = activeTopTab(g.btns) || curType;   /* 取不到高亮时沿用上一次，避免误判为切走 */
+    if (!type) return;
+    if (!DATA[type]) {                            /* 「个人」页由别的脚本负责，这里清理干净 */
+      cleanup();
+      rowNode = g.row;
+      return;
+    }
+
+    var row = g.row;                       /* 一级页签行 */
     var wrap = row.parentNode;             /* overflow hidden 包装 */
-    var headerBlock = wrap.parentNode;     /* 标题 + 页签 区块 */
-    if (!headerBlock) { cleanup(); return; }
+    var headerBlock = wrap ? wrap.parentNode : null;  /* 标题 + 页签 区块 */
+    if (!headerBlock) return;
 
     if (curType && curType !== type) {
       /* 切到另一个一级页签：回到总览 */
