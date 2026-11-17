@@ -39,10 +39,10 @@
     .track{height:6px;border-radius:4px;background:#e8edf6;overflow:hidden;margin:5px 0}.bar{height:100%;border-radius:4px;background:#6275e8}.warn .bar{background:#e9a126}
     .metric-foot{font-size:10px;color:#5f6872;white-space:nowrap}
     .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px}
-    .collapse{width:42px;height:42px;position:relative;flex:0 0 auto}
-    .collapse:before,.collapse:after{content:"";position:absolute;top:17px;width:20px;height:5px;background:#000;border-radius:3px;transition:.2s}
-    .collapse:before{left:5px;transform:rotate(45deg)}.collapse:after{right:5px;transform:rotate(-45deg)}
-    .collapsed .collapse:before{transform:rotate(-45deg)}.collapsed .collapse:after{transform:rotate(45deg)}
+    .collapse{width:34px;height:34px;border-radius:50%;background:#f3f5f8;display:grid;place-items:center;flex:0 0 auto;border:1px solid #e9edf2;transition:background .2s,border-color .2s}
+    .collapse:hover{background:#e9eef5;border-color:#dbe3ec}
+    .collapse .chev{display:block;width:11px;height:11px;border-left:2.5px solid #7d8590;border-top:2.5px solid #7d8590;border-radius:1.5px;transform:rotate(45deg);transition:transform .28s ease}
+    .collapsed .collapse .chev{transform:rotate(225deg)}
     .speech-intro{font-size:11px;color:#737b85;margin:0 0 9px}
     .speech-body{display:flex;flex-direction:column;gap:10px}
     .speech-block{background:#e7f1ff;border-radius:11px;padding:11px;font-size:13px;line-height:1.6}
@@ -86,7 +86,7 @@
       <section class="card"><h2>整体经营情况</h2><div class="metric-grid" id="metricGrid"></div></section>
 
       <section class="card" id="speechCard">
-        <div class="section-head"><h2>AI 晨会发言框架</h2><button class="collapse" id="speechToggle" aria-label="收起AI晨会发言框架"></button></div>
+        <div class="section-head"><h2>AI 晨会发言框架</h2><button class="collapse" id="speechToggle" aria-label="收起AI晨会发言框架"><i class="chev"></i></button></div>
         <p class="speech-intro">完成情况、主要问题、工作安排均引用当前报告快照，点击编辑可调整。</p>
         <div class="speech-body" id="speechBody"></div>
         <button class="wide-btn" id="editSpeech">编辑</button>
