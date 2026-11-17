@@ -256,15 +256,23 @@
     applyFilter();
   }
 
-  var timer = null;
+  var busy = false, again = false;
+  function applyGuarded() {
+    if (busy) { again = true; return; }
+    busy = true;
+    try { apply(); } finally {
+      busy = false;
+      if (again) { again = false; applyGuarded(); }
+    }
+  }
   function schedule() {
-    if (timer) return;
-    timer = setTimeout(function () { timer = null; apply(); }, 140);
+    /* 同步执行，早于绘制，避免切页签/切子页签时闪一下旧内容 */
+    applyGuarded();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
-  else apply();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyGuarded);
+  else applyGuarded();
   try { new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
-  setInterval(apply, 900);
-  window.__ydStatHook = 'v2';
+  setInterval(applyGuarded, 900);
+  window.__ydStatHook = 'v3';
 })();

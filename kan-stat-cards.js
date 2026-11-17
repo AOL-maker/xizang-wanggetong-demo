@@ -189,7 +189,7 @@
     return t.indexOf('家庭成员关系为合成演示') === 0 && t.length < 100;
   }
 
-  /* 离开「总览」/ 换页签时还原原生内容 */
+  /* 离开「总览」/ 换页签时还原原生内容（仅在当前页签没有 6 卡配置时用） */
   function restore() {
     var g = document.getElementById(GRID_ID);
     if (!g) return;
@@ -203,83 +203,179 @@
     if (g.parentNode) g.parentNode.removeChild(g);
   }
 
-  function hideNode(n, store) {
-    if (!n) return;
-    store.push(n);
-    n.style.display = 'none';
+  function cfgOf(key) {
+    for (var i = 0; i < TABS.length; i += 1) if (TABS[i].key === key) return TABS[i];
+    return null;
   }
 
-  function apply() {
-    injectStyle();
-
-    var type = activeTopType();
-    var want;                                  /* undefined = 判断不出当前页，沿用现状 */
-    if (type) want = TYPE_KEY.hasOwnProperty(type) ? TYPE_KEY[type] : null;
-
-    var grid = document.getElementById(GRID_ID);
-    if (grid) {
-      var gridKey = grid.getAttribute('data-kr');
-      /* 当前页与已注入的配置不一致（切了页签）→ 先还原，再按新页签重建 */
-      if (want !== undefined && want !== gridKey) {
-        restore();
-      } else {
-        /* 已注入：兜底修复（React 重设 display） */
-        var cfg0 = null;
-        for (var c0 = 0; c0 < TABS.length; c0 += 1) if (TABS[c0].key === gridKey) cfg0 = TABS[c0];
-        if (!cfg0 || !grid.parentNode) { restore(); return; }
-        var hidden0 = grid.__krHidden || [];
-        for (var h = 0; h < hidden0.length; h += 1) {
-          if (hidden0[h] && hidden0[h].parentNode && hidden0[h].style.display !== 'none') hidden0[h].style.display = 'none';
-        }
-        return;
-      }
+  function matchCfg(t) {
+    for (var k = 0; k < TABS.length; k += 1) {
+      var cd = TABS[k];
+      if (t.slice(0, cd.start.length) !== cd.start) continue;
+      var allIn = true;
+      for (var m = 0; m < cd.must.length; m += 1) if (t.indexOf(cd.must[m]) < 0) { allIn = false; break; }
+      if (allIn) return cd;
     }
-    if (want === null) return;                 /* 该页签暂无配置 */
+    return null;
+  }
 
+  /* 扫一遍当前页签的原生统计块并隐藏，返回锚点（优先「真的可见」的那份）+ 隐藏清单。
+     要点：
+     1) 只取「最内层」命中：行被隐藏后，它的外层卡片 textContent 也以同样前缀开头，
+        若不过滤会把整张卡片（连同我们插入的 grid）一起藏掉；
+     2) 命中的元素一律隐藏，但锚点优先选可见的，避免挂到另一份隐藏的旧页面上。 */
+  function sweep(cfg, oldStore) {
     var root = document.getElementById('root');
-    if (!root) return;
+    var out = { first: null, firstVisible: null, store: [] };
+    if (!root) return out;
     var nodes = root.querySelectorAll('div');
+    var hits = [];
     for (var i = 0; i < nodes.length; i += 1) {
       var el = nodes[i];
+      if (el.closest && el.closest('#' + GRID_ID + ',#subYdPanel,#subYdTabs')) continue;
       var t = el.textContent || '';
       if (t.length > 70) continue;
-      var cfg = null;
-      for (var k = 0; k < TABS.length; k += 1) {
-        var cd = TABS[k];
-        if (t.slice(0, cd.start.length) !== cd.start) continue;
-        var allIn = true;
-        for (var m = 0; m < cd.must.length; m += 1) if (t.indexOf(cd.must[m]) < 0) { allIn = false; break; }
-        if (allIn) { cfg = cd; break; }
+      var c = matchCfg(t);
+      if (!c || c.key !== cfg.key) continue;
+      hits.push(el);
+    }
+    for (var h = 0; h < hits.length; h += 1) {
+      var node = hits[h];
+      var isWrapper = false;
+      for (var h2 = 0; h2 < hits.length; h2 += 1) {
+        if (h2 !== h && node.contains(hits[h2])) { isWrapper = true; break; }
       }
-      if (!cfg) continue;
-      if (!el.getClientRects().length) continue;      /* 行被隐藏（如在「XX异动」页）时不注入 */
-      var card = el.parentElement;
-      if (!card || el.__krDone) continue;
+      if (isWrapper) continue;
+
+      var card = node.parentElement;
+      if (!card) continue;
       if ((card.textContent || '').indexOf(cfg.cardMark) < 0) continue;
 
-      el.__krDone = 1;
-      var store = [];
-      /* 数字行 + 三环图 +（小区）脚注 */
-      hideNode(el, store);
-      var ring = el.nextElementSibling;
+      node.__krDone = 1;
+      var anchor = { card: card, el: node };
+      if (!out.first) out.first = anchor;
+      if (!out.firstVisible && node.getClientRects().length) out.firstVisible = anchor;
+      if (node.style.display !== 'none') node.style.display = 'none';
+      out.store.push(node);
+      var ring = node.nextElementSibling;
       if (isRingRow(ring)) {
-        hideNode(ring, store);
+        ring.__krDone = 1;
+        if (ring.style.display !== 'none') ring.style.display = 'none';
+        out.store.push(ring);
         var foot = ring.nextElementSibling;
-        if (cfg.hideFoot && isFootRow(foot)) hideNode(foot, store);
+        if (cfg.hideFoot && isFootRow(foot)) {
+          foot.__krDone = 1;
+          if (foot.style.display !== 'none') foot.style.display = 'none';
+          out.store.push(foot);
+        }
       }
+    }
+    if (oldStore && oldStore.length) {
+      for (var j = 0; j < oldStore.length; j += 1) {
+        var n = oldStore[j];
+        if (n && n.parentNode && out.store.indexOf(n) < 0) {
+          if (n.style.display !== 'none') n.style.display = 'none';
+          out.store.push(n);
+        }
+      }
+    }
+    return out;
+  }
 
-      var g = buildGrid(cfg);
-      g.__krHidden = store;
-      card.insertBefore(g, el);
-      return;
+  function fixHidden(g) {
+    var hidden = g.__krHidden || [];
+    for (var i = 0; i < hidden.length; i += 1) {
+      if (hidden[i] && hidden[i].parentNode && hidden[i].style.display !== 'none') hidden[i].style.display = 'none';
     }
   }
 
-  var timer = null;
-  function schedule() {
-    if (timer) return;
-    timer = setTimeout(function () { timer = null; apply(); }, 120);
+  function cardsHTML(cfg) {
+    var html = '';
+    for (var i = 0; i < cfg.data.length; i += 1) {
+      html += '<div class="kr-card"><div class="kr-txt"><div class="kr-t">' + cfg.data[i][0] + '</div>' +
+        '<div class="kr-v">' + cfg.data[i][1] + '</div></div>' +
+        (cfg.data[i][2] === 'p' ? penta() : round()) + '</div>';
+    }
+    return html;
   }
+
+  var busy = false, again = false;
+
+  function apply() {
+    if (busy) { again = true; return; }
+    busy = true;
+    try {
+      injectStyle();
+
+      var type = activeTopType();
+      var want;                                /* undefined = 过渡态，无法判断当前页签 */
+      if (type) want = TYPE_KEY.hasOwnProperty(type) ? TYPE_KEY[type] : null;
+
+      var grid = document.getElementById(GRID_ID);
+      var gridKey = grid ? grid.getAttribute('data-kr') : null;
+
+      if (want === undefined) { if (grid) fixHidden(grid); return; }
+      if (want === null) { if (grid) restore(); return; }
+
+      var cfg = cfgOf(want);
+      if (!cfg) { if (grid) restore(); return; }
+
+      var sw = sweep(cfg, grid ? grid.__krHidden : null);
+
+      if (grid) {
+        if (gridKey !== want) {                /* 换页签：就地换内容，绝不先还原原生块（否则会闪旧版式） */
+          grid.innerHTML = cardsHTML(cfg);
+          grid.setAttribute('data-kr', want);
+        }
+        grid.__krHidden = sw.store;
+        var anchor0 = sw.firstVisible || sw.first;    /* 优先挂到「真的看得见」的那份页面 */
+        if (anchor0 && grid.parentNode !== anchor0.card) {
+          /* 各页签可能是各自独立的 DOM 子树：把 grid 搬到当前页的锚点位置 */
+          anchor0.card.insertBefore(grid, anchor0.el);
+          applySoon();
+        } else if (anchor0 && !grid.getClientRects().length && anchor0.el.getClientRects().length) {
+          applySoon();                                /* 位置对了但还没显示出来，下一帧再核一次 */
+        }
+        fixHidden(grid);
+        return;
+      }
+      var anchor1 = sw.firstVisible || sw.first;
+      if (!anchor1) return;                     /* 找不到目标行（可能在「XX异动」页）：等下一页 */
+      var g = buildGrid(cfg);
+      g.__krHidden = sw.store;
+      anchor1.card.insertBefore(g, anchor1.el);
+      fixHidden(g);
+      applySoon();
+    } finally {
+      busy = false;
+      if (again) { again = false; apply(); }
+    }
+  }
+
+  function applySoon() {
+    if (typeof requestAnimationFrame !== 'function') { apply(); return; }
+    requestAnimationFrame(function () { apply(); });
+  }
+
+  function schedule() {
+    /* MutationObserver 回调在微任务里执行，早于下一帧绘制：
+       同步跑完 apply 才能保证切页签时不闪旧页面 */
+    apply();
+  }
+
+  /* 点一级页签后连打几枪：RN 可能在点击后的不同时机才把新页面挂好，
+     只靠 MutationObserver 容易漏掉「挂好但还没可见」的瞬间 */
+  function burst() {
+    var delays = [0, 40, 120, 260, 520, 900];
+    for (var i = 0; i < delays.length; i += 1) setTimeout(apply, delays[i]);
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var btn = t && t.closest ? t.closest('button') : null;
+    if (!btn) return;
+    if (TOP_NAMES.indexOf((btn.textContent || '').trim()) < 0) return;
+    burst();
+  }, true);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { apply(); });
   else apply();
@@ -288,5 +384,5 @@
     new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
   setInterval(apply, 900);
-  window.__krStatHook = 'v5';
+  window.__krStatHook = 'v6';
 })();

@@ -442,7 +442,18 @@
 
   var missCount = 0;
 
+  var busy = false, again = false;
+
   function tick() {
+    if (busy) { again = true; return; }
+    busy = true;
+    try { tickInner(); } finally {
+      busy = false;
+      if (again) { again = false; tick(); }
+    }
+  }
+
+  function tickInner() {
     var groups = topTabGroups();
     if (!groups.length) {
       /* 可能是页面切换/重渲染的瞬时状态：连续多次找不到才真正清理 */
@@ -484,12 +495,26 @@
     if (timer) return;
     timer = setInterval(function () {
       try { tick(); } catch (e) { /* 容错，等待下一次 */ }
-    }, 320);
+    }, 240);
+    /* 点一级页签后连打几枪，保证新页面的子页签/面板尽快到位 */
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      var btn = t && t.closest ? t.closest('button') : null;
+      if (!btn) return;
+      if (TOP_TABS.indexOf((btn.textContent || '').trim()) < 0) return;
+      [0, 40, 120, 260, 520, 900].forEach(function (d) { setTimeout(function () { try { tick(); } catch (err) {} }, d); });
+    }, true);
+    /* 同步响应 DOM 变化（微任务阶段，早于绘制）：切页签时立刻换掉旧标签/旧面板，避免闪旧页面 */
+    try {
+      new MutationObserver(function () {
+        try { tick(); } catch (e) {}
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
     try { tick(); } catch (e) {}
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') start();
   else document.addEventListener('DOMContentLoaded', start);
   window.addEventListener('load', start);
-  window.__subYdHook = 'v2';
+  window.__subYdHook = 'v3';
 })();
