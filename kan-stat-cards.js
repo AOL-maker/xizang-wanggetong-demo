@@ -143,23 +143,6 @@
     return found;   /* undefined = 识别不到（过渡态），null 不会出现 */
   }
 
-  /* 仅「总览」生效：总览 tab 选中时文字为蓝色 */
-  function isOverviewActive() {
-    var els = document.querySelectorAll('#root div, #root span');
-    var found = false;
-    for (var i = 0; i < els.length; i += 1) {
-      var el = els[i];
-      if ((el.textContent || '').trim() !== '总览') continue;
-      found = true;
-      var m = (getComputedStyle(el).color || '').match(/(\d+),\s*(\d+),\s*(\d+)/);
-      if (m) {
-        var r = +m[1], b = +m[3];
-        if (b > r + 40 && b > 120) return true;
-      }
-    }
-    return found ? false : true;
-  }
-
   function isRingRow(n) {
     if (!n) return false;
     var t = n.textContent || '';
@@ -195,7 +178,6 @@
 
   function apply() {
     injectStyle();
-    if (!isOverviewActive()) { restore(); return; }
 
     var type = activeTopType();
     var want;                                  /* undefined = 判断不出当前页，沿用现状 */
@@ -237,6 +219,7 @@
         if (allIn) { cfg = cd; break; }
       }
       if (!cfg) continue;
+      if (!el.getClientRects().length) continue;      /* 行被隐藏（如在「XX异动」页）时不注入 */
       var card = el.parentElement;
       if (!card || el.__krDone) continue;
       if ((card.textContent || '').indexOf(cfg.cardMark) < 0) continue;
