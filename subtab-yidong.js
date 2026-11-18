@@ -6,77 +6,40 @@
   var PANEL_ID = 'subYdPanel';
   var TOP_TABS = ['个人', '小区', '园楼', '集团', '家庭'];
 
-  /* ---------- 数据 ---------- */
-  var METRICS = [
-    '当月携出客户数', '当月降档客户数', '当月离网客户数',
-    '当月投诉客户数', '当月解约客户数', '流失预警客户数'
-  ];
-  var TAGS = ['当月携出', '当月降档', '当月离网', '当月投诉', '当月解约', '流失预警'];
-  var TAG_UNIT = ['1 户', '1 户', '1 户', '2 起', '1 户', '2 户'];
-
-  var DATA = {
-    '小区': {
-      label: '小区', unit: '个', listTitle: '异动小区列表', searchLabel: '搜索小区',
-      placeholder: '小区名称、地址、看管人',
-      items: [
-        { name: '八廓街示范小区', chip: '小区', addr: '拉萨市八廓街20号（演示）', meta: '关联客户 7 · 看管人 张明' },
-        { name: '江苏路示范小区', chip: '小区', addr: '拉萨市江苏路22号（演示）', meta: '关联客户 6 · 看管人 张明' },
-        { name: '吉日街道示范小区', chip: '小区', addr: '拉萨市吉日街道21号（演示）', meta: '关联客户 7 · 看管人 张明' }
-      ]
-    },
-    '园楼': {
-      label: '园楼', unit: '个', listTitle: '异动园楼列表', searchLabel: '搜索园楼',
-      placeholder: '园楼名称、地址、看管人',
-      items: [
-        { name: '江苏路产业园', chip: '园楼', addr: '拉萨市江苏路22号（演示）', meta: '关联客户 3 · 看管人 张明' },
-        { name: '吉日街道商务楼', chip: '园楼', addr: '拉萨市吉日街道21号（演示）', meta: '关联客户 4 · 看管人 张明' },
-        { name: '八廓街产业园', chip: '园楼', addr: '拉萨市八廓街20号（演示）', meta: '关联客户 4 · 看管人 张明' },
-        { name: '八廓街商务楼', chip: '园楼', addr: '拉萨市八廓街23号（演示）', meta: '关联客户 3 · 看管人 张明' },
-        { name: '江苏路商务楼', chip: '园楼', addr: '拉萨市江苏路25号（演示）', meta: '关联客户 3 · 看管人 张明' },
-        { name: '吉日街道产业园', chip: '园楼', addr: '拉萨市吉日街道24号（演示）', meta: '关联客户 3 · 看管人 张明' }
-      ]
-    },
-    '集团': {
-      label: '集团', unit: '个', listTitle: '异动集团列表', searchLabel: '搜索集团',
-      placeholder: '请输入集团编码或名称',
-      items: [
-        { name: '雪域教育集团', chip: 'A类集团', addr: '拉萨市江苏路22号（演示）', meta: '集团编码 6805938 · 成员客户 2 位' },
-        { name: '城关商贸集团', chip: 'B类集团', addr: '拉萨市八廓街23号（演示）', meta: '集团编码 1453060 · 成员客户 2 位' },
-        { name: '高原水务集团', chip: 'A类集团', addr: '拉萨市八廓街26号（演示）', meta: '集团编码 1475518 · 成员客户 2 位' },
-        { name: '雪莲医药集团', chip: 'A类集团', addr: '拉萨市江苏路28号（演示）', meta: '集团编码 1951502 · 成员客户 2 位' },
-        { name: '拉萨能源集团', chip: 'B类集团', addr: '拉萨市八廓街29号（演示）', meta: '集团编码 8061690 · 成员客户 2 位' },
-        { name: '拉萨物流集团', chip: 'B类集团', addr: '拉萨市吉日街道21号（演示）', meta: '集团编码 4392836 · 成员客户 2 位' },
-        { name: '藏源农牧集团', chip: 'A类集团', addr: '拉萨市吉日街道24号（演示）', meta: '集团编码 6287854 · 成员客户 2 位' },
-        { name: '城关建筑集团', chip: 'A类集团', addr: '拉萨市吉日街道27号（演示）', meta: '集团编码 7564302 · 成员客户 2 位' },
-        { name: '拉萨文旅集团', chip: 'B类集团', addr: '拉萨市江苏路26号（演示）', meta: '集团编码 5127043 · 成员客户 2 位' },
-        { name: '城关物业集团', chip: 'B类集团', addr: '拉萨市吉日街道29号（演示）', meta: '集团编码 3378915 · 成员客户 2 位' }
-      ]
-    },
-    '家庭': {
-      label: '家庭', unit: '个', listTitle: '异动家庭列表', searchLabel: '搜索家庭',
-      placeholder: '家庭联系人、地址、看管人',
-      items: [
-        { name: '陈霞', chip: '家庭', addr: '拉萨市江苏路28号（演示）', meta: '189****2108 · 家庭成员 2 位 · 未覆盖宽带' },
-        { name: '赵静', chip: '家庭', addr: '拉萨市江苏路34号（演示）', meta: '189****2114 · 家庭成员 2 位 · 未覆盖宽带' },
-        { name: '德吉', chip: '家庭', addr: '拉萨市吉日街道21号（演示）', meta: '189****2101 · 家庭成员 2 位 · 已覆盖宽带' },
-        { name: '张丽', chip: '家庭', addr: '拉萨市八廓街26号（演示）', meta: '189****2106 · 家庭成员 2 位 · 融合家庭' },
-        { name: '格桑', chip: '家庭', addr: '拉萨市吉日街道33号（演示）', meta: '189****2113 · 家庭成员 2 位 · 已覆盖宽带' },
-        { name: '吴敏', chip: '家庭', addr: '拉萨市八廓街38号（演示）', meta: '189****2118 · 家庭成员 1 位 · 融合家庭' },
-        { name: '李雪', chip: '家庭', addr: '拉萨市江苏路22号（演示）', meta: '189****2102 · 家庭成员 2 位 · 未覆盖宽带' },
-        { name: '扎西', chip: '家庭', addr: '拉萨市八廓街20号（演示）', meta: '189****2100 · 家庭成员 2 位 · 融合家庭' },
-        { name: '索朗', chip: '家庭', addr: '拉萨市吉日街道27号（演示）', meta: '189****2107 · 家庭成员 2 位 · 已覆盖宽带' },
-        { name: '周强', chip: '家庭', addr: '拉萨市八廓街32号（演示）', meta: '189****2112 · 家庭成员 2 位 · 融合家庭' },
-        { name: '尼玛', chip: '家庭', addr: '拉萨市江苏路25号（演示）', meta: '189****2109 · 家庭成员 2 位 · 未覆盖宽带' }
-      ]
-    }
+  /* ---------- 数据（统一取 kan-data.js，按网格变化） ---------- */
+  var TYPE_KEY = { '小区': 'xq', '园楼': 'yl', '集团': 'grp', '家庭': 'ji' };
+  var META = {
+    '小区': { label: '小区', unit: '个', listTitle: '异动小区列表', searchLabel: '搜索小区', placeholder: '小区名称、地址、看管人' },
+    '园楼': { label: '园楼', unit: '个', listTitle: '异动园楼列表', searchLabel: '搜索园楼', placeholder: '园楼名称、地址、看管人' },
+    '集团': { label: '集团', unit: '个', listTitle: '异动集团列表', searchLabel: '搜索集团', placeholder: '请输入集团编码或名称' },
+    '家庭': { label: '家庭', unit: '户', listTitle: '异动家庭列表', searchLabel: '搜索家庭', placeholder: '家庭联系人、地址、看管人' }
   };
+  var METRICS = ['当月携出客户数', '当月降档客户数', '当月离网客户数', '当月投诉客户数', '当月解约客户数', '流失预警客户数'];
+  var TAGS = ['当月携出', '当月降档', '当月离网', '当月投诉', '当月解约', '流失预警'];
+  var EMPTY_COUNTS = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
 
-  /* 每对象挂 2 类异动，保证每张卡都有命中对象 */
-  Object.keys(DATA).forEach(function (k) {
-    DATA[k].items.forEach(function (it, i) {
-      it.cats = [i % 6, (i + 3) % 6];
-    });
-  });
+  function KAN() { return window.WGT_KAN || null; }
+
+  function typeKey(type) { return TYPE_KEY[type] || 'xq'; }
+
+  /* 打包当前页签 + 当前网格的数据 */
+  function pack(type) {
+    var m = META[type] || META['小区'];
+    var k = KAN();
+    var out = {
+      label: m.label, unit: m.unit, listTitle: m.listTitle, searchLabel: m.searchLabel,
+      placeholder: m.placeholder, items: [], counts: EMPTY_COUNTS, metrics: METRICS
+    };
+    if (k && k.yd) {
+      var y = k.yd(typeKey(type));
+      if (y) {
+        if (y.items && y.items.length) out.items = y.items;
+        if (y.counts) out.counts = y.counts;
+        if (y.metrics) out.metrics = y.metrics;
+      }
+    }
+    return out;
+  }
 
   var FUNNEL = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
     '<path d="M3.5 5.2h17l-6.4 7.4v5.6l-4.2 2v-7.6L3.5 5.2Z" stroke="#2069e8" stroke-width="1.6" stroke-linejoin="round"/></svg>';
@@ -255,18 +218,23 @@
   }
 
   /* ---------- 异动面板 ---------- */
-  function cardHTML(m, i) {
+  function cardHTML(name, i, counts) {
+    var cur = counts[i] ? counts[i][0] : 0;
+    var yday = counts[i] ? counts[i][1] : 0;
     return '<div class="sy-card" data-card="' + i + '">' +
-      '<div class="sy-top"><span class="sy-name">' + m + '</span>' + WARN + '</div>' +
-      '<div class="sy-bottom"><span class="sy-num">800</span>' +
-      '<span class="sy-yday">昨日<b>600</b></span></div></div>';
+      '<div class="sy-top"><span class="sy-name">' + name + '</span>' + WARN + '</div>' +
+      '<div class="sy-bottom"><span class="sy-num">' + cur + '</span>' +
+      '<span class="sy-yday">昨日<b>' + yday + '</b></span></div></div>';
   }
 
   function itemHTML(it) {
-    var tags = it.cats.map(function (c) {
-      return '<span class="sy-tag">' + TAGS[c] + ' ' + TAG_UNIT[c] + '</span>';
+    var cats = it.cats || [];
+    var idx = cats.map(function (c) { return c.m; });
+    var tags = cats.map(function (c) {
+      var unit = c.m === 3 ? '起' : (c.m === 5 ? '户' : '户');
+      return '<span class="sy-tag">' + TAGS[c.m] + ' ' + c.q + ' ' + unit + '</span>';
     }).join('');
-    return '<div class="sy-item" data-cats="' + it.cats.join(',') + '">' +
+    return '<div class="sy-item" data-cats="' + idx.join(',') + '" data-org="' + it.name + '">' +
       '<div class="sy-item-top"><span class="sy-iname">' + it.name + '</span>' +
       '<span class="sy-chip">' + it.chip + '</span></div>' +
       '<div class="sy-addr">' + it.addr + '</div>' +
@@ -275,15 +243,16 @@
   }
 
   function buildPanel(type) {
-    var d = DATA[type];
+    var d = pack(type);
     var p = document.createElement('div');
     p.id = PANEL_ID;
     p.setAttribute('data-sy-mine', '1');
     p.setAttribute('data-type', type);
+    p.setAttribute('data-grid', KAN() ? KAN().grid() : '');
     p.innerHTML =
       '<div class="sy-head"><div class="sy-left"><i class="sy-bar"></i><span class="sy-title">看异动</span></div>' +
       '<div class="sy-links"><span class="lnk">指标说明</span><span class="sep">｜</span><span class="lnk">查看更多 ›</span></div></div>' +
-      '<div class="sy-grid">' + METRICS.map(cardHTML).join('') + '</div>' +
+      '<div class="sy-grid">' + d.metrics.map(function (m, i) { return cardHTML(m, i, d.counts); }).join('') + '</div>' +
       '<div class="sy-head sy-sec"><div class="sy-left"><i class="sy-bar"></i><span class="sy-title">' + d.listTitle + '</span></div>' +
       '<div class="sy-links"><span class="lnk">编辑表头</span></div></div>' +
       '<div class="sy-searchlabel">' + d.searchLabel + '</div>' +
@@ -293,6 +262,16 @@
       '<div class="sy-list">' + d.items.map(itemHTML).join('') + '</div>';
 
     p.addEventListener('click', function (e) {
+      var item = e.target.closest ? e.target.closest('.sy-item') : null;
+      if (item) {
+        /* 点对象卡片 → 打开「小区 / 园楼 / 集团 / 家庭」画像（含成员信息） */
+        var nm = item.getAttribute('data-org');
+        if (nm && typeof window.__openOrgProfile === 'function') {
+          e.stopPropagation();
+          window.__openOrgProfile(typeKey(type), nm);
+        }
+        return;
+      }
       var card = e.target.closest ? e.target.closest('.sy-card') : null;
       if (!card) return;
       var k = +card.getAttribute('data-card');
@@ -317,13 +296,13 @@
       items[j].style.display = hit ? '' : 'none';
       if (hit) shown += 1;
     }
-    var d = DATA[panelEl.getAttribute('data-type')];
+    var d = pack(panelEl.getAttribute('data-type'));
     var countEl = panelEl.querySelector('.sy-count');
     var emptyEl = panelEl.querySelector('.sy-empty');
     if (countEl) {
       countEl.textContent = activeCard < 0
         ? ('全部' + d.label + '异动 · ' + d.items.length + ' ' + d.unit + ' · 本人责任范围')
-        : (METRICS[activeCard] + ' · ' + shown + ' ' + d.unit + ' · 本人责任范围');
+        : (d.metrics[activeCard] + ' · ' + shown + ' ' + d.unit + ' · 本人责任范围');
     }
     var listEl = panelEl.querySelector('.sy-list');
     if (listEl) {
@@ -429,7 +408,9 @@
       showNative();
       return;
     }
-    if (panelEl && panelEl.parentNode && panelEl.getAttribute('data-type') === curType) {
+    var curGrid = KAN() ? KAN().grid() : '';
+    if (panelEl && panelEl.parentNode && panelEl.getAttribute('data-type') === curType
+      && (panelEl.getAttribute('data-grid') || '') === curGrid) {
       hideNative(headerBlock);
       return;
     }
@@ -467,7 +448,7 @@
     rowNode = g.row;
     var type = activeTopTab(g.btns) || curType;   /* 取不到高亮时沿用上一次，避免误判为切走 */
     if (!type) return;
-    if (!DATA[type]) {                            /* 「个人」页由别的脚本负责，这里清理干净 */
+    if (!META[type]) {                            /* 「个人」页由别的脚本负责，这里清理干净 */
       cleanup();
       rowNode = g.row;
       return;
@@ -511,10 +492,14 @@
       }).observe(document.documentElement, { childList: true, subtree: true });
     } catch (e) {}
     try { tick(); } catch (e) {}
+    /* 网格筛选切换：立刻按新网格重绘异动面板 */
+    window.addEventListener('wgt:grid-change', function () {
+      try { removePanel(); tick(); } catch (e) {}
+    });
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') start();
   else document.addEventListener('DOMContentLoaded', start);
   window.addEventListener('load', start);
-  window.__subYdHook = 'v3';
+  window.__subYdHook = 'v4';
 })();

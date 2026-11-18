@@ -110,9 +110,13 @@
     </div>
     <script src="./leader-report-bootstrap.js"></script>
     <script src="./manager-report-bootstrap.js"></script>
-    <script src="./kan-stat-cards.js?v=6"></script>
-    <script src="./yd-stat-cards.js?v=3"></script>
-    <script src="./subtab-yidong.js?v=3"></script>
+    <script src="./kan-data.js?v=1"></script>
+    <script src="./kan-stat-cards.js?v=8"></script>
+    <script src="./kan-object-list.js?v=1"></script>
+    <script src="./yd-stat-cards.js?v=4"></script>
+    <script src="./subtab-yidong.js?v=4"></script>
+    <script src="./kan-grid-filter.js?v=1"></script>
+    <script src="./org-profile-bootstrap.js?v=1"></script>
     <script>
       /* 个人客户画像入口（内联 v7） */
       (function () {
@@ -277,7 +281,17 @@
           if (!frame.src || frame.src.indexOf('customer-profile.html') < 0) frame.src = './customer-profile.html?v=7';
         }, 1200);
         window.__openCustomerProfile = openProfile;
-        window.__cpHook = 'v7';
+        /* 组织画像里的成员下钻：带姓名/手机号打开个人客户画像 */
+        window.__openMemberProfile = function (name, phone) {
+          if (name || phone) {
+            currentCustomer = {
+              name: name || (currentCustomer && currentCustomer.name) || '',
+              phone: phone || (currentCustomer && currentCustomer.phone) || ''
+            };
+          }
+          openProfile();
+        };
+        window.__cpHook = 'v8';
       })();
     </script>
   <script src="./_expo/static/js/web/index-a5fa2269106122f621fd04202efca946.js" defer></script>

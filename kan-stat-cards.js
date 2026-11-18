@@ -1,16 +1,19 @@
-/* 客户看管 · 总览：统计区 6 卡化（两列三行）
-   - 个人 · 总览：「看结果」卡片内 客户规模/宽带客户规模/离网客户规模 + 三环图 → 6 卡
-   - 小区 · 总览：在管小区/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
-   - 园楼 · 总览：在管园楼/关联客户/异动关注 + 三环图 + 脚注 → 6 卡
-   - 家庭 · 总览：在管家庭/宽带家庭/融合家庭 + 三环图 + 脚注 → 6 卡
-   - 集团 · 总览：集团数量/AB集团/集团成员/全球通客户 + 三环图 + 脚注 → 6 卡
+/* 客户看管 · 总览统计区（两列三行 6 卡）
+   - 个人 · 总览：「看结果」卡片内原生统计 → 6 卡（原生已有「看结果」标题，不重复加）
+   - 小区 / 园楼 / 集团 / 家庭 · 总览：原生统计 + 三环图 + 脚注 → 「看结果」标题 + 6 卡
+   数据来自 kan-data.js（按网格切换），脚本只负责：找到原生统计行 → 隐藏 → 原位放 6 卡。
    其余区域（标题行、稳定度得分、快捷查询、列表）保持原样。 */
 (function () {
   var STYLE_ID = 'krStatStyle';
   var GRID_ID = 'krStatGrid';
+  var HEAD_ID = 'krStatHead';
 
   var CSS = [
-    '#' + GRID_ID + '{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box;padding:2px 0}',
+    '#krStatBox{width:100%;box-sizing:border-box}',
+    '#' + HEAD_ID + '{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;margin:0 0 12px}',
+    '#' + HEAD_ID + ' .kr-ht{font-size:17px;font-weight:800;color:#1f2733;letter-spacing:.2px}',
+    '#' + HEAD_ID + ' .kr-more{font-size:13px;color:#1361ff;cursor:pointer;white-space:nowrap}',
+    '#' + GRID_ID + '{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box;padding:0}',
     '#' + GRID_ID + ' .kr-card{display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;',
     '  min-height:70px;padding:11px 12px 11px 14px;border-radius:10px;',
     '  background:linear-gradient(135deg,#f9fcff 0%,#e3eefe 100%);border:1px solid #e8f1fc}',
@@ -51,84 +54,25 @@
       '</svg>';
   }
 
-  /* 每个页签的配置：如何识别原生统计行、要隐藏哪些行、换成哪 6 张卡 */
+  /* 每个页签：如何识别原生统计行 / 隐藏哪些行 / 是否要补「看结果」标题 */
   var TABS = [
-    {
-      key: 'per',
-      start: '客户规模',
-      must: ['宽带客户规模', '离网客户规模'],
-      cardMark: '看结果',
-      hideFoot: false,
-      data: [
-        ['个人全量客户', '2378', 'p'],
-        ['集团AB成员客户', '2378', 'r'],
-        ['新入网(T-6)客户', '1,600', 'p'],
-        ['中高档客户', '2378', 'r'],
-        ['宽带客户', '1,600', 'p'],
-        ['携转挽留中客户', '1,600', 'r']
-      ]
-    },
-    {
-      key: 'xq',
-      start: '在管小区',
-      must: ['关联客户', '异动关注'],
-      cardMark: '小区健康率',
-      hideFoot: true,
-      data: [
-        ['小区(农村)数量', '2378', 'p'],
-        ['移动客户规模', '2378', 'r'],
-        ['宽带客户规模', '1,600', 'p'],
-        ['全球通客户规模', '2378', 'r'],
-        ['千兆小区数量', '1,600', 'p'],
-        ['合约客户规模', '1,600', 'r']
-      ]
-    },
-    {
-      key: 'yl',
-      start: '在管园楼',
-      must: ['关联客户', '异动关注'],
-      cardMark: '园楼健康率',
-      hideFoot: true,
-      data: [
-        ['楼宇(园区)数量', '2378', 'p'],
-        ['楼宇(园区)企业数', '2378', 'r'],
-        ['建档集团数', '1,600', 'p'],
-        ['企业渗透数', '2378', 'r'],
-        ['企业渗透率', '91.23%', 'p'],
-        ['企业成员数', '1,600', 'r']
-      ]
-    },
-    {
-      key: 'ji',
-      start: '在管家庭',
-      must: ['宽带家庭', '融合家庭'],
-      cardMark: '服务闭环率',
-      hideFoot: true,
-      data: [
-        ['在管家庭数', '2378', 'p'],
-        ['移动宽带家庭数', '2378', 'r'],
-        ['外网宽带家庭数', '1,600', 'p'],
-        ['融合家庭数', '2378', 'r'],
-        ['融合渗透率', '89.01%', 'p'],
-        ['宽带覆盖率', '89.01%', 'r']
-      ]
-    },
-    {
-      key: 'grp',
-      start: '集团数量',
-      must: ['AB集团数量', '集团成员数量', '全球通客户数量'],
-      cardMark: '看管覆盖率',
-      hideFoot: true,
-      data: [
-        ['在管集团数', '2378', 'p'],
-        ['AB集团数量', '2378', 'r'],
-        ['集团成员数', '1,600', 'p'],
-        ['全球通客户数', '2378', 'r'],
-        ['合约客户数', '1,600', 'p'],
-        ['看管覆盖率', '89.01%', 'r']
-      ]
-    }
+    { key: 'per', start: '客户规模', must: ['宽带客户规模', '离网客户规模'], cardMark: '看结果', hideFoot: false, head: false },
+    { key: 'xq', start: '在管小区', must: ['关联客户', '异动关注'], cardMark: '小区健康率', hideFoot: true, head: true },
+    { key: 'yl', start: '在管园楼', must: ['关联客户', '异动关注'], cardMark: '园楼健康率', hideFoot: true, head: true },
+    { key: 'grp', start: '集团数量', must: ['AB集团数量', '集团成员数量', '全球通客户数量'], cardMark: '看管覆盖率', hideFoot: true, head: true },
+    { key: 'ji', start: '在管家庭', must: ['宽带家庭', '融合家庭'], cardMark: '服务闭环率', hideFoot: true, head: true }
   ];
+
+  function KAN() { return window.WGT_KAN || null; }
+
+  function dataOf(cfg) {
+    var k = KAN();
+    if (k && k.stats) {
+      var d = k.stats(cfg.key);
+      if (d && d.length) return d;
+    }
+    return [];
+  }
 
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -142,15 +86,20 @@
     var wrap = document.createElement('div');
     wrap.id = GRID_ID;
     wrap.setAttribute('data-kr', cfg.key);
-    for (var i = 0; i < cfg.data.length; i += 1) {
-      var c = document.createElement('div');
-      c.className = 'kr-card';
-      c.innerHTML = '<div class="kr-txt"><div class="kr-t">' + cfg.data[i][0] + '</div>' +
-        '<div class="kr-v">' + cfg.data[i][1] + '</div></div>' +
-        (cfg.data[i][2] === 'p' ? penta() : round());
-      wrap.appendChild(c);
-    }
+    wrap.setAttribute('data-grid', KAN() ? KAN().grid() : '');
+    wrap.innerHTML = cardsHTML(cfg);
     return wrap;
+  }
+
+  function buildHead() {
+    var d = document.createElement('div');
+    d.id = HEAD_ID;
+    d.innerHTML = '<span class="kr-ht">看结果</span><span class="kr-more">查看更多 ›</span>';
+    d.addEventListener('click', function (e) {
+      if (!e.target.closest || !e.target.closest('.kr-more')) return;
+      e.stopPropagation();
+    }, true);
+    return d;
   }
 
   /* 当前一级页签（个人/小区/园楼/集团/家庭）→ 对应配置 key
@@ -161,7 +110,7 @@
 
   function activeTopType() {
     var btns = document.querySelectorAll('#root button');
-    var found = undefined, foundW = -1;
+    var found, foundW = -1;
     for (var i = 0; i < btns.length; i += 1) {
       var t = (btns[i].textContent || '').trim();
       if (TOP_NAMES.indexOf(t) < 0) continue;
@@ -172,7 +121,7 @@
       var w = btns[i].parentNode ? btns[i].parentNode.getBoundingClientRect().width : 0;
       if (w > foundW) { found = t; foundW = w; }
     }
-    return found;   /* undefined = 识别不到（过渡态），null 不会出现 */
+    return found;   /* undefined = 识别不到（过渡态） */
   }
 
   function isRingRow(n) {
@@ -192,15 +141,18 @@
   /* 离开「总览」/ 换页签时还原原生内容（仅在当前页签没有 6 卡配置时用） */
   function restore() {
     var g = document.getElementById(GRID_ID);
-    if (!g) return;
-    var hidden = g.__krHidden || [];
-    for (var i = 0; i < hidden.length; i += 1) {
-      if (!hidden[i]) continue;
-      if (hidden[i].style) hidden[i].style.display = '';
-      hidden[i].__krDone = 0;   /* 允许切回「总览」时重新注入 */
+    if (g) {
+      var hidden = g.__krHidden || [];
+      for (var i = 0; i < hidden.length; i += 1) {
+        if (!hidden[i]) continue;
+        if (hidden[i].style) hidden[i].style.display = '';
+        hidden[i].__krDone = 0;   /* 允许切回「总览」时重新注入 */
+      }
+      g.__krHidden = [];
+      if (g.parentNode) g.parentNode.removeChild(g);
     }
-    g.__krHidden = [];
-    if (g.parentNode) g.parentNode.removeChild(g);
+    var h = document.getElementById(HEAD_ID);
+    if (h && h.parentNode) h.parentNode.removeChild(h);
   }
 
   function cfgOf(key) {
@@ -232,7 +184,7 @@
     var hits = [];
     for (var i = 0; i < nodes.length; i += 1) {
       var el = nodes[i];
-      if (el.closest && el.closest('#' + GRID_ID + ',#subYdPanel,#subYdTabs')) continue;
+      if (el.closest && el.closest('#' + GRID_ID + ',#' + HEAD_ID + ',#subYdPanel,#subYdTabs,#krObjList')) continue;
       var t = el.textContent || '';
       if (t.length > 70) continue;
       var c = matchCfg(t);
@@ -290,13 +242,33 @@
   }
 
   function cardsHTML(cfg) {
+    var data = dataOf(cfg);
     var html = '';
-    for (var i = 0; i < cfg.data.length; i += 1) {
-      html += '<div class="kr-card"><div class="kr-txt"><div class="kr-t">' + cfg.data[i][0] + '</div>' +
-        '<div class="kr-v">' + cfg.data[i][1] + '</div></div>' +
-        (cfg.data[i][2] === 'p' ? penta() : round()) + '</div>';
+    for (var i = 0; i < data.length; i += 1) {
+      html += '<div class="kr-card"><div class="kr-txt"><div class="kr-t">' + data[i][0] + '</div>' +
+        '<div class="kr-v">' + data[i][1] + '</div></div>' +
+        (data[i][2] === 'p' ? penta() : round()) + '</div>';
     }
     return html;
+  }
+
+  /* 「看结果」标题：仅小区/园楼/集团/家庭需要（个人页原生已有） */
+  function ensureHead(grid, cfg, card, beforeEl) {
+    var head = document.getElementById(HEAD_ID);
+    if (!cfg.head) {
+      if (head && head.parentNode) head.parentNode.removeChild(head);
+      return;
+    }
+    if (!head) head = buildHead();
+    if (head.parentNode !== card || head.nextElementSibling !== grid) {
+      card.insertBefore(head, grid);
+    }
+    /* 标题必须在 6 卡之前；若 anchor 是别的元素，把 head+grid 依次放到 anchor 前 */
+    if (beforeEl && beforeEl.parentNode === card && beforeEl !== grid && beforeEl !== head) {
+      card.insertBefore(head, beforeEl);
+      card.insertBefore(grid, beforeEl);
+    }
+    void beforeEl;
   }
 
   var busy = false, again = false;
@@ -313,6 +285,8 @@
 
       var grid = document.getElementById(GRID_ID);
       var gridKey = grid ? grid.getAttribute('data-kr') : null;
+      var gridData = grid ? grid.getAttribute('data-grid') : null;
+      var curGrid = KAN() ? KAN().grid() : '';
 
       if (want === undefined) { if (grid) fixHidden(grid); return; }
       if (want === null) { if (grid) restore(); return; }
@@ -321,22 +295,31 @@
       if (!cfg) { if (grid) restore(); return; }
 
       var sw = sweep(cfg, grid ? grid.__krHidden : null);
+      var hasAnchor = !!(sw.firstVisible || sw.first);
 
       if (grid) {
-        if (gridKey !== want) {                /* 换页签：就地换内容，绝不先还原原生块（否则会闪旧版式） */
-          grid.innerHTML = cardsHTML(cfg);
-          grid.setAttribute('data-kr', want);
-        }
+        if (gridKey !== want) { grid.innerHTML = cardsHTML(cfg); grid.setAttribute('data-kr', want); }
+        else if (gridData !== curGrid) { grid.innerHTML = cardsHTML(cfg); grid.setAttribute('data-grid', curGrid); }
         grid.__krHidden = sw.store;
-        var anchor0 = sw.firstVisible || sw.first;    /* 优先挂到「真的看得见」的那份页面 */
+        var anchor0 = sw.firstVisible || sw.first;  /* 优先挂到「真的看得见」的那份页面 */
         if (anchor0 && grid.parentNode !== anchor0.card) {
-          /* 各页签可能是各自独立的 DOM 子树：把 grid 搬到当前页的锚点位置 */
           anchor0.card.insertBefore(grid, anchor0.el);
+          ensureHead(grid, cfg, anchor0.card, anchor0.el);
           applySoon();
-        } else if (anchor0 && !grid.getClientRects().length && anchor0.el.getClientRects().length) {
-          applySoon();                                /* 位置对了但还没显示出来，下一帧再核一次 */
+        } else if (anchor0) {
+          ensureHead(grid, cfg, anchor0.card, null);
+          if (!grid.getClientRects().length && anchor0.el.getClientRects().length) applySoon();
         }
+        /* 不在「总览」（例如切到「全球通客户」子页签）：整块先收起来 */
+        grid.style.display = hasAnchor ? '' : 'none';
         fixHidden(grid);
+        if (hasAnchor && grid.style.display === '') {
+          var h = document.getElementById(HEAD_ID);
+          if (h) h.style.display = '';
+        } else {
+          var h2 = document.getElementById(HEAD_ID);
+          if (h2) h2.style.display = 'none';
+        }
         return;
       }
       var anchor1 = sw.firstVisible || sw.first;
@@ -344,6 +327,7 @@
       var g = buildGrid(cfg);
       g.__krHidden = sw.store;
       anchor1.card.insertBefore(g, anchor1.el);
+      ensureHead(g, cfg, anchor1.card, anchor1.el);
       fixHidden(g);
       applySoon();
     } finally {
@@ -363,8 +347,7 @@
     apply();
   }
 
-  /* 点一级页签后连打几枪：RN 可能在点击后的不同时机才把新页面挂好，
-     只靠 MutationObserver 容易漏掉「挂好但还没可见」的瞬间 */
+  /* 点一级页签后连打几枪：RN 可能在点击后的不同时机才把新页面挂好 */
   function burst() {
     var delays = [0, 40, 120, 260, 520, 900];
     for (var i = 0; i < delays.length; i += 1) setTimeout(apply, delays[i]);
@@ -384,5 +367,5 @@
     new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
   setInterval(apply, 900);
-  window.__krStatHook = 'v6';
+  window.__krStatHook = 'v8';
 })();

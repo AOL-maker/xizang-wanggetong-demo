@@ -38,14 +38,25 @@
     '</svg>';
 
   /* 指标 → 名单筛选用关键词（与下方名单同一规则） */
-  var DATA = [
-    { name: '当月携出客户数', cur: '800', yday: '600', key: '融合客户' },
-    { name: '当月降档客户数', cur: '800', yday: '600', key: '宽带客户' },
-    { name: '当月离网客户数', cur: '800', yday: '600', key: '待安排维系' },
-    { name: '当月投诉客户数', cur: '800', yday: '600', key: '业务办理异常' },
-    { name: '当月解约客户数', cur: '800', yday: '600', key: '服务事项未闭环' },
-    { name: '流失预警客户数', cur: '800', yday: '600', key: '业务使用变化' }
-  ];
+  var KEYS = ['融合客户', '宽带客户', '待安排维系', '业务办理异常', '服务事项未闭环', '业务使用变化'];
+
+  /* 数字来自 kan-data.js，按当前网格取值；拿不到数据时用兜底值 */
+  var FALLBACK = [[6, 3], [5, 3], [4, 2], [7, 4], [3, 1], [14, 7]];
+  var DATA = buildData();
+
+  function buildData() {
+    var k = window.WGT_KAN;
+    var counts = FALLBACK, names = ['当月携出客户数', '当月降档客户数', '当月离网客户数', '当月投诉客户数', '当月解约客户数', '流失预警客户数'];
+    if (k && k.yd) {
+      var y = k.yd('per');
+      if (y && y.counts && y.counts.length === 6) { counts = y.counts; names = y.metrics || names; }
+    }
+    var out = [];
+    for (var i = 0; i < 6; i += 1) {
+      out.push({ name: names[i], cur: String(counts[i][0]), yday: String(counts[i][1]), key: KEYS[i] });
+    }
+    return out;
+  }
 
   var active = -1;
   var originTitle = null;
@@ -143,8 +154,10 @@
   }
 
   function buildGrid() {
+    DATA = buildData();
     var wrap = document.createElement('div');
     wrap.id = GRID_ID;
+    wrap.setAttribute('data-grid', window.WGT_KAN ? window.WGT_KAN.grid() : '');
     DATA.forEach(function (d, i) {
       var c = document.createElement('div');
       c.className = 'yd-card';
@@ -205,10 +218,35 @@
     return (n && n.parentElement === ancestor) ? n : null;
   }
 
+  function paintNums() {
+    var wrap = document.getElementById(GRID_ID);
+    if (!wrap) return;
+    DATA = buildData();
+    var cards = wrap.querySelectorAll('.yd-card');
+    for (var i = 0; i < cards.length && i < DATA.length; i += 1) {
+      var n = cards[i].querySelector('.yd-num');
+      var y = cards[i].querySelector('.yd-yday b');
+      if (n) n.textContent = DATA[i].cur;
+      if (y) y.textContent = DATA[i].yday;
+      cards[i].setAttribute('data-yd', String(i));
+    }
+  }
+
   function apply() {
     injectStyle();
     if (!isYidongActive()) { restore(); return; }
-    if (document.getElementById(GRID_ID)) { if (active >= 0) applyFilter(); return; }
+    var curGrid = window.WGT_KAN ? window.WGT_KAN.grid() : '';
+    if (document.getElementById(GRID_ID)) {
+      var wrap0 = document.getElementById(GRID_ID);
+      if ((wrap0.getAttribute('data-grid') || '') !== curGrid) {
+        wrap0.setAttribute('data-grid', curGrid);
+        paintNums();
+        if (active >= 0) applyFilter();
+        return;
+      }
+      if (active >= 0) applyFilter();
+      return;
+    }
 
     /* 1) 以标题文本为锚点，锁定统计卡容器 */
     var els = document.querySelectorAll('#root div');
@@ -274,5 +312,5 @@
   else applyGuarded();
   try { new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
   setInterval(applyGuarded, 900);
-  window.__ydStatHook = 'v3';
+  window.__ydStatHook = 'v4';
 })();
