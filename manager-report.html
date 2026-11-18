@@ -133,6 +133,34 @@
     .history-row{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px}.history-row b{font-size:15px}.history-row p{font-size:12px;color:#707782;margin:6px 0 0}
     .st{float:right;font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px}
     .st.done{color:#128a52;background:#eafaf1}.st.doing{color:#b9740a;background:#fff6e6}
+    /* 工单详情（重点任务「反馈」进入） */
+    #ticketPage{background:#edf2f9}
+    #ticketPage.active{display:flex;flex-direction:column;min-height:100vh}
+    .tk-head{height:54px;grid-template-columns:54px 1fr 54px;background:#fff;border-bottom:0;flex:0 0 auto}
+    .tk-head h1{font-size:17px;font-weight:500;color:#2b3038}
+    .tk-head button{font-size:26px;color:#a2aab4;min-height:44px;display:grid;place-items:center}
+    .tk-body{flex:1 1 auto;padding:10px 13px 0}
+    .tk-card{background:#fff;border-radius:12px;padding:2px 18px;margin-bottom:11px}
+    .tk-row{display:grid;grid-template-columns:106px 1fr;gap:6px;align-items:start;padding:15px 0;border-top:1px solid #f1f3f6}
+    .tk-row:first-child{border-top:0}
+    .tk-label{font-size:13.5px;color:#3a3f46;line-height:1.75}
+    .tk-label em{color:#e74a3b;font-style:normal;margin-left:2px}
+    .tk-val{font-size:13px;color:#3a3f46;line-height:1.8;white-space:pre-line;word-break:break-word}
+    .tk-person{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 0;border-top:1px solid #f1f3f6;font-size:13.5px;color:#3a3f46}
+    .tk-person:first-child{border-top:0}
+    .tk-person b{font-weight:400}
+    .tk-person span{color:#8d949d;display:flex;align-items:center;gap:5px}
+    .tk-person span i{font-style:normal;color:#c7ced8;font-size:16px;line-height:1}
+    .tk-feed{padding:15px 18px 16px}
+    .tk-feed-title{font-size:13px;color:#3a3f46;margin-bottom:8px}
+    .tk-feed-title em{color:#e74a3b;font-style:normal;margin-left:2px}
+    .tk-feed textarea{width:100%;min-height:92px;border:1px solid #dfe6ef;border-radius:9px;padding:10px 11px;font:inherit;font-size:13px;line-height:1.7;color:#25282d;background:#fbfcfe;resize:vertical}
+    .tk-feed textarea::placeholder{color:#a9b1bb}
+    .tk-feed textarea:focus{outline:none;border-color:#8eb8f5;background:#fff;box-shadow:0 0 0 2px #e8f2ff}
+    .tk-footer{flex:0 0 auto;padding:8px 13px 20px;background:#edf2f9}
+    .tk-footer button{width:100%;min-height:46px;border-radius:8px;background:#0878ee;color:#fff;font-size:15px;font-weight:600}
+    .tk-footer button:active{background:#0768d0}
+    @media(max-width:520px){.tk-row{grid-template-columns:104px 1fr}.tk-label,.tk-val{font-size:13px}}
     @media(max-width:520px){
       .topbar{grid-template-columns:54px 1fr 82px;padding:0 8px}.title{font-size:21px}.records{font-size:14px}
       .filters{height:112px;padding:8px 16px;grid-template-columns:1fr;gap:4px}
@@ -203,6 +231,19 @@
     <header class="sub-head"><button data-back-sub>‹</button><h1>报告记录</h1><span></span></header>
     <div class="sub-content" id="historyList"></div>
   </section>
+
+  <section class="subpage" id="ticketPage">
+    <header class="sub-head tk-head"><button id="tkBack" aria-label="返回">‹</button><h1>工单详情</h1><span></span></header>
+    <div class="tk-body">
+      <div class="tk-card" id="tkFields"></div>
+      <div class="tk-card tk-feed">
+        <div class="tk-feed-title">处理反馈<em>*</em></div>
+        <textarea id="tkFeedback" placeholder="请填写本次处理结果与客户反馈…"></textarea>
+      </div>
+      <div class="tk-card" id="tkPeople"></div>
+    </div>
+    <div class="tk-footer"><button id="tkSubmit">提交</button></div>
+  </section>
 </main>
 <div class="toast" id="toast"></div>
 <script>
@@ -235,7 +276,8 @@ const DAY = {
     { t: '晨会点名 · 今日目标确认', m: '已完成', done: true },
     { t: '网格区域巡检 2 个小区', m: '已完成', done: true },
     { t: '李老板续签谈判', m: '', chip: '重点', chipCls: 'key', done: false },
-    { t: '工单 #C2081 上门处理', m: '', chip: 'SLA 18:00', chipCls: 'sla', done: false },
+    { t: '工单 #C2081 上门处理', m: '', chip: 'SLA 18:00', chipCls: 'sla', done: false,
+      tk: { type: '上门处理', sub: '上门处理', title: '用户网络慢，需要进行设备检查', phone: '13845627764', addr: '昌都市芒康县金阳小区2栋1104房', desc: '用户反馈宽带速度慢，想退订宽带，需要上门进行网络和设备检查。' } },
     { t: '商机补录：餐饮连锁需求', m: '', done: false },
     { t: '欠费催缴：扎西 1280 元逾期 7 天', m: '', done: false },
     { t: '客户建档：金阳花园 3 户未建档', m: '', done: false }
@@ -447,7 +489,7 @@ function renderTodos() {
     <div class="todo ${x.done ? 'done' : ''}" data-i="${i}">
       <span class="box"><i></i></span>
       <div><div class="todo-title">${x.t}</div>${x.m ? `<div class="todo-meta">${x.m}</div>` : ''}</div>
-      <div class="todo-right">${x.chip ? `<span class="chip ${x.chipCls || ''}">${x.chip}</span>` : ''}${x.done ? '' : '<button class="fb" data-toast="已打开反馈录入">反馈</button>'}</div>
+      <div class="todo-right">${x.chip ? `<span class="chip ${x.chipCls || ''}">${x.chip}</span>` : ''}${x.done ? '' : `<button class="fb" data-fb="${i}">反馈</button>`}</div>
     </div>`).join('');
   const n = d.todos.filter(x => x.done).length;
   document.getElementById('todoCount').textContent = n + '/' + d.todos.length + ' 项';
@@ -455,6 +497,96 @@ function renderTodos() {
   document.getElementById('draftHint').innerHTML = d.draftHint + '<span class="lnk" data-toast="打开日报草稿">查看</span>';
   notifyParent();
 }
+
+/* ---------- 工单详情：重点任务「反馈」进入 ---------- */
+const TICKET_STORE = 'wgtTicketFeedV1';
+const DONE_STORE = 'wgtTodoDoneV1';
+const ME_NAME = (document.title || '').split('·')[0].trim() || '张明';
+
+function meRole() {
+  try {
+    const s = JSON.parse(localStorage.getItem('wanggetong-preferences-v1') || '{}');
+    return (s.state && s.state.role) || '网格经理';
+  } catch (e) { return '网格经理'; }
+}
+function readStore(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) { return {}; } }
+function writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+/* 勾选状态持久化：关掉报告再打开、刷新页面都保留 */
+function markDone(p, i, on) {
+  const m = readStore(DONE_STORE); const k = p + '-' + i;
+  if (on) m[k] = 1; else delete m[k];
+  writeStore(DONE_STORE, m);
+}
+function applyDone() {
+  const m = readStore(DONE_STORE);
+  ['day', 'week', 'month'].forEach(k => DATA[k].todos.forEach((t, i) => { if (m[k + '-' + i]) t.done = true; }));
+}
+
+/* 工单内容随当前重点任务走：标题 = 任务标题，描述由任务类型生成，客户信息按任务轮转 */
+const CUST_POOL = [
+  { phone: '13845627764', addr: '昌都市芒康县金阳小区2栋1104房' },
+  { phone: '13908951234', addr: '昌都市芒康县如美镇318国道12号' },
+  { phone: '15889012345', addr: '昌都市芒康县盐井镇盐田路6号' },
+  { phone: '13618902345', addr: '昌都市芒康县嘎托镇团结路27号' }
+];
+const TK_RULES = [
+  { re: /续签|谈判/, type: '客户维系', sub: '续约洽谈', desc: '客户对续签方案有异议，需上门沟通资费与权益，避免客户流失。' },
+  { re: /催缴|欠费/, type: '欠费催缴', sub: '欠费催缴', desc: '客户欠费逾期未缴，需上门告知并协助完成缴费，避免影响业务使用。' },
+  { re: /巡检/, type: '现场巡检', sub: '区域巡检', desc: '按网格巡检计划现场核查线路与设备，发现隐患当场处理并登记。' },
+  { re: /建档/, type: '客户建档', sub: '客户建档', desc: '补充客户基础信息与业务使用情况，完善网格客户档案。' },
+  { re: /回访/, type: '电话回访', sub: '投诉回访', desc: '对客户投诉进行回访，确认问题是否解决并记录满意度。' },
+  { re: /商机/, type: '商机跟进', sub: '商机推进', desc: '商机停滞多日，需再次对接客户需求，推动商机转化。' },
+  { re: /工单|上门|安装/, type: '上门处理', sub: '上门处理', desc: '现场处理客户网络与设备问题，处理完成后回填处理结果。' }
+];
+
+function ticketOf(todo, i) {
+  if (todo.tk) return todo.tk;
+  const r = TK_RULES.find(x => x.re.test(todo.t)) || TK_RULES[TK_RULES.length - 1];
+  const c = CUST_POOL[i % CUST_POOL.length];
+  const extra = [todo.m, todo.chip].filter(Boolean).join(' · ');
+  return { type: r.type, sub: r.sub, title: todo.t, phone: c.phone, addr: c.addr,
+    desc: r.desc + (extra ? '（' + extra + '）' : '') };
+}
+
+let curTicket = -1;
+
+function openTicket(i) {
+  const todo = DATA[period].todos[i];
+  if (!todo) return;
+  curTicket = i;
+  const tk = ticketOf(todo, i);
+  const rows = [['工单类型', tk.type], ['问题单子类', tk.sub], ['问题单标题', tk.title]];
+  document.getElementById('tkFields').innerHTML = rows.map(([l, v]) =>
+    `<div class="tk-row"><div class="tk-label">${l}<em>*</em></div><div class="tk-val">${v}</div></div>`).join('')
+    + `<div class="tk-row"><div class="tk-label">问题单描述<em>*</em></div><div class="tk-val">用户号码：${tk.phone}\n用户地址：${tk.addr}\n描述：${tk.desc}</div></div>`;
+  /* 提交角色 = 当前登录角色；问题处理人 = 当前登录人 */
+  document.getElementById('tkPeople').innerHTML =
+    `<div class="tk-person"><b>提交角色</b><span>${meRole()}<i>›</i></span></div>
+     <div class="tk-person"><b>问题处理人</b><span>${ME_NAME}<i>›</i></span></div>`;
+  document.getElementById('tkFeedback').value = readStore(TICKET_STORE)[period + '-' + i] || '';
+  openView('ticket');
+}
+
+function submitTicket() {
+  if (curTicket < 0) return;
+  const ta = document.getElementById('tkFeedback');
+  const text = (ta.value || '').trim();
+  if (!text) { showToast('请先填写处理反馈'); ta.focus(); return; }
+  const i = curTicket;
+  const m = readStore(TICKET_STORE); m[period + '-' + i] = text; writeStore(TICKET_STORE, m);
+  /* 提交即完成：重点任务打勾，卡片/报告数据同步 */
+  DATA[period].todos[i].done = true;
+  markDone(period, i, true);
+  curTicket = -1;
+  closeView();
+  renderTodos();
+  if (!savedMap[planKey()] && !editing) renderPlan();
+  notifyParent();
+  showToast('反馈已提交 · 该重点任务已标记完成');
+}
+
+document.getElementById('tkBack').onclick = () => { curTicket = -1; closeView(); };
+document.getElementById('tkSubmit').onclick = submitTicket;
 
 /* ---------- 渲染：计划（只读 / 编辑） ---------- */
 let editing = false;
@@ -655,18 +787,22 @@ document.getElementById('btnSavePlan').onclick = () => {
   showToast(`计划已保存 · 共 ${currentItems().length} 项`);
 };
 
-/* 待办勾选 */
+/* 待办：点「反馈」进工单详情；点行本体切换完成状态 */
 document.addEventListener('click', e => {
+  const fb = e.target.closest('[data-fb]');
+  if (fb) { openTicket(+fb.dataset.fb); return; }
   const el = e.target.closest('[data-toast]');
   if (el) { showToast(el.dataset.toast); return; }
   const row = e.target.closest('.todo');
   if (row && !e.target.closest('.fb')) {
     const i = +row.dataset.i;
-    DATA[period].todos[i].done = !DATA[period].todos[i].done;
+    const next = !DATA[period].todos[i].done;
+    DATA[period].todos[i].done = next;
+    markDone(period, i, next);
     renderTodos();
     /* 未勾选的待办集合变了 → 若计划尚未保存，同步刷新默认计划 */
     if (!savedMap[planKey()] && !editing) renderPlan();
-    showToast(DATA[period].todos[i].done ? '已标记完成 · 日报同步更新' : '已取消完成标记');
+    showToast(next ? '已标记完成 · 日报同步更新' : '已取消完成标记');
   }
 });
 
@@ -677,6 +813,7 @@ document.querySelectorAll('[data-view]').forEach(x => x.onclick = () => openView
 document.querySelectorAll('[data-back-sub]').forEach(x => x.onclick = closeView);
 document.getElementById('backBtn').onclick = () => parent.postMessage({ type: 'closeManagerReport', back: true }, '*');
 
+applyDone();   /* 先应用已保存的勾选状态，再渲染 */
 renderPeriod();
 </script>
 </body>
