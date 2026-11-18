@@ -94,6 +94,11 @@
   window.addEventListener('wgt:report-closed', schedule);   /* 关掉报告浮层后按最新数据刷一次 */
   window.addEventListener('wgt:grid-change', schedule);
   setInterval(function () { try { paint(); } catch (e) {} }, 1500);
+  /* iframe 一加载完就立刻刷一次，不必等 1.5s 轮询（消除首屏几秒的旧假数） */
+  ['managerReportFrame', 'leaderReportFrame'].forEach(function (id) {
+    var f = document.getElementById(id);
+    if (f) f.addEventListener('load', function () { try { paint(); } catch (e) {} });
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
   else schedule();
 

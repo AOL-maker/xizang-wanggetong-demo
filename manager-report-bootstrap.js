@@ -13,10 +13,10 @@
     }
   }
 
-  /* 预热：角色匹配时就把报告页加载好（隐藏），点开时只需 display:block，
-     避免「先看到原生旧日报页、再跳到新版」的闪屏 */
+  /* 预热：页面一加载就把报告页加载好（隐藏），不等角色确定。
+     登录前 localStorage 里还没有角色；若等角色出现再加载，工作台卡片会先显示几秒
+     写死的 1 / 20% / 0。报告页是纯静态、不依赖角色，无条件预热是安全的。 */
   function preload() {
-    if (currentRole() !== '网格经理') return;
     if (frame.getAttribute('data-loaded') === '1') return;
     frame.setAttribute('data-loaded', '1');
     frame.src = './manager-report.html?v=2';
@@ -80,7 +80,9 @@
       var node = event.target;
       for (var i = 0; i < 4 && node; i += 1, node = node.parentElement) {
         var t = (node.innerText || '').trim();
-        if (/查看 AI\s*[日周月]报与工作建议/.test(t)) { openManagerReport(); return; }
+        /* 必须限定短文本：否则向上遍历到 body 时整页文本也含这句，
+           会在筛选面板等任何弹层里按下鼠标就误开报告浮层 */
+        if (t.length < 40 && /查看 AI\s*[日周月]报与工作建议/.test(t)) { openManagerReport(); return; }
       }
     }, true);
   });
