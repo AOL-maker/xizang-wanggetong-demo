@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>如美网格 · 日报</title>
   <style>
     :root{--blue:#0878ee;--blue-soft:#eaf5ff;--page:#e9f3ff;--ink:#25282d;--muted:#6f7782;--line:#e7ebef;--danger:#e74a3b;--orange:#ee9b1f;--green:#16a05d;--radius:16px}
@@ -38,7 +39,10 @@
     .metric-value{font-size:19px;font-weight:800;color:#19365a}.metric-target{font-size:11px;font-weight:500;color:#959ca5}.metric-gap{font-size:9px;font-weight:800;color:#e64b40;white-space:nowrap}.metric-gap.ok{color:var(--green)}
     .track{height:6px;border-radius:4px;background:#e8edf6;overflow:hidden;margin:5px 0}.bar{height:100%;border-radius:4px;background:#6275e8}.warn .bar{background:#e9a126}
     .metric-foot{font-size:10px;color:#5f6872;white-space:nowrap}
+    .metric-note{margin:10px 0 0;font-size:10px;line-height:1.6;color:#8a939d;background:#f7f9fc;border-radius:8px;padding:7px 9px}
     .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px}
+    .section-head h2{margin:0}
+    .head-meta{font-size:11px;color:#8d949d;white-space:nowrap}
     .collapse{width:34px;height:34px;border-radius:50%;background:#f3f5f8;display:grid;place-items:center;flex:0 0 auto;border:1px solid #e9edf2;transition:background .2s,border-color .2s}
     .collapse:hover{background:#e9eef5;border-color:#dbe3ec}
     .collapse .chev{display:block;width:11px;height:11px;border-left:2.5px solid #7d8590;border-top:2.5px solid #7d8590;border-radius:1.5px;transform:rotate(45deg);transition:transform .28s ease}
@@ -51,7 +55,7 @@
     .wide-btn,.pair button{min-height:44px;border-radius:10px;background:#e7f4ff;color:#0072ed;font-size:13px;font-weight:700;display:grid;place-items:center}
     .wide-btn{width:100%;margin-top:10px}.wide-btn.primary{background:#0877da;color:#fff}
     .anomaly{border:1px solid #ffc2ba;background:#fff8f6;border-radius:11px;padding:11px;margin-top:10px}
-    .tag{display:inline-flex;align-items:center;min-height:22px;padding:2px 9px;border-radius:5px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;margin-right:8px}.tag.red{background:#ed1430}.tag.blue{background:#1689ee}.tag.orange{background:#ef9f25}
+    .tag{display:inline-flex;align-items:center;min-height:22px;padding:2px 9px;border-radius:5px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;margin-right:8px}.tag.red{background:#ed1430}.tag.blue{background:#1689ee}.tag.orange{background:#ef9f25}.tag.gray{background:#8b95a1}
     .anomaly-title,.task-title{font-size:13px;font-weight:800}.small{font-size:10px;color:#626b74;line-height:1.7;margin:6px 0}.desc{font-size:13px;line-height:1.6;margin:7px 0 9px}
     .pair{display:grid;grid-template-columns:1fr 1fr;gap:38px}.pair.single{grid-template-columns:1fr;gap:0}
     .pair button.white{background:#fff}
@@ -60,10 +64,45 @@
     .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
     .quick{min-height:112px;border-radius:11px;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;color:#999}
     .quick strong{font-size:24px;color:#111;margin:6px 0}.quick em{font-style:normal;font-size:15px}.up{color:#79c84b}.down{color:#e55e65}.good{color:#70c54e}.bad{color:#ef6c61}
+    /* 走势条 */
+    .spark{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+    .spark-row{display:grid;grid-template-columns:58px 1fr 58px;align-items:center;gap:8px;font-size:11px;color:#65707c}
+    .spark-track{height:13px;border-radius:7px;background:#eff3f9;overflow:hidden}
+    .spark-bar{height:100%;border-radius:7px;background:linear-gradient(90deg,#9cc6ff,#3b82f6)}
+    .spark-bar.now{background:linear-gradient(90deg,#ffd79f,#ee9b1f)}
+    .spark-row em{display:block;font-style:normal;font-size:9px;color:#a3aab3;font-weight:500}
+    .spark-row>span:first-child{line-height:1.25}
+    .spark-val{text-align:right;font-weight:800;color:#3a4550;font-variant-numeric:tabular-nums;white-space:nowrap}
+    /* 对比 */
+    .cmp-head,.cmp-row{display:grid;align-items:center;gap:6px;font-size:11px}
+    .cmp-head{color:#98a0a9;padding-bottom:7px;border-bottom:1px solid var(--line)}
+    .cmp-row{padding:10px 0;border-bottom:1px solid #f2f5f8}
+    .cmp-row:last-child{border-bottom:0;padding-bottom:0}
+    .cmp-label{font-weight:700;color:#3f4a56;font-size:12px}
+    .cmp-sub{font-size:10px;color:#98a0a9;font-weight:500;margin-top:2px}
+    .cmp-v{text-align:right;color:#66707c;font-variant-numeric:tabular-nums}
+    .cmp-v.cur{font-weight:800;color:#22303f}
+    .delta{display:inline-block;font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;white-space:nowrap}
+    .delta.good{color:#128a52;background:#eafaf1}
+    .delta.bad{color:#d94736;background:#ffece8}
+    .delta.flat{color:#6f7782;background:#f2f4f7}
+    /* 排名 */
+    .rank-row{display:grid;grid-template-columns:26px 1fr 58px;align-items:center;gap:9px;padding:9px 0;border-top:1px solid #f2f5f8;font-size:12px}
+    .rank-row:first-child{border-top:0}
+    .rank-no{width:23px;height:23px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;background:#f2f5f9;color:#7b848f}
+    .rank-no.t1{background:#ffe9c9;color:#b9740a}.rank-no.t2{background:#e8eefb;color:#4a6bbd}.rank-no.t3{background:#fde6d8;color:#bd6a33}
+    .rank-no.low{background:#ffece8;color:#d94736}
+    .rank-name{font-weight:700;line-height:1.4}
+    .rank-note{font-size:10px;color:#98a0a9;font-weight:500;margin-top:2px}
+    .rank-pct{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+    .rank-pct i{font-style:normal;font-size:9px;font-weight:700;color:#a3aab3;margin-left:2px}
+    .rank-split{height:1px;background:#eef2f7;margin:6px 0}
     .footer-actions{padding:34px 35px 24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff}
     .footer-actions button{min-height:50px;border-radius:11px;background:#e7f4ff;color:#0072ed;font-size:14px;font-weight:700}.footer-actions .submit{background:#0877d8;color:#fff}
     .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:rgba(25,31,40,.9);color:#fff;padding:11px 18px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:10;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
     .subpage{display:none;min-height:100vh;background:#f6f8fb}.subpage.active{display:block}.report-page.hidden{display:none}.sub-head{height:64px;display:grid;grid-template-columns:60px 1fr 60px;align-items:center;background:#fff;padding:0 12px;border-bottom:1px solid #eee}.sub-head h1{text-align:center;font-size:20px;margin:0}.sub-content{padding:16px}.history-row,.team-row{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px}.history-row b,.team-row b{font-size:15px}.history-row p,.team-row p{font-size:12px;color:#707782;margin:6px 0 0}
+    .st{float:right;font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px}
+    .st.done{color:#128a52;background:#eafaf1}.st.doing{color:#b9740a;background:#fff6e6}
     @media(max-width:520px){.topbar{grid-template-columns:54px 1fr 82px;padding:0 8px}.title{font-size:21px}.records{font-size:14px}.filters{height:112px;padding:8px 16px;grid-template-columns:1fr;gap:4px}.content{padding:10px;gap:10px}.card{padding:13px}.metric-grid{gap:5px}.metric{padding:7px}.metric-label{font-size:10px}.metric-value{font-size:16px}.metric-foot{font-size:9px}.pair{gap:10px}.quick-grid{gap:5px}.quick{padding:5px}.quick strong{font-size:20px}.footer-actions{padding:24px 16px}.priority-title,.desc,.speech-block{font-size:12px}}
   </style>
 </head>
@@ -73,77 +112,558 @@
     <header class="topbar"><button class="back" id="backBtn" aria-label="返回">‹</button><div class="title" id="pageTitle">如美网格 · 日报</div><button class="records" data-view="history">报告记录 ›</button></header>
     <div class="filters">
       <div class="segments" role="tablist"><button class="segment active" data-period="day">日报</button><button class="segment" data-period="week">周报</button><button class="segment" data-period="month">月报</button></div>
-      <div class="date-nav"><button id="prevDate" aria-label="上一期">‹</button><span id="dateLabel">2026-11-11</span><button id="nextDate" aria-label="下一期">›</button></div>
+      <div class="date-nav"><button id="prevDate" aria-label="上一期">‹</button><span id="dateLabel">2026-11-17</span><button id="nextDate" aria-label="下一期">›</button></div>
     </div>
     <div class="content">
       <section class="card brief">
-        <h2>网格长晨会简报</h2><p class="hint">同一快照提炼 · 点击可下钻到指标依据或业务明细</p>
-        <div class="priority"><span class="num red">1</span><div><div class="priority-title danger">指标缺口 · 宽带新增距目标差8</div><div class="priority-meta">已完成24/32，完成率75%，时间进度100%</div><div class="priority-action">核实宽带新增缺口对象与原因，明确当日推进安排</div></div></div>
-        <div class="priority"><span class="num orange">2</span><div><div class="priority-title">指标缺口 · 5G套包达成率距目标差4</div><div class="priority-meta">已完成8/12，完成率67%，时间进度100%</div><div class="priority-action">核实5G套包达成率缺口对象与原因，明确当日推进安排</div></div></div>
-        <div class="priority"><span class="num blue">3</span><div><div class="priority-title">指标缺口 · 宽带保有率距目标差6.6</div><div class="priority-meta">已完成78.4/85，完成率92%，时间进度100%</div><div class="priority-action">核实宽带保有率缺口对象与原因，明确当日推进安排</div></div></div>
+        <h2 id="briefTitle">网格长晨会简报</h2><p class="hint" id="briefHint">同一快照提炼 · 点击可下钻到指标依据或业务明细</p>
+        <div id="briefList"></div>
       </section>
 
-      <section class="card"><h2>整体经营情况</h2><div class="metric-grid" id="metricGrid"></div></section>
+      <section class="card"><h2 id="metricTitle">整体经营情况</h2><div class="metric-grid" id="metricGrid"></div><p class="metric-note" id="metricNote" hidden></p></section>
+
+      <section class="card" id="trendCard" hidden>
+        <div class="section-head"><h2 id="trendTitle">走势</h2><span class="head-meta" id="trendMeta"></span></div>
+        <div class="spark" id="trendBody"></div>
+      </section>
+
+      <section class="card" id="cmpCard" hidden>
+        <div class="section-head"><h2 id="cmpTitle">对比</h2><span class="head-meta" id="cmpMeta"></span></div>
+        <div id="cmpBody" style="margin-top:8px"></div>
+      </section>
 
       <section class="card" id="speechCard">
-        <div class="section-head"><h2>AI 晨会发言框架</h2><button class="collapse" id="speechToggle" aria-label="收起AI晨会发言框架"><i class="chev"></i></button></div>
-        <p class="speech-intro">完成情况、主要问题、工作安排均引用当前报告快照，点击编辑可调整。</p>
+        <div class="section-head"><h2 id="speechTitle">AI 晨会发言框架</h2><button class="collapse" id="speechToggle" aria-label="收起AI晨会发言框架"><i class="chev"></i></button></div>
+        <p class="speech-intro" id="speechIntro">完成情况、主要问题、工作安排均引用当前报告快照，点击编辑可调整。</p>
         <div class="speech-body" id="speechBody"></div>
         <button class="wide-btn" id="editSpeech">编辑</button>
       </section>
 
-      <section class="card"><h2>AI识别异常指标</h2><div id="anomalies"></div><button class="wide-btn" data-toast="已展开全部6项异常">查看全部6项异常</button></section>
+      <section class="card"><h2 id="anomalyTitle">AI识别异常指标</h2><div id="anomalies"></div><button class="wide-btn" id="moreAnomaly" data-toast="已展开全部6项异常">查看全部6项异常</button></section>
 
-      <section class="card"><h2>团队未完成事项及重点工作</h2><div id="tasks"></div></section>
+      <section class="card"><h2 id="taskTitle">团队未完成事项及重点工作</h2><div id="tasks"></div></section>
 
-      <section class="card"><div class="section-head"><h2>团队快速一览</h2><button class="quick-link" data-view="team">→ 点击切换到团队日报看完整汇总</button></div><div class="quick-grid">
-        <div class="quick">团队均值<strong>82%</strong><em class="up">▲ +5%</em></div>
-        <div class="quick">落后成员<strong>2人</strong><em class="down">● 李四<br>65%</em></div>
-        <div class="quick">标杆成员<strong>1人</strong><em class="good">王小明<br>120%</em></div>
-        <div class="quick">待处理异常<strong>3件</strong><em class="bad">P0 3件</em></div>
-      </div></section>
+      <section class="card"><div class="section-head"><h2 id="quickTitle">团队快速一览</h2><button class="quick-link" data-view="team">→ 点击切换到团队日报看完整汇总</button></div><div class="quick-grid" id="quickGrid"></div></section>
+
+      <section class="card" id="rankCard" hidden>
+        <div class="section-head"><h2 id="rankTitle">团队排名</h2><span class="head-meta" id="rankMeta"></span></div>
+        <div id="rankBody" style="margin-top:6px"></div>
+      </section>
     </div>
     <div class="footer-actions"><button class="submit" data-toast="报告已提交">提交报告</button><button id="exportReport">导出报告文本</button></div>
   </section>
 
-  <section class="subpage" id="historyPage"><header class="sub-head"><button data-back-sub>‹</button><h1>报告记录</h1><span></span></header><div class="sub-content"><div class="history-row"><b>如美网格 · 日报</b><p>2026-11-11 · 已提交</p></div><div class="history-row"><b>如美网格 · 周报</b><p>2026年第45周 · 已提交</p></div><div class="history-row"><b>如美网格 · 月报</b><p>2026年10月 · 已提交</p></div></div></section>
-  <section class="subpage" id="teamPage"><header class="sub-head"><button data-back-sub>‹</button><h1>团队日报完整汇总</h1><span></span></header><div class="sub-content"><div class="team-row"><b>王小明 · 标杆成员</b><p>完成率120% · 宽带转化经验待分享</p></div><div class="team-row"><b>张三 · 网格经理</b><p>1个SLA明日到期 · 处理中60%</p></div><div class="team-row"><b>李四 · 落后成员</b><p>完成率65% · 需重点帮扶</p></div><div class="team-row"><b>赵六 · 网格经理</b><p>今日拜访记录缺失 · 待补录</p></div></div></section>
+  <section class="subpage" id="historyPage"><header class="sub-head"><button data-back-sub>‹</button><h1>报告记录</h1><span></span></header><div class="sub-content" id="historyList"></div></section>
+  <section class="subpage" id="teamPage"><header class="sub-head"><button data-back-sub>‹</button><h1 id="teamPageTitle">团队日报完整汇总</h1><span></span></header><div class="sub-content" id="teamList"></div></section>
 </main>
 <div class="toast" id="toast"></div>
 <script>
-  const metrics=[['收入完成率','86','100','差14',86,false,true],['宽带新增','24','32','缺8',75,true],['融合保有率','96','95','达标',100,false,true],['5G套包达成率','8','12','缺4',67,true],['客户份额','52.1','52','达标',100,false,true],['宽带保有率','78.4','85','缺6.6',92,true],['日必达达成率','78','100','缺22',78,true],['综合考核得分','44.6','60','缺15.4',74,true],['攻坚日均新增','68','81','缺13',84,true]];
-  document.getElementById('metricGrid').innerHTML=metrics.map(m=>`<div class="metric ${m[5]?'warn':''}"><div class="metric-label">${m[0]}</div><div class="metric-line"><span class="metric-value">${m[1]}<span class="metric-target">/${m[2]}</span></span><span class="metric-gap ${m[6]?'ok':''}">${m[3]}</span></div><div class="track"><div class="bar" style="width:${Math.min(m[4],100)}%"></div></div><div class="metric-foot">${m[4]} % · 时间进度 100 %</div></div>`).join('');
-  const speech=[
-    ['一、完成情况','昨天团队收入完成率86%，融合保有率101%，客户份额100%，这两项达标表现不错。\n但不少指标拖了后腿：宽带新增只完成75%，差了8户；5G套包达成率67%，缺口4户；宽带保有率92%，还差6.6个点；日必达、综合考核、攻坚日均新增都存在不同程度差距。\n这里重点说下人员差距—王小明120%领跑全队，但李四只有65%，比团队均值低了17个百分点，主要差在宽带新增和商机转化上。目前还有28笔欠费催收待分派、3件异常待处理。'],
-    ['二、主要问题','三件事要盯死：第一，宽带新增、5G套包、宽带保有率三大核心指标缺口大，当日必须拿出推进动作补缺口；第二，重点事项闭环风险高，28笔欠费催收今天必须分派到10名网格经理，张三那张SLA工单明天12点前要闭环，刘总集团商机已经停滞7天没进展；第三，团队两极分化明显，李四短板突出，再不跟进会拖整体进度。'],
-    ['三、工作安排','1. 指标攻坚：梳理宽带新增、5G套包、宽带保有缺口客户，现场落实责任人；单独对齐李四，找准卡点、评估帮扶资源。\n2. 风险清收：优先处置逾期工单与任务，补齐 4 份订单资料；保障 SLA 投诉工单按时闭环，避免考核超时。\n3. 重点事项：完成 28 笔欠费催收分派；确定刘总商机对接人，启动区县协同；补齐缺失拜访记录。\n4. 标杆带动：安排王小明准备宽带转化经验，后续团队内分享。']
-  ];
-  const renderSpeech=edit=>{document.getElementById('speechBody').innerHTML=speech.map((s,i)=>`<div class="speech-block"><h3>${s[0]}</h3>${edit?`<textarea class="edit-area" data-speech="${i}">${s[1]}</textarea>`:`<p>${s[1].replaceAll('\n','<br>')}</p>`}</div>`).join('')};renderSpeech(false);
-  const anomalyData=[['指标缺口 · 宽带新增距目标差8','已完成24/32，完成率75%，时间进度100%','核实宽带新增缺口对象与原因，明确当日推进安排'],['指标缺口 · 5G套包达成率距目标差4','已完成8/12，完成率67%，时间进度100%','核实5G套包达成率缺口对象与原因，明确当日推进安排'],['指标缺口 · 宽带保有率距目标差6.6','已完成78.4/85，完成率92%，时间进度100%','核实宽带保有率缺口对象与原因，明确当日推进安排']];
-  document.getElementById('anomalies').innerHTML=anomalyData.map(a=>`<div class="anomaly"><div><span class="tag">高风险</span><span class="anomaly-title">${a[0]}</span></div><div class="small">${a[1]}</div><div class="desc">${a[2]}</div><div class="pair"><button data-toast="已发起攻坚">发起攻坚</button><button class="white" data-toast="已打开指标明细">查看明细</button></div></div>`).join('');
-  const tasks=[
-    {tag:'重点工作',tagClass:'red',title:'欠费催收 28 笔 · 一键分派',desc:'紧急：今日内必须分派给10名网格经理',urgent:true,buttons:['分派']},
-    {tag:'未完成事项',tagClass:'blue',title:'张三 · 1个SLA明日到期',desc:'客户投诉工单(WO20261112)明日12:00前必须闭环,当前状态:处理中60%',buttons:['发起提醒','查看工单详情']},
-    {tag:'未完成事项',tagClass:'blue',title:'刘总集团商机停滞7天',desc:'客户此前表示需等集团总部审批，当前无进展，建议安排区县侧协同推进',buttons:['安排协同','查看商机']},
-    {tag:'未完成事项',tagClass:'blue',title:'赵六 · 今日拜访记录缺失',desc:'检测到签到2次但未提交拜访记录，可能遗漏客户需求',buttons:['发起提醒','查看工单详情']}
-  ];
-  document.getElementById('tasks').innerHTML=tasks.map(t=>`<div class="task ${t.urgent?'urgent':''}"><div><span class="tag ${t.tagClass}">${t.tag}</span><span class="task-title">${t.title}</span></div><div class="desc">${t.desc}</div><div class="pair ${t.buttons.length===1?'single':''}">${t.buttons.map((b,i)=>`<button class="${i?'white':''}" data-toast="${b}操作已记录">${b}</button>`).join('')}</div></div>`).join('');
-  const toast=document.getElementById('toast');let toastTimer;function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}
-  document.addEventListener('click',e=>{const el=e.target.closest('[data-toast]');if(el)showToast(el.dataset.toast)});
-  document.getElementById('speechToggle').onclick=()=>{const card=document.getElementById('speechCard');card.classList.toggle('collapsed');document.getElementById('speechBody').style.display=card.classList.contains('collapsed')?'none':'flex';document.getElementById('editSpeech').style.display=card.classList.contains('collapsed')?'none':'grid'};
-  let editing=false;document.getElementById('editSpeech').onclick=e=>{if(editing){document.querySelectorAll('[data-speech]').forEach(x=>speech[+x.dataset.speech][1]=x.value);editing=false;renderSpeech(false);e.target.textContent='编辑';showToast('发言框架已保存')}else{editing=true;renderSpeech(true);e.target.textContent='保存'}};
-  let period='day';let date=new Date(2026,10,11);const PERIOD_TITLE={day:'日报',week:'周报',month:'月报'};
-  function fmtDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-  function isoWeek(dt){const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));const day=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-day+3);const first=new Date(Date.UTC(d.getUTCFullYear(),0,4));const fd=(first.getUTCDay()+6)%7;first.setUTCDate(first.getUTCDate()-fd+3);return{year:d.getUTCFullYear(),week:1+Math.round((d-first)/6048e5)}}
-  function periodLabel(){if(period==='day')return fmtDate(date);if(period==='week'){const w=isoWeek(date);return `${w.year}年第${w.week}周`}return `${date.getFullYear()}年${date.getMonth()+1}月`}
-  function renderPeriod(){document.querySelectorAll('[data-period]').forEach(b=>b.classList.toggle('active',b.dataset.period===period));document.getElementById('dateLabel').textContent=periodLabel();document.getElementById('pageTitle').textContent=`如美网格 · ${PERIOD_TITLE[period]}`;document.title=`如美网格 · ${PERIOD_TITLE[period]}`}
-  function setDate(step){if(period==='day')date.setDate(date.getDate()+step);else if(period==='week')date.setDate(date.getDate()+step*7);else date.setMonth(date.getMonth()+step);renderPeriod()}
-  document.getElementById('prevDate').onclick=()=>setDate(-1);document.getElementById('nextDate').onclick=()=>setDate(1);
-  document.querySelectorAll('[data-period]').forEach(btn=>btn.onclick=()=>{period=btn.dataset.period;renderPeriod()});renderPeriod();
-  function openView(name){document.getElementById('reportPage').classList.add('hidden');document.getElementById(name+'Page').classList.add('active');scrollTo(0,0)}function closeView(){document.querySelectorAll('.subpage').forEach(x=>x.classList.remove('active'));document.getElementById('reportPage').classList.remove('hidden');scrollTo(0,0)}
-  document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>openView(x.dataset.view));document.querySelectorAll('[data-back-sub]').forEach(x=>x.onclick=closeView);
-  document.getElementById('backBtn').onclick=()=>parent.postMessage({type:'closeLeaderReport',back:true},'*');
-  document.getElementById('exportReport').onclick=()=>{const text=[`如美网格 · ${PERIOD_TITLE[period]}`,periodLabel(),'网格长晨会简报',...anomalyData.map(x=>x.join('｜')),...speech.map(x=>x[0]+'\n'+x[1])].join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download=`如美网格${PERIOD_TITLE[period]}_${periodLabel()}.txt`;a.click();URL.revokeObjectURL(a.href);showToast('报告文本已导出')};
+/* ============================================================
+   数据层：日报 / 周报 / 月报三套快照，口径与数量互相咬合
+   - 日报：11/17 当日 vs 日目标
+   - 周报：第 47 周（11/16–11/22）累计 vs 阶段目标（日目标 × 已过 2 天）
+   - 月报：11 月累计 vs 阶段目标（日目标 × 已过 17 天）
+   宽带新增：日 24 + 11/16 的 22 = 周累计 46；月累计 386（W1 168 + W2 172 + W3 46）
+   ============================================================ */
+const DAY = {
+  briefTitle: '网格长晨会简报',
+  briefHint: '同一快照提炼 · 点击可下钻到指标依据或业务明细',
+  priorities: [
+    { cls: 'red', danger: true, title: '指标缺口 · 宽带新增距目标差8', meta: '已完成24/32，完成率75%，时间进度100%', action: '核实宽带新增缺口对象与原因，明确当日推进安排' },
+    { cls: 'orange', danger: false, title: '指标缺口 · 5G套包达成率距目标差4', meta: '已完成8/12，完成率67%，时间进度100%', action: '核实5G套包达成率缺口对象与原因，明确当日推进安排' },
+    { cls: 'blue', danger: false, title: '指标缺口 · 宽带保有率距目标差6.6', meta: '已完成78.4/85，完成率92%，时间进度100%', action: '核实宽带保有率缺口对象与原因，明确当日推进安排' }
+  ],
+  metricTitle: '整体经营情况',
+  metricNote: '',
+  foot: p => p + ' % · 时间进度 100 %',
+  metrics: [
+    ['收入完成率', '86', '100', '差14', 86, false, true],
+    ['宽带新增', '24', '32', '缺8', 75, true, false],
+    ['融合保有率', '96', '95', '达标', 100, false, true],
+    ['5G套包达成率', '8', '12', '缺4', 67, true, false],
+    ['客户份额', '52.1', '52', '达标', 100, false, true],
+    ['宽带保有率', '78.4', '85', '缺6.6', 92, true, false],
+    ['日必达达成率', '78', '100', '缺22', 78, true, false],
+    ['综合考核得分', '44.6', '60', '缺15.4', 74, true, false],
+    ['攻坚日均新增', '68', '81', '缺13', 84, true, false]
+  ],
+  trend: null,
+  cmp: null,
+  rank: null,
+  speechTitle: 'AI 晨会发言框架',
+  speechIntro: '完成情况、主要问题、工作安排均引用当前报告快照，点击编辑可调整。',
+  speech: [
+    ['一、完成情况', '昨天团队收入完成率86%，融合保有率101%，客户份额100%，这两项达标表现不错。\n但不少指标拖了后腿：宽带新增只完成75%，差了8户；5G套包达成率67%，缺口4户；宽带保有率92%，还差6.6个点；日必达、综合考核、攻坚日均新增都存在不同程度差距。\n这里重点说下人员差距—王小明120%领跑全队，但李四只有65%，比团队均值低了17个百分点，主要差在宽带新增和商机转化上。目前还有28笔欠费催收待分派、3件异常待处理。'],
+    ['二、主要问题', '三件事要盯死：第一，宽带新增、5G套包、宽带保有率三大核心指标缺口大，当日必须拿出推进动作补缺口；第二，重点事项闭环风险高，28笔欠费催收今天必须分派到10名网格经理，张三那张SLA工单明天12点前要闭环，刘总集团商机已经停滞7天没进展；第三，团队两极分化明显，李四短板突出，再不跟进会拖整体进度。'],
+    ['三、工作安排', '1. 指标攻坚：梳理宽带新增、5G套包、宽带保有缺口客户，现场落实责任人；单独对齐李四，找准卡点、评估帮扶资源。\n2. 风险清收：优先处置逾期工单与任务，补齐 4 份订单资料；保障 SLA 投诉工单按时闭环，避免考核超时。\n3. 重点事项：完成 28 笔欠费催收分派；确定刘总商机对接人，启动区县协同；补齐缺失拜访记录。\n4. 标杆带动：安排王小明准备宽带转化经验，后续团队内分享。']
+  ],
+  anomalyTitle: 'AI识别异常指标',
+  anomalies: [
+    { tag: '高风险', title: '指标缺口 · 宽带新增距目标差8', meta: '已完成24/32，完成率75%，时间进度100%', action: '核实宽带新增缺口对象与原因，明确当日推进安排' },
+    { tag: '高风险', title: '指标缺口 · 5G套包达成率距目标差4', meta: '已完成8/12，完成率67%，时间进度100%', action: '核实5G套包达成率缺口对象与原因，明确当日推进安排' },
+    { tag: '高风险', title: '指标缺口 · 宽带保有率距目标差6.6', meta: '已完成78.4/85，完成率92%，时间进度100%', action: '核实宽带保有率缺口对象与原因，明确当日推进安排' }
+  ],
+  anomalyMore: '查看全部6项异常',
+  anomalyTotal: 6,
+  taskTitle: '团队未完成事项及重点工作',
+  tasks: [
+    { tag: '重点工作', tagClass: 'red', title: '欠费催收 28 笔 · 一键分派', desc: '紧急：今日内必须分派给10名网格经理', urgent: true, buttons: ['分派'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '张三 · 1个SLA明日到期', desc: '客户投诉工单(WO20261112)明日12:00前必须闭环,当前状态:处理中60%', buttons: ['发起提醒', '查看工单详情'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '刘总集团商机停滞7天', desc: '客户此前表示需等集团总部审批，当前无进展，建议安排区县侧协同推进', buttons: ['安排协同', '查看商机'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '赵六 · 今日拜访记录缺失', desc: '检测到签到2次但未提交拜访记录，可能遗漏客户需求', buttons: ['发起提醒', '查看工单详情'] }
+  ],
+  quickTitle: '团队快速一览',
+  quick: [
+    ['团队均值', '82%', '▲ +5%', 'up'],
+    ['落后成员', '2人', '● 李四<br>65%', 'down'],
+    ['标杆成员', '1人', '王小明<br>120%', 'good'],
+    ['待处理异常', '3件', 'P0 3件', 'bad']
+  ],
+  teamLink: '→ 点击切换到团队日报看完整汇总',
+  history: [
+    ['如美网格 · 日报', '2026-11-17 · 已提交', 'done'],
+    ['如美网格 · 日报', '2026-11-16 · 已提交', 'done'],
+    ['如美网格 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 周报', '2026年第46周 · 已提交', 'done'],
+    ['如美网格 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 月报', '2026年10月 · 已提交', 'done']
+  ],
+  team: [
+    ['王小明 · 标杆成员', '完成率120% · 宽带转化经验待分享'],
+    ['张三 · 网格经理', '1个SLA明日到期 · 处理中60%'],
+    ['李四 · 落后成员', '完成率65% · 需重点帮扶'],
+    ['赵六 · 网格经理', '今日拜访记录缺失 · 待补录']
+  ]
+};
+
+const WEEK = {
+  briefTitle: '网格长周度经营简报',
+  briefHint: '第 47 周（11/16–11/22）截至 11/17 · 已过 2 天 · 阶段目标按日目标×已过天数折算',
+  priorities: [
+    { cls: 'red', danger: true, title: '指标缺口 · 宽带新增周累计距阶段目标差18', meta: '已完成46/64（2天），完成率72%，日均23户低于日均目标32户9户', action: '今日组织2场专项扫楼，重点补齐金阳花园、幸福里两片区缺口' },
+    { cls: 'orange', danger: false, title: '业务发展周排名靠后 · 5G套包16/24', meta: '完成率67%，10名网格经理中排第8，SKU转化仅2.6%', action: '今日对齐李四、马丽、赵六3人，落实存量客户SKU提升动作' },
+    { cls: 'blue', danger: false, title: 'SLA 工单周累计 11 件 · 2 件已超时', meta: '平均首次响应42分钟（目标30分钟），超时集中在11/11、11/16', action: '今日闭环2件超时工单并复盘分派机制，避免周考核扣分' }
+  ],
+  metricTitle: '本周经营情况 · 累计进度',
+  metricNote: '口径：本周（11/16–11/22）累计完成 / 截至今日阶段目标（日目标 × 已过 2 天）· 日均按已过天数折算，供周中纠偏使用。',
+  foot: p => p + '% · 阶段进度 2/7 天',
+  metrics: [
+    ['收入完成率', '85.4', '100', '差14.6', 85, false, false],
+    ['宽带新增', '46', '64', '缺18', 72, true, false],
+    ['融合保有率', '95.6', '95', '达标', 100, false, true],
+    ['5G套包达成率', '16', '24', '缺8', 67, true, false],
+    ['客户份额', '52.1', '52', '达标', 100, false, true],
+    ['宽带保有率', '80.1', '85', '缺4.9', 94, true, false],
+    ['日必达达成率', '81', '100', '缺19', 81, true, false],
+    ['综合考核得分', '47.2', '60', '缺12.8', 79, true, false],
+    ['攻坚日均新增', '71', '81', '缺10', 88, true, false]
+  ],
+  trend: {
+    title: '近 7 日宽带新增走势',
+    meta: '合计 174 户 · 日均 24.9 户',
+    unit: '户',
+    highlightLast: true,
+    rows: [['11/11', 19], ['11/12', 26], ['11/13', 31], ['11/14', 24], ['11/15', 28], ['11/16', 22], ['11/17', 24]]
+  },
+  cmp: {
+    title: '本周 vs 上周',
+    meta: '同为 2 天口径 · 11/16–11/17 vs 11/9–11/10',
+    cols: ['本周', '上周'],
+    rows: [
+      { label: '宽带新增', sub: '户', vals: ['46', '41'], delta: '+5 户（+12.2%）', kind: 'good' },
+      { label: '5G套包', sub: '单', vals: ['16', '14'], delta: '+2 单', kind: 'good' },
+      { label: '宽带保有率', sub: '时点值', vals: ['80.1%', '79.2%'], delta: '+0.9pp', kind: 'good' },
+      { label: '收入完成率', sub: '阶段', vals: ['85.4%', '83.8%'], delta: '+1.6pp', kind: 'good' },
+      { label: 'SLA 超时工单', sub: '件', vals: ['2', '4'], delta: '-2 件', kind: 'good' }
+    ]
+  },
+  rank: {
+    title: '本周成员完成率排名',
+    meta: '10 人 · 团队均值 89.6% · 后 3 名需帮扶',
+    rows: [
+      ['王小明', 118, '宽带新增 9 户 · 全队第一'],
+      ['陈刚', 106, '集团商机转化 2 单'],
+      ['刘敏', 98, '融合套餐续约 6 户'],
+      ['高翔', 95, '拜访量 18 次'],
+      ['周涛', 92, '宽带保有率 84.2%'],
+      ['张明', 90, 'SLA 响应 26 分钟'],
+      ['张三', 88, '1 件工单超时'],
+      ['赵六', 84, '拜访记录缺 2 天'],
+      ['马丽', 64, '5G 套包 0 单'],
+      ['李四', 61, '连续 3 周低于均值']
+    ]
+  },
+  speechTitle: 'AI 周例会发言框架',
+  speechIntro: '口径为本周累计（截至 11/17）· 完成情况、主要问题、下周安排均引用当前快照，可编辑调整。',
+  speech: [
+    ['一、本周完成情况', '本周前两天团队宽带新增累计46户，日均23户，完成阶段目标72%，缺口18户；5G套包16单，完成67%，缺口8单；融合保有率95.6%、客户份额52.1%，两项保持达标。\n收入完成率85.4%，比上周同口径提升1.6个百分点；SLA超时工单从4件降到2件，首次响应从51分钟降到42分钟，工单闭环有改善。\n人员方面，王小明118%领跑，陈刚106%紧随其后；李四61%、马丽64%明显落后，两人5G套包合计只完成1单。'],
+    ['二、本周主要问题', '第一，宽带新增日均23户，比日目标少9户，按这个节奏本周只能完成170户左右，缺口会扩大到54户，必须靠扫楼补回来。\n第二，5G套包是最大短板，全队SKU转化只有2.6%，10个人里3个人零单，说明存量客户触达没做到位。\n第三，SLA还有2件超时（WO20261111、WO20261116），周考核按件扣分，今天必须闭环。\n第四，刘总集团商机推到第12天仍未落地，跨区县协同没跟上。'],
+    ['三、下周工作安排', '1. 宽带补缺：金阳花园、幸福里各排2场驻点，把18户缺口分解到人，日跟踪。\n2. 5G攻坚：梳理存量高价值客户清单，3名零单成员每人每天至少5户触达，下周SKU转化目标提到5%。\n3. 时限闭环：2件超时工单今日清零，建立4小时预警提醒，周内不再新增超时。\n4. 帮扶落后：李四、马丽一对一跟访2次，由王小明带教宽带转化话术。\n5. 商机推进：刘总集团商机本周内确定区县对接人，下周完成方案初稿。']
+  ],
+  anomalyTitle: 'AI识别异常指标 · 本周',
+  anomalies: [
+    { tag: '高风险', title: '指标缺口 · 宽带新增周累计距阶段目标差18', meta: '46/64，完成率72%，日均23户低于目标9户', action: '今日组织2场专项扫楼补缺口，日跟踪到人' },
+    { tag: '趋势异常', title: '11/11 单日宽带新增仅19户 · 近7日最低', meta: '较近7日均值低5.9户，当日无驻点安排', action: '核查当日驻点排班，补齐片区覆盖' },
+    { tag: '人员异常', title: '李四周完成率61% · 连续3周低于均值', meta: '团队均值89.6%，差距28.6个百分点，5G套包0单', action: '安排王小明带教，本周跟访2次' },
+    { tag: '时限风险', title: '2件 SLA 工单已超时（WO20261111、WO20261116）', meta: '平均首次响应42分钟，超时工单周考核按件扣分', action: '今日闭环并复盘分派机制' },
+    { tag: '指标缺口', title: '综合考核得分 47.2/60 · 距达标差12.8', meta: '业务发展、日必达两项拖累，合计失分8.4', action: '按考核项拆解到人，周内逐项补分' }
+  ],
+  anomalyMore: '查看全部5项异常',
+  anomalyTotal: 5,
+  taskTitle: '本周未完成事项及重点工作',
+  tasks: [
+    { tag: '重点工作', tagClass: 'red', title: '欠费催收 146 笔 · 已分派 112 笔', desc: '剩余34笔今日必须清零，其中逾期30天以上21笔（合计2.8万）', urgent: true, buttons: ['继续分派'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '2件 SLA 工单超时未闭环', desc: 'WO20261111（张三，已超时19小时）、WO20261116（赵六，已超时3小时）', buttons: ['发起督办', '查看工单详情'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '刘总集团商机停滞 12 天', desc: '本周无任何跟进记录，客户等待总部审批，需区县侧协同', buttons: ['安排协同', '查看商机'] },
+    { tag: '未完成事项', tagClass: 'gray', title: '5 名成员周拜访记录未补录（共 9 条）', desc: '签到记录与拜访记录不匹配，影响周拜访覆盖率考核', buttons: ['批量提醒'] }
+  ],
+  quickTitle: '团队快速一览 · 本周',
+  quick: [
+    ['团队均值', '89.6%', '▲ +6%', 'up'],
+    ['落后成员', '2人', '● 李四61%<br>马丽64%', 'down'],
+    ['标杆成员', '1人', '王小明<br>118%', 'good'],
+    ['闭环异常', '19件', '待处理 5 件', 'bad']
+  ],
+  teamLink: '→ 点击切换到团队周报看完整汇总',
+  history: [
+    ['如美网格 · 日报', '2026-11-17 · 已提交', 'done'],
+    ['如美网格 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
+    ['如美网格 · 周报', '2026年第45周（11/2–11/8）· 已提交', 'done'],
+    ['如美网格 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 月报', '2026年10月 · 已提交', 'done']
+  ],
+  team: [
+    ['王小明 · 标杆成员', '本周 118% · 宽带新增9户 · 建议下周做经验分享'],
+    ['陈刚 · 稳定发挥', '本周 106% · 集团商机转化2单'],
+    ['张三 · 需关注', '本周 88% · WO20261111 已超时19小时'],
+    ['赵六 · 需关注', '本周 84% · 拜访记录缺2天 · 1件工单超时'],
+    ['马丽 · 落后成员', '本周 64% · 5G套包0单 · 需帮扶'],
+    ['李四 · 落后成员', '本周 61% · 连续3周低于均值']
+  ]
+};
+
+const MONTH = {
+  briefTitle: '网格长月度经营复盘',
+  briefHint: '2026 年 11 月 · 截至 11/17（已过 17 天）· 累计口径，含环比与同比对照',
+  priorities: [
+    { cls: 'red', danger: true, title: '收入进度 86.2% · 距月度目标差 13.8 个点', meta: '剩余13天需日均提升1.1个百分点，当前日均提升0.72个点', action: '锁定高价值存量客户续约与融合升档，本周排出补收清单' },
+    { cls: 'orange', danger: false, title: '宽带新增月累计 386/544 · 缺口 158 户', meta: '日均22.7户，按此节奏月末仅完成 681 户目标的 57%，需提至日均30户', action: '启动3场专项扫楼，把158户缺口分解到10名网格经理按周跟踪' },
+    { cls: 'blue', danger: false, title: '客户份额 51.9% · 环比 -0.2pp', meta: '移动侧在幸福里、金阳花园发起降价促销（月费低20元），异网渗透加剧', action: '本周落地存量保有专项，对2个小区做驻点拦截与到期客户预回访' }
+  ],
+  metricTitle: '本月经营情况 · 累计进度',
+  metricNote: '口径：11/1–11/17 累计完成 / 截至今日阶段目标（日目标 × 已过 17 天）· 环比对照 10 月同期，同比对照 2025 年 11 月同期。',
+  foot: p => p + '% · 阶段进度 17/30 天',
+  metrics: [
+    ['收入完成率', '86.2', '100', '差13.8', 86, false, false],
+    ['宽带新增', '386', '544', '缺158', 71, true, false],
+    ['融合保有率', '95.2', '95', '达标', 100, false, true],
+    ['5G套包达成率', '132', '204', '缺72', 65, true, false],
+    ['客户份额', '51.9', '52.5', '缺0.6', 99, true, false],
+    ['宽带保有率', '81.6', '85', '缺3.4', 96, true, false],
+    ['日必达达成率', '83', '100', '缺17', 83, true, false],
+    ['综合考核得分', '49.8', '60', '缺10.2', 83, true, false],
+    ['攻坚日均新增', '74', '81', '缺7', 91, true, false]
+  ],
+  trend: {
+    title: '本月各周宽带新增',
+    meta: '累计 386 户 · 周均 129 户 · 目标周均 224 户',
+    unit: '户',
+    highlightLast: true,
+    rows: [['W1', 168, '1–7日'], ['W2', 172, '8–14日'], ['W3', 46, '15–17日']]
+  },
+  cmp: {
+    title: '环比 / 同比对照',
+    meta: '环比 = 2026年10月同期 · 同比 = 2025年11月同期',
+    cols: ['本月', '上月', '去年同期'],
+    rows: [
+      { label: '收入完成率', sub: '累计', vals: ['86.2%', '80.0%', '76.4%'], delta: '环比 +6.2pp · 同比 +9.8pp', kind: 'good' },
+      { label: '宽带新增', sub: '户', vals: ['386', '412', '358'], delta: '环比 -26 户 · 同比 +28 户', kind: 'bad' },
+      { label: '客户份额', sub: '时点', vals: ['51.9%', '52.1%', '50.7%'], delta: '环比 -0.2pp · 同比 +1.2pp', kind: 'bad' },
+      { label: '融合保有率', sub: '时点', vals: ['95.2%', '96.0%', '94.9%'], delta: '环比 -0.8pp · 同比 +0.3pp', kind: 'bad' },
+      { label: '综合考核得分', sub: '分', vals: ['49.8', '45.3', '43.7'], delta: '环比 +4.5 分 · 同比 +6.1 分', kind: 'good' }
+    ]
+  },
+  rank: {
+    title: '本月成员累计完成率排名',
+    meta: '10 人 · 团队均值 92.7% · 较上月 +3.6pp',
+    rows: [
+      ['王小明', 121, '月度宽带 52 户 · 全队第一'],
+      ['陈刚', 108, '集团客户 3 家新增'],
+      ['高翔', 101, '融合升档 18 户'],
+      ['刘敏', 97, '拜访覆盖率 96%'],
+      ['周涛', 94, '宽带保有率 85.1%'],
+      ['张明', 91, 'SLA 平均响应 31 分钟'],
+      ['张三', 88, '2 件工单超时'],
+      ['赵六', 86, '建档缺口 4 户'],
+      ['马丽', 79, '5G 套包月仅 6 单'],
+      ['李四', 62, '连续 3 周低于均值']
+    ]
+  },
+  speechTitle: 'AI 月度复盘发言框架',
+  speechIntro: '口径为 11 月累计（截至 11/17）· 含环比/同比对照，可编辑调整。',
+  speech: [
+    ['一、本月完成情况', '11月前17天，团队完成宽带新增386户，日均22.7户，完成阶段目标71%，缺口158户；5G套包132单，完成65%；融合保有率95.2%、客户份额51.9%，两项接近目标。\n收入完成率86.2%，环比10月同期提升6.2个百分点，同比提升9.8个百分点，是本月最大亮点；综合考核得分49.8分，环比提升4.5分。\n人员方面团队均值92.7%，王小明121%、陈刚108%领先；李四62%、马丽79%拖后，两人合计拉低团队均值约1.7个百分点。'],
+    ['二、本月主要问题', '第一，宽带新增和能力目标差距最大：按当前日均只能完成约681户中的386户，月末缺口将扩大到158户以上，靠常规拜访补不回来。\n第二，客户份额环比掉了0.2个百分点，移动侧在幸福里、金阳花园做降价促销，我们没有对应的保有动作。\n第三，5G套包月缺口72单，SKU转化率2.6%远低于全区3.4%的水平，存量客户价值挖掘不到位。\n第四，拜访覆盖率78%，低于90%的月度要求，4名成员未达标。'],
+    ['三、下阶段工作安排', '1. 补缺口：剩余13天日均宽带提到30户，3场专项扫楼（金阳花园、幸福里、阳光新城），缺口按周分解到人。\n2. 保份额：本周落地2个小区的驻点拦截，对到期客户提前15天预回访，月度份额目标回到52%以上。\n3. 提SKU：存量高价值客户清单拆到人，每天5户触达，月度SKU转化提到3.4%。\n4. 补覆盖：4名未达标成员本月内补齐拜访记录，覆盖率回到90%。\n5. 稳队伍：李四、马丽一对一帮扶，王小明带教宽带转化，月度考核前完成2轮跟访。']
+  ],
+  anomalyTitle: 'AI识别异常指标 · 本月',
+  anomalies: [
+    { tag: '高风险', title: '宽带新增月累计缺口 158 户', meta: '386/544，完成率71%，按当前日均月末缺口将扩至 295 户', action: '启动3场专项扫楼，缺口按周分解到人' },
+    { tag: '风险', title: '客户份额 51.9% · 环比 -0.2pp', meta: '移动侧在幸福里、金阳花园降价20元促销，异网渗透加剧', action: '本周落地存量保有专项与驻点拦截' },
+    { tag: '风险', title: '5G套包月缺口 72 单 · SKU 转化 2.6%', meta: '低于全区均值 3.4%，3 名成员月内接近零单', action: '存量高价值客户清单拆解到人，日跟踪' },
+    { tag: '趋势异常', title: 'W3 周均宽带新增 23 户 · 较 W1 下降 4%', meta: 'W1 168 户、W2 172 户、W3（3天）46 户，节奏放缓', action: '核查驻点排班与到访量，恢复周均水平' },
+    { tag: '管理短板', title: '拜访覆盖率 78% · 目标 90%', meta: '4 名成员未达标，合计缺 32 条拜访记录', action: '月末前补齐，纳入月度考核' }
+  ],
+  anomalyMore: '查看全部5项异常',
+  anomalyTotal: 5,
+  taskTitle: '本月未完成事项及重点工作',
+  tasks: [
+    { tag: '重点工作', tagClass: 'red', title: '月度欠费清收 612 笔 · 已完成 508 笔', desc: '完成率83%，剩余104笔（逾期30天以上37笔，合计4.6万）需月末前清零', urgent: true, buttons: ['继续清收'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '11月宽带缺口 158 户 · 3场专项扫楼未排期', desc: '金阳花园、幸福里、阳光新城三片区方案已出，驻点人员与物料未落实', buttons: ['排期扫楼'] },
+    { tag: '未完成事项', tagClass: 'blue', title: '2个小区异网促销应对方案未落地', desc: '幸福里、金阳花园降价促销已持续11天，我方尚无保有动作', buttons: ['下发方案', '查看竞对'] },
+    { tag: '未完成事项', tagClass: 'gray', title: '拜访覆盖率 78%（目标 90%）· 4人未达标', desc: '赵六 61%、李四 64%、马丽 71%、张三 76%', buttons: ['批量提醒'] }
+  ],
+  quickTitle: '团队快速一览 · 本月',
+  quick: [
+    ['团队均值', '92.7%', '▲ +3.6%', 'up'],
+    ['落后成员', '1人', '● 李四<br>62%', 'down'],
+    ['标杆成员', '2人', '王小明121%<br>陈刚108%', 'good'],
+    ['闭环异常', '76件', '待处理 7 件', 'bad']
+  ],
+  teamLink: '→ 点击切换到团队月报看完整汇总',
+  history: [
+    ['如美网格 · 日报', '2026-11-17 · 已提交', 'done'],
+    ['如美网格 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['如美网格 · 月报', '2026年10月 · 已提交', 'done'],
+    ['如美网格 · 月报', '2026年9月 · 已提交', 'done'],
+    ['如美网格 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done']
+  ],
+  team: [
+    ['王小明 · 标杆成员', '月度 121% · 宽带 52 户 · 建议做全区经验分享'],
+    ['陈刚 · 标杆成员', '月度 108% · 集团客户新增 3 家'],
+    ['高翔 · 稳定发挥', '月度 101% · 融合升档 18 户'],
+    ['张三 · 需关注', '月度 88% · 2 件工单超时'],
+    ['赵六 · 需关注', '月度 86% · 建档缺口 4 户 · 拜访覆盖率 61%'],
+    ['马丽 · 落后成员', '月度 79% · 5G 套包仅 6 单'],
+    ['李四 · 落后成员', '月度 62% · 连续 3 周低于均值']
+  ]
+};
+
+const DATA = { day: DAY, week: WEEK, month: MONTH };
+const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
+const TEAM_PAGE_TITLE = { day: '团队日报完整汇总', week: '团队周报完整汇总', month: '团队月报完整汇总' };
+
+/* ---------- 渲染 ---------- */
+function renderBrief(d) {
+  document.getElementById('briefTitle').textContent = d.briefTitle;
+  document.getElementById('briefHint').textContent = d.briefHint;
+  document.getElementById('briefList').innerHTML = d.priorities.map((p, i) => `
+    <div class="priority"><span class="num ${p.cls}">${i + 1}</span><div>
+      <div class="priority-title ${p.danger ? 'danger' : ''}">${p.title}</div>
+      <div class="priority-meta">${p.meta}</div>
+      <div class="priority-action">${p.action}</div>
+    </div></div>`).join('');
+}
+
+function renderMetrics(d) {
+  document.getElementById('metricTitle').textContent = d.metricTitle;
+  document.getElementById('metricGrid').innerHTML = d.metrics.map(m => `
+    <div class="metric ${m[5] ? 'warn' : ''}">
+      <div class="metric-label">${m[0]}</div>
+      <div class="metric-line"><span class="metric-value">${m[1]}<span class="metric-target">/${m[2]}</span></span><span class="metric-gap ${m[6] ? 'ok' : ''}">${m[3]}</span></div>
+      <div class="track"><div class="bar" style="width:${Math.min(m[4], 100)}%"></div></div>
+      <div class="metric-foot">${d.foot(m[4])}</div>
+    </div>`).join('');
+  const note = document.getElementById('metricNote');
+  if (d.metricNote) { note.hidden = false; note.textContent = d.metricNote; } else { note.hidden = true; note.textContent = ''; }
+}
+
+function renderTrend(d) {
+  const card = document.getElementById('trendCard');
+  if (!d.trend) { card.hidden = true; return; }
+  card.hidden = false;
+  document.getElementById('trendTitle').textContent = d.trend.title;
+  document.getElementById('trendMeta').textContent = d.trend.meta;
+  const max = Math.max.apply(null, d.trend.rows.map(r => r[1]));
+  document.getElementById('trendBody').innerHTML = d.trend.rows.map((r, i) => {
+    const now = d.trend.highlightLast && i === d.trend.rows.length - 1;
+    return `<div class="spark-row"><span>${r[0]}${r[2] ? '<em>' + r[2] + '</em>' : ''}</span>
+      <div class="spark-track"><div class="spark-bar ${now ? 'now' : ''}" style="width:${Math.round(r[1] / max * 100)}%"></div></div>
+      <span class="spark-val">${r[1]} ${d.trend.unit}</span></div>`;
+  }).join('');
+}
+
+function renderCmp(d) {
+  const card = document.getElementById('cmpCard');
+  if (!d.cmp) { card.hidden = true; return; }
+  card.hidden = false;
+  document.getElementById('cmpTitle').textContent = d.cmp.title;
+  document.getElementById('cmpMeta').textContent = d.cmp.meta;
+  const cols = d.cmp.cols;
+  const tpl = `grid-template-columns:1fr repeat(${cols.length},62px)`;
+  const head = `<div class="cmp-head" style="${tpl}"><span>指标</span>${cols.map((c, i) => `<span class="cmp-v" style="text-align:right">${c}</span>`).join('')}</div>`;
+  const rows = d.cmp.rows.map(r => `
+    <div class="cmp-row" style="${tpl}">
+      <div><div class="cmp-label">${r.label}</div><div class="cmp-sub">${r.sub} · <span class="delta ${r.kind}">${r.delta}</span></div></div>
+      ${r.vals.map((v, i) => `<span class="cmp-v ${i === 0 ? 'cur' : ''}" style="text-align:right">${v}</span>`).join('')}
+    </div>`).join('');
+  document.getElementById('cmpBody').innerHTML = head + rows;
+}
+
+function renderSpeech(d) {
+  document.getElementById('speechTitle').textContent = d.speechTitle;
+  document.getElementById('speechIntro').textContent = d.speechIntro;
+  renderSpeechBody(false);
+}
+const speechCache = {};
+function currentSpeech() {
+  const d = DATA[period];
+  if (!speechCache[period]) speechCache[period] = d.speech.map(x => [x[0], x[1]]);
+  return speechCache[period];
+}
+function renderSpeechBody(edit) {
+  const speech = currentSpeech();
+  document.getElementById('speechBody').innerHTML = speech.map((s, i) => `
+    <div class="speech-block"><h3>${s[0]}</h3>${edit
+      ? `<textarea class="edit-area" data-speech="${i}">${s[1]}</textarea>`
+      : `<p>${s[1].replaceAll('\n', '<br>')}</p>`}</div>`).join('');
+}
+
+function renderAnomalies(d) {
+  document.getElementById('anomalyTitle').textContent = d.anomalyTitle;
+  document.getElementById('anomalies').innerHTML = d.anomalies.map(a => `
+    <div class="anomaly"><div><span class="tag ${a.tag === '高风险' ? '' : (a.tag === '风险' || a.tag === '趋势异常' ? 'orange' : 'blue')}">${a.tag}</span><span class="anomaly-title">${a.title}</span></div>
+      <div class="small">${a.meta}</div><div class="desc">${a.action}</div>
+      <div class="pair"><button data-toast="已发起攻坚">发起攻坚</button><button class="white" data-toast="已打开指标明细">查看明细</button></div>
+    </div>`).join('');
+  const btn = document.getElementById('moreAnomaly');
+  btn.textContent = d.anomalyMore;
+  btn.dataset.toast = '已展开' + (d.anomalyTotal || d.anomalies.length) + '项异常';
+}
+
+function renderTasks(d) {
+  document.getElementById('taskTitle').textContent = d.taskTitle;
+  document.getElementById('tasks').innerHTML = d.tasks.map(t => `
+    <div class="task ${t.urgent ? 'urgent' : ''}"><div><span class="tag ${t.tagClass}">${t.tag}</span><span class="task-title">${t.title}</span></div>
+      <div class="desc">${t.desc}</div>
+      <div class="pair ${t.buttons.length === 1 ? 'single' : ''}">${t.buttons.map((b, i) => `<button class="${i ? 'white' : ''}" data-toast="${b}操作已记录">${b}</button>`).join('')}</div>
+    </div>`).join('');
+}
+
+function renderQuick(d) {
+  document.getElementById('quickTitle').textContent = d.quickTitle;
+  document.querySelector('.quick-link').textContent = d.teamLink;
+  document.getElementById('quickGrid').innerHTML = d.quick.map(q => `
+    <div class="quick">${q[0]}<strong>${q[1]}</strong><em class="${q[3]}">${q[2]}</em></div>`).join('');
+}
+
+function renderRank(d) {
+  const card = document.getElementById('rankCard');
+  if (!d.rank) { card.hidden = true; return; }
+  card.hidden = false;
+  document.getElementById('rankTitle').textContent = d.rank.title;
+  document.getElementById('rankMeta').textContent = d.rank.meta;
+  const rows = d.rank.rows;
+  document.getElementById('rankBody').innerHTML = rows.map((r, i) => {
+    const cls = i === 0 ? 't1' : i === 1 ? 't2' : i === 2 ? 't3' : (i >= rows.length - 2 ? 'low' : '');
+    return `<div class="rank-row"><span class="rank-no ${cls}">${i + 1}</span>
+      <div><div class="rank-name">${r[0]}</div><div class="rank-note">${r[2]}</div></div>
+      <span class="rank-pct">${r[1]}<i>%</i></span></div>`;
+  }).join('');
+}
+
+function renderSubs(d) {
+  document.getElementById('historyList').innerHTML = d.history.map(h => `
+    <div class="history-row"><span class="st ${h[2]}">${h[2] === 'done' ? '已提交' : '生成中'}</span><b>${h[0]}</b><p>${h[1]}</p></div>`).join('');
+  document.getElementById('teamPageTitle').textContent = TEAM_PAGE_TITLE[period];
+  document.getElementById('teamList').innerHTML = d.team.map(t => `
+    <div class="team-row"><b>${t[0]}</b><p>${t[1]}</p></div>`).join('');
+}
+
+/* ---------- 周期切换 ---------- */
+const toast = document.getElementById('toast'); let toastTimer;
+function showToast(text) { toast.textContent = text; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800); }
+document.addEventListener('click', e => { const el = e.target.closest('[data-toast]'); if (el) showToast(el.dataset.toast); });
+
+let period = 'day';
+let date = new Date(2026, 10, 17);
+function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
+function isoWeek(dt) { const d = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day + 3); const first = new Date(Date.UTC(d.getUTCFullYear(), 0, 4)); const fd = (first.getUTCDay() + 6) % 7; first.setUTCDate(first.getUTCDate() - fd + 3); return { year: d.getUTCFullYear(), week: 1 + Math.round((d - first) / 6048e5) } }
+function weekRange(d) {
+  const s = new Date(d); const day = (s.getDay() + 6) % 7; s.setDate(s.getDate() - day);
+  const e = new Date(s); e.setDate(s.getDate() + 6);
+  return { start: s, end: e, text: `${s.getMonth() + 1}/${s.getDate()}–${e.getMonth() + 1}/${e.getDate()}` };
+}
+function periodLabel() {
+  if (period === 'day') return fmtDate(date);
+  if (period === 'week') return `${isoWeek(date).year}年第${isoWeek(date).week}周 · ${weekRange(date).text}`;
+  return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+}
+
+function renderAll() {
+  const d = DATA[period];
+  document.querySelectorAll('[data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === period));
+  document.getElementById('dateLabel').textContent = periodLabel();
+  document.getElementById('pageTitle').textContent = `如美网格 · ${PERIOD_TITLE[period]}`;
+  document.title = `如美网格 · ${PERIOD_TITLE[period]}`;
+  renderBrief(d); renderMetrics(d); renderTrend(d); renderCmp(d);
+  renderSpeech(d); renderAnomalies(d); renderTasks(d); renderQuick(d); renderRank(d); renderSubs(d);
+  editing = false;
+  document.getElementById('editSpeech').textContent = '编辑';
+  document.getElementById('speechBody').style.display = 'flex';
+  document.getElementById('editSpeech').style.display = 'grid';
+  document.getElementById('speechCard').classList.remove('collapsed');
+}
+
+function setDate(step) {
+  if (period === 'day') date.setDate(date.getDate() + step);
+  else if (period === 'week') date.setDate(date.getDate() + step * 7);
+  else date.setMonth(date.getMonth() + step);
+  renderAll();
+}
+document.getElementById('prevDate').onclick = () => setDate(-1);
+document.getElementById('nextDate').onclick = () => setDate(1);
+document.querySelectorAll('[data-period]').forEach(btn => btn.onclick = () => { period = btn.dataset.period; renderAll(); });
+
+/* ---------- 发言框架 ---------- */
+document.getElementById('speechToggle').onclick = () => {
+  const card = document.getElementById('speechCard');
+  card.classList.toggle('collapsed');
+  const off = card.classList.contains('collapsed');
+  document.getElementById('speechBody').style.display = off ? 'none' : 'flex';
+  document.getElementById('editSpeech').style.display = off ? 'none' : 'grid';
+};
+let editing = false;
+document.getElementById('editSpeech').onclick = e => {
+  if (editing) {
+    document.querySelectorAll('[data-speech]').forEach(x => { currentSpeech()[+x.dataset.speech][1] = x.value; });
+    editing = false; renderSpeechBody(false); e.target.textContent = '编辑'; showToast('发言框架已保存');
+  } else {
+    editing = true; renderSpeechBody(true); e.target.textContent = '保存';
+  }
+};
+
+/* ---------- 子页 / 返回 / 导出 ---------- */
+function openView(name) { document.getElementById('reportPage').classList.add('hidden'); document.getElementById(name + 'Page').classList.add('active'); scrollTo(0, 0) }
+function closeView() { document.querySelectorAll('.subpage').forEach(x => x.classList.remove('active')); document.getElementById('reportPage').classList.remove('hidden'); scrollTo(0, 0) }
+document.querySelectorAll('[data-view]').forEach(x => x.onclick = () => openView(x.dataset.view));
+document.querySelectorAll('[data-back-sub]').forEach(x => x.onclick = closeView);
+document.getElementById('backBtn').onclick = () => parent.postMessage({ type: 'closeLeaderReport', back: true }, '*');
+document.getElementById('exportReport').onclick = () => {
+  const d = DATA[period];
+  const text = [`如美网格 · ${PERIOD_TITLE[period]}`, periodLabel(), d.briefTitle,
+    ...d.priorities.map(p => p.title + '｜' + p.meta + '｜' + p.action),
+    ...d.metrics.map(m => `${m[0]} ${m[1]}/${m[2]} ${m[3]}`),
+    ...currentSpeech().map(x => x[0] + '\n' + x[1])].join('\n\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+  a.download = `如美网格${PERIOD_TITLE[period]}_${periodLabel().replace(/[ ·]/g, '_')}.txt`;
+  a.click(); URL.revokeObjectURL(a.href); showToast('报告文本已导出');
+};
+
+renderAll();
 </script>
 </body>
 </html>

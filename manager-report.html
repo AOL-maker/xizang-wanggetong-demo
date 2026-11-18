@@ -40,6 +40,13 @@
     .pill.p0{color:#e0432f;background:#ffece8;border:1px solid #ffc9bf}
     .pill.sla{color:#d9820d;background:#fff6e6;border:1px solid #f7dfae}
     .pill.high{color:#0d6fdd;background:#e9f3ff;border:1px solid #c7e0ff}
+    /* 关键数据 */
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+    .stat-item{background:#f6f8fb;border:1px solid #e9edf2;border-radius:10px;padding:9px 6px;text-align:center}
+    .stat-item b{display:block;font-size:16px;font-weight:800;color:#19365a;line-height:1.3}
+    .stat-item span{font-size:10px;color:#7b838d;white-space:nowrap}
+    .sum-note{margin:10px 0 0;font-size:11px;line-height:1.7;color:#5f6a76;background:#f7f9fc;border-radius:9px;padding:9px 11px}
+    .sum-note b{color:#2f3944}
     /* 考核进度 */
     .kpi{display:grid;grid-template-columns:74px 1fr 44px;align-items:center;gap:10px;padding:7px 0}
     .kpi-label{font-size:12px;color:#4c545e;white-space:nowrap}
@@ -51,7 +58,7 @@
     .ai-tip .lnk{color:#0d6fdd;font-weight:700}
     /* 待办 */
     .hint{margin:0 0 10px;color:#7b838d;font-size:11px;line-height:1.6}
-    .hint .lnk{color:#0d6fdd;font-weight:700;margin-left:6px}
+    .hint .lnk{color:#0d6fdd;font-weight:700;margin-left:6px;cursor:pointer}
     .todo{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
     .todo:first-of-type{border-top:0}
     .box{width:20px;height:20px;border-radius:6px;border:1.6px solid #c3ccd8;display:grid;place-items:center;background:#fff;transition:.15s}
@@ -68,7 +75,7 @@
     .chip.sla{color:#e0432f;background:#ffece8;border:1px solid #ffc9bf}
     .fb{font-size:11.5px;font-weight:700;color:#0d6fdd;background:#eaf3ff;border-radius:7px;padding:6px 11px;white-space:nowrap}
     .note{margin:12px 0 0;font-size:11px;color:#7b838d;line-height:1.6;background:#f6f8fb;border-radius:9px;padding:9px 11px}
-    /* 明日计划 */
+    /* 计划（只读） */
     .plan-row{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
     .plan-row:first-of-type{border-top:0}
     .plan-tag{font-size:10px;font-weight:800;text-align:center;padding:4px 0;border-radius:6px}
@@ -77,6 +84,37 @@
     .plan-text{font-size:13px;font-weight:600;line-height:1.5}
     .plan-text em{font-style:normal;color:#8b939d;font-weight:500;font-size:11.5px}
     .adjust{font-size:11.5px;font-weight:700;color:#69737f;background:#f2f4f7;border-radius:7px;padding:6px 11px}
+    .plan-saved{margin:12px 0 0;font-size:11px;color:#128a52;background:#eafaf1;border-radius:8px;padding:8px 10px;line-height:1.5}
+    /* 计划（编辑） */
+    .ed-sec{margin-top:14px}
+    .ed-sec:first-child{margin-top:4px}
+    .ed-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:800;color:#3a4550;margin-bottom:4px}
+    .ed-head small{font-weight:600;color:#98a0a9;font-size:10.5px}
+    .ed-toggle{font-size:10.5px;font-weight:700;color:#0d6fdd;background:#eef5ff;border-radius:6px;padding:4px 8px}
+    .ed-item{display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:start;padding:9px 0;border-top:1px solid #f2f5f8;font-size:12.5px;line-height:1.5;cursor:pointer}
+    .ed-item:first-of-type{border-top:0}
+    .cbx{width:20px;height:20px;border-radius:6px;border:1.6px solid #c3ccd8;background:#fff;display:grid;place-items:center;margin-top:1px;flex:0 0 auto}
+    .cbx i{width:10px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+    .ed-item.on .cbx{background:#1f8ff0;border-color:#1f8ff0}
+    .ed-item.on .cbx i{opacity:1}
+    .ed-item.off{cursor:default;color:#aab1ba}
+    .ed-item.off .cbx{background:#f4f6f9;border-color:#e0e6ee;border-style:dashed}
+    .ed-tagline{font-size:10px;color:#98a0a9;margin-top:2px;font-weight:500}
+    .ed-add{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:6px}
+    .ed-input{width:100%;min-height:42px;border:1px solid #d5dee9;border-radius:9px;padding:0 11px;font:inherit;font-size:12.5px;color:#25282d;background:#fff}
+    .ed-input::placeholder{color:#a9b1bb}
+    .ed-input:focus{outline:none;border-color:#8eb8f5;box-shadow:0 0 0 2px #e8f2ff}
+    .ed-add button{min-height:42px;padding:0 15px;border-radius:9px;background:#0877d8;color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap}
+    .pe-row{display:grid;grid-template-columns:46px 1fr 34px;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #f2f5f8}
+    .pe-row:first-of-type{border-top:0}
+    .pe-row input{min-height:38px;border:1px solid #e2e8f0;border-radius:8px;padding:0 10px;font:inherit;font-size:12.5px;background:#fbfcfe;color:#25282d;width:100%}
+    .pe-row input:focus{outline:none;border-color:#8eb8f5;background:#fff}
+    .del{width:32px;height:32px;border-radius:8px;background:#fff1f0;color:#d94736;font-size:14px;font-weight:800;display:grid;place-items:center}
+    .ed-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .ed-actions button{min-height:44px;border-radius:10px;font-size:13px;font-weight:700}
+    .ed-actions .ghost{background:#f4f5f7;color:#5a6370}
+    .ed-actions .primary{background:#0877d8;color:#fff}
+    .ed-empty{font-size:11.5px;color:#a9b1bb;padding:9px 0}
     /* 底部 */
     .footer-actions{padding:22px 24px 28px;background:#fff;display:grid;gap:12px}
     .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -88,6 +126,8 @@
     .subpage{display:none;min-height:100vh;background:#f6f8fb}.subpage.active{display:block}.report-page.hidden{display:none}
     .sub-head{height:64px;display:grid;grid-template-columns:60px 1fr 60px;align-items:center;background:#fff;padding:0 12px;border-bottom:1px solid #eee}.sub-head h1{text-align:center;font-size:20px;margin:0}.sub-content{padding:16px}
     .history-row{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px}.history-row b{font-size:15px}.history-row p{font-size:12px;color:#707782;margin:6px 0 0}
+    .st{float:right;font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px}
+    .st.done{color:#128a52;background:#eafaf1}.st.doing{color:#b9740a;background:#fff6e6}
     @media(max-width:520px){
       .topbar{grid-template-columns:54px 1fr 82px;padding:0 8px}.title{font-size:21px}.records{font-size:14px}
       .filters{height:112px;padding:8px 16px;grid-template-columns:1fr;gap:4px}
@@ -97,6 +137,7 @@
       .priority{grid-template-columns:26px 1fr auto;gap:8px}
       .num{width:26px;height:26px;font-size:12px}
       .priority-title,.todo-title,.plan-text{font-size:12.5px}
+      .stat-item b{font-size:14px}
     }
   </style>
 </head>
@@ -111,20 +152,19 @@
     <div class="content">
       <section class="card">
         <h2 id="keyTitle">今日重点任务 · 3 项</h2>
-        <div class="priority"><span class="num red">01</span><div><div class="priority-title">宽带新增缺口 8 单</div><div class="priority-meta">完成率低于网格均值 23% · 团队宽带整体缺口 128 户</div></div><span class="pill p0">P0 紧急</span></div>
-        <div class="priority"><span class="num orange">02</span><div><div class="priority-title">投诉工单 3 个今日响应</div><div class="priority-meta">12:00 前必须完成首次响应 · 团队 3 张 SLA 投诉分派给我</div></div><span class="pill sla">SLA</span></div>
-        <div class="priority"><span class="num blue">03</span><div><div class="priority-title">刘总集团商机停滞 7 天</div><div class="priority-meta">网格长今日协同推进 · 建议今日跟进 · 目标 3 万收入</div></div><span class="pill high">高价值</span></div>
+        <div id="keyList"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h2 id="statTitle">本期关键数据</h2><span class="head-meta" id="statMeta"></span></div>
+        <div class="stat-grid" id="statGrid"></div>
+        <p class="sum-note" id="statNote" hidden></p>
       </section>
 
       <section class="card">
         <div class="section-head"><h2>个人考核完成进度</h2><span class="head-meta" id="kpiMeta">截止 11/17 · 月度进度 57%</span></div>
-        <div class="kpi"><span class="kpi-label">收入</span><div class="kpi-track"><div class="kpi-bar" style="width:94%"></div></div><span class="kpi-val">94%</span></div>
-        <div class="kpi"><span class="kpi-label">客户规模</span><div class="kpi-track"><div class="kpi-bar" style="width:65%"></div></div><span class="kpi-val">65%</span></div>
-        <div class="kpi"><span class="kpi-label">业务发展</span><div class="kpi-track"><div class="kpi-bar" style="width:40%"></div></div><span class="kpi-val">40%</span></div>
-        <div class="kpi"><span class="kpi-label">社区融合</span><div class="kpi-track"><div class="kpi-bar" style="width:50%"></div></div><span class="kpi-val">50%</span></div>
-        <div class="kpi"><span class="kpi-label">集团客户</span><div class="kpi-track"><div class="kpi-bar" style="width:100%"></div></div><span class="kpi-val">100%</span></div>
-        <div class="kpi"><span class="kpi-label">渠道拓展</span><div class="kpi-track"><div class="kpi-bar" style="width:60%"></div></div><span class="kpi-val">60%</span></div>
-        <div class="ai-tip"><b>AI 提醒</b><br>客户规模 65%、业务发展 40% 双落后，建议下午集中跑<span class="lnk">金阳花园片区</span>，重点挖潜宽带 + 5G 套餐（团队 SKU 仅 2-3%，是最大缺口）</div>
+        <div id="kpiList"></div>
+        <div class="ai-tip" id="aiTip"></div>
       </section>
 
       <section class="card">
@@ -134,16 +174,18 @@
         <p class="note" id="todoNote">勾选后：完成数 5→6 · 进度条 · 日报【今日完成】段落同步更新</p>
       </section>
 
-      <section class="card">
-        <div class="section-head"><h2 id="planTitle">AI 明日计划</h2><span class="head-count">未完成 3 项 + 新增 2 项</span></div>
-        <div id="planList"></div>
+      <section class="card" id="planCard">
+        <div class="section-head"><h2 id="planTitle">AI 明日计划</h2><span class="head-count" id="planCount"></span></div>
+        <p class="hint" id="planHint"></p>
+        <div id="planBody"></div>
+        <p class="plan-saved" id="planSaved" hidden></p>
       </section>
     </div>
     <div class="footer-actions">
       <div class="row3">
-        <button class="ghost" data-toast="已重新生成计划">重新生成</button>
-        <button class="ghost" data-toast="打开手动添加">手动添加</button>
-        <button class="ghost" data-toast="计划已保存">保存计划</button>
+        <button class="ghost" id="btnRegen">重新生成</button>
+        <button class="ghost" id="btnAddManual">手动添加</button>
+        <button class="ghost" id="btnSavePlan">保存计划</button>
       </div>
       <div class="row2">
         <button data-toast="打开日报草稿编辑">编辑日报草稿</button>
@@ -154,26 +196,34 @@
 
   <section class="subpage" id="historyPage">
     <header class="sub-head"><button data-back-sub>‹</button><h1>报告记录</h1><span></span></header>
-    <div class="sub-content">
-      <div class="history-row"><b>张明 · 日报</b><p>2026-11-17 · 已提交</p></div>
-      <div class="history-row"><b>张明 · 周报</b><p>2026年第46周 · 已提交</p></div>
-      <div class="history-row"><b>张明 · 月报</b><p>2026年10月 · 已提交</p></div>
-    </div>
+    <div class="sub-content" id="historyList"></div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
 <script>
-  /* 顶部结构与网格长日报一致：标题居中、报告记录在右、tab 与日期同一行 */
-  let period = 'day';
-  let date = new Date(2026, 10, 17);
-  const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
-  const KEY_TITLE = { day: '今日重点任务 · 3 项', week: '本周重点任务 · 3 项', month: '本月重点任务 · 3 项' };
-  const TODO_TITLE = { day: '今日待办 · 重点任务', week: '本周待办 · 重点任务', month: '本月待办 · 重点任务' };
-  const PLAN_TITLE = { day: 'AI 明日计划', week: 'AI 下周计划', month: 'AI 下月计划' };
-  const DRAFT = { day: '日报草稿 17:50 已自动生成 · 数据来自任务/拜访/商机/工单', week: '周报草稿 周五 17:50 已自动生成 · 数据来自任务/拜访/商机/工单', month: '月报草稿 月末 17:50 已自动生成 · 数据来自任务/拜访/商机/工单' };
-  const NOTE = { day: '勾选后：完成数 5→6 · 进度条 · 日报【今日完成】段落同步更新', week: '勾选后：完成数 5→6 · 进度条 · 周报【本周完成】段落同步更新', month: '勾选后：完成数 5→6 · 进度条 · 月报【本月完成】段落同步更新' };
-
-  const todos = [
+/* ============================================================
+   数据层：日报 / 周报 / 月报各一套，口径互相对得上
+   - 日报：11/17 当日，宽带 3/4、5G 1/2、拜访 5 次
+   - 周报：第 47 周（11/16–11/22）截至 11/17，宽带 9/12、5G 3/4、拜访 18 次
+   - 月报：11 月截至 11/17，宽带 31/60、5G 18/36、拜访 96 次
+   ============================================================ */
+const DAY = {
+  keyTitle: '今日重点任务 · 3 项',
+  priorities: [
+    { cls: 'red', title: '宽带新增缺口 8 单', meta: '完成率低于网格均值 23% · 团队宽带整体缺口 128 户', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '投诉工单 3 个今日响应', meta: '12:00 前必须完成首次响应 · 团队 3 张 SLA 投诉分派给我', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '刘总集团商机停滞 7 天', meta: '网格长今日协同推进 · 建议今日跟进 · 目标 3 万收入', pill: '高价值', pillCls: 'high' }
+  ],
+  statTitle: '本期关键数据',
+  statMeta: '今日 · 数据来自任务/拜访/商机/工单',
+  stats: [['3/4', '宽带新增'], ['1/2', '5G 套包'], ['5 次', '拜访'], ['1 个', '商机成交']],
+  kpiMeta: '截止 11/17 · 月度进度 57%',
+  kpi: [['收入', 94], ['客户规模', 65], ['业务发展', 40], ['社区融合', 50], ['集团客户', 100], ['渠道拓展', 60]],
+  aiTip: '<b>AI 提醒</b><br>客户规模 65%、业务发展 40% 双落后，建议下午集中跑<span class="lnk">金阳花园片区</span>，重点挖潜宽带 + 5G 套餐（团队 SKU 仅 2-3%，是最大缺口）',
+  todoTitle: '今日待办 · 重点任务',
+  draftHint: '日报草稿 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  todoNoteSeg: '日报【今日完成】',
+  todos: [
     { t: '拜访小区物业洽谈宽带团购', m: '成交 3 户', done: true },
     { t: '投诉回访 2 件', m: '已闭环', done: true },
     { t: '金阳花园 5 户宽带安装', m: '已完成', done: true },
@@ -184,92 +234,422 @@
     { t: '商机补录：餐饮连锁需求', m: '', done: false },
     { t: '欠费催缴：扎西 1280 元逾期 7 天', m: '', done: false },
     { t: '客户建档：金阳花园 3 户未建档', m: '', done: false }
-  ];
-  const plans = [
-    { tag: '顺延', cls: 'carry', t: '李老板续签谈判', em: '→ 明日 10:00' },
-    { tag: '顺延', cls: 'carry', t: '工单 #C2081 二次上门', em: '' },
-    { tag: '顺延', cls: 'carry', t: '欠费催缴：扎西 1280 元', em: '' },
-    { tag: '新增', cls: 'add', t: '晨会指派：陪同拜访刘总集团', em: '' },
-    { tag: '新增', cls: 'add', t: 'AI 推荐：3 户宽带临期回访（金阳花园）', em: '' }
-  ];
+  ],
+  planTitle: 'AI 明日计划',
+  target: '明日',
+  suggest: ['晨会指派：陪同拜访刘总集团', 'AI 推荐：3 户宽带临期回访（金阳花园）'],
+  history: [
+    ['张明 · 日报', '2026-11-17 · 已提交', 'done'],
+    ['张明 · 日报', '2026-11-16 · 已提交', 'done'],
+    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 月报', '2026年10月 · 已提交', 'done']
+  ]
+};
 
-  function renderTodos() {
-    document.getElementById('todoList').innerHTML = todos.map((x, i) => `
-      <div class="todo ${x.done ? 'done' : ''}" data-i="${i}">
-        <span class="box"><i></i></span>
-        <div><div class="todo-title">${x.t}</div>${x.m ? `<div class="todo-meta">${x.m}</div>` : ''}</div>
-        <div class="todo-right">${x.chip ? `<span class="chip ${x.chipCls}">${x.chip}</span>` : ''}${x.done ? '' : '<button class="fb" data-toast="已打开反馈录入">反馈</button>'}</div>
-      </div>`).join('');
-    const n = todos.filter(x => x.done).length;
-    document.getElementById('todoCount').textContent = n + '/' + todos.length + ' 项';
-    document.getElementById('todoNote').textContent = noteText(n, n + 1);
-  }
-  function noteText(from, to) {
-    const seg = { day: '日报【今日完成】', week: '周报【本周完成】', month: '月报【本月完成】' }[period];
-    return `勾选后：完成数 ${from}→${to} · 进度条 · ${seg}段落同步更新`;
-  }
-  function renderPlans() {
-    document.getElementById('planList').innerHTML = plans.map((p, i) => `
-      <div class="plan-row"><span class="plan-tag ${p.cls}">${p.tag}</span>
-        <div class="plan-text">${p.t}${p.em ? ' <em>' + p.em.replace('明日', PERIOD_TITLE[period] === '日报' ? '明日' : (period === 'week' ? '下周' : '下月')) + '</em>' : ''}</div>
-        <button class="adjust" data-toast="调整计划内容">调整</button>
-      </div>`).join('');
-  }
+const WEEK = {
+  keyTitle: '本周重点任务 · 3 项',
+  priorities: [
+    { cls: 'red', title: '宽带新增周缺口 3 单', meta: '本周 9/12，完成 75%，日均 4.5 户低于个人日均目标 6 户', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '5G 套包周内补 1 单', meta: '本周 3/4，完成 75%，剩余 6 天需日均 0.2 单即可达成', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '金阳花园异网降价应对', meta: '竞对 11/16 起月费降 20 元 · 本人负责 1 场驻点 · 存量 42 户', pill: '高价值', pillCls: 'high' }
+  ],
+  statTitle: '本期关键数据',
+  statMeta: '本周（11/16–11/17）累计 · 已过 2/7 天',
+  stats: [['9/12', '宽带新增'], ['3/4', '5G 套包'], ['18 次', '拜访'], ['2 个', '商机成交']],
+  summary: '<b>本周小结</b>：11/16–11/17 累计宽带 9 户（日均 4.5 户，个人日均目标 6 户），5G 套包 3 单，拜访 18 次已达周目标 14 次的 129%；SLA 工单 1 件待闭环（11/19 到期）。周完成率 90%，网格 10 人中排第 6。',
+  kpiMeta: '截止 11/17 · 周进度 2/7 天',
+  kpi: [['收入', 88], ['客户规模', 62], ['业务发展', 55], ['社区融合', 70], ['集团客户', 100], ['渠道拓展', 75]],
+  aiTip: '<b>AI 提醒</b><br>收入 88% 节奏正常，业务发展 55% 落后 11 个点，主因 5G 套包仅 3 单、SKU 转化 2.4%。建议周二、周四各排 1 场<span class="lnk">金阳花园驻点</span>，叠加宽带+5G 组合推荐',
+  todoTitle: '本周待办 · 重点任务',
+  draftHint: '周报草稿 周五 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  todoNoteSeg: '周报【本周完成】',
+  todos: [
+    { t: '周一晨会 · 周目标确认', m: '已完成', done: true },
+    { t: '金阳花园驻点 2 场', m: '已完成 · 登记意向 11 户', done: true },
+    { t: '物业合作洽谈（幸福里）', m: '已完成 · 团购 5 户', done: true },
+    { t: '宽带安装 5 户', m: '已完成', done: true },
+    { t: '投诉回访 3 件', m: '已完成 · 全部闭环', done: true },
+    { t: '集团客户拜访 1 家（刘总）', m: '已完成 · 待方案', done: true },
+    { t: '欠费催缴 9 笔', m: '已完成 · 回收 6,420 元', done: true },
+    { t: '周拜访记录补录', m: '已完成', done: true },
+    { t: '5G 套包补 1 单', m: '', chip: '重点', chipCls: 'key', done: false },
+    { t: '工单 #C2081 二次上门', m: '', chip: 'SLA 11/19', chipCls: 'sla', done: false },
+    { t: '幸福里 12 户到期客户预回访', m: '已完成 7/12 户', chip: '', done: false },
+    { t: '商机补录：餐饮连锁（停滞 5 天）', m: '', done: false }
+  ],
+  planTitle: 'AI 下周计划',
+  target: '下周',
+  suggest: ['晨会指派：金阳花园第 3 场驻点（周三 15:00）', 'AI 推荐：5 户 5G 套包临期客户触达'],
+  history: [
+    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
+    ['张明 · 周报', '2026年第45周（11/2–11/8）· 已提交', 'done'],
+    ['张明 · 日报', '2026-11-17 · 已提交', 'done'],
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 月报', '2026年10月 · 已提交', 'done']
+  ]
+};
 
-  const toast = document.getElementById('toast'); let toastTimer;
-  function showToast(text) { toast.textContent = text; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800); }
+const MONTH = {
+  keyTitle: '本月重点任务 · 3 项',
+  priorities: [
+    { cls: 'red', title: '月度宽带缺口 29 户', meta: '31/60，完成 52%，剩余 13 天需日均 2.3 户（当前日均 1.8 户）', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '幸福里存量保有专项', meta: '负责 12 户到期客户预回访，已完成 7 户，剩余 5 户本周清零', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '5G 套包月内补 18 单', meta: '18/36，完成 50%，SKU 转化 2.6% 低于网格 3.1%', pill: '高价值', pillCls: 'high' }
+  ],
+  statTitle: '本期关键数据',
+  statMeta: '11/1–11/17 累计 · 已过 17/30 天',
+  stats: [['31/60', '宽带新增'], ['18/36', '5G 套包'], ['96 次', '拜访'], ['7 个', '商机成交']],
+  summary: '<b>本月小结</b>：11/1–11/17 累计宽带 31 户（日均 1.8 户，目标 3 户）、5G 套包 18 单（50%）、拜访 96 次（覆盖率 87%）；收入完成 91% 为最强项，业务发展 52% 为最大短板，缺口 29 户宽带 + 18 单 5G。月度综合完成率 91%，网格 10 人中排第 6。',
+  kpiMeta: '截止 11/17 · 月度进度 57%',
+  kpi: [['收入', 91], ['客户规模', 68], ['业务发展', 52], ['社区融合', 60], ['集团客户', 100], ['渠道拓展', 66]],
+  aiTip: '<b>AI 提醒</b><br>业务发展 52% 距月度目标差 48 个点，宽带缺口 29 户、5G 缺口 18 单是主因。按剩余 13 天测算，需日均 2.3 户宽带 + 1.4 单 5G，建议把<span class="lnk">幸福里 5 户到期客户</span>并入本周驻点清单',
+  todoTitle: '本月待办 · 重点任务',
+  draftHint: '月报草稿 月末 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  todoNoteSeg: '月报【本月完成】',
+  todos: [
+    { t: '月度经营目标分解与公示', m: '已完成', done: true },
+    { t: '宽带专项扫楼 4 场', m: '已完成 · 成交 23 户', done: true },
+    { t: '集团客户拜访 6 家', m: '已完成', done: true },
+    { t: '欠费催收 78 笔', m: '已完成 · 回收 3.2 万', done: true },
+    { t: '投诉闭环 9 件', m: '已完成', done: true },
+    { t: '渠道网点巡检 3 次', m: '已完成', done: true },
+    { t: '月度培训 2 场（5G + 宽带）', m: '已完成', done: true },
+    { t: '幸福里到期客户预回访 12 户', m: '已完成 7/12 户', chip: '重点', chipCls: 'key', done: false },
+    { t: '5G 套包月内补 18 单', m: '', chip: '缺口', chipCls: 'sla', done: false },
+    { t: '客户建档 4 户未完成', m: '', done: false },
+    { t: '幸福里异网应对方案落地', m: '', done: false },
+    { t: '商机补录 3 条', m: '', done: false }
+  ],
+  planTitle: 'AI 下月计划',
+  target: '下月',
+  suggest: ['月度例会指派：幸福里存量保有专项', 'AI 推荐：12 户融合到期客户续约回访'],
+  history: [
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 月报', '2026年10月 · 已提交', 'done'],
+    ['张明 · 月报', '2026年9月 · 已提交', 'done'],
+    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
+    ['张明 · 日报', '2026-11-17 · 已提交', 'done']
+  ]
+};
 
-  function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
-  function isoWeek(dt) { const d = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day + 3); const first = new Date(Date.UTC(d.getUTCFullYear(), 0, 4)); const fd = (first.getUTCDay() + 6) % 7; first.setUTCDate(first.getUTCDate() - fd + 3); return { year: d.getUTCFullYear(), week: 1 + Math.round((d - first) / 6048e5) } }
-  function weekRange(d) {
-    const s = new Date(d); const day = (s.getDay() + 6) % 7; s.setDate(s.getDate() - day);
-    const e = new Date(s); e.setDate(s.getDate() + 6);
-    return fmtDate(s) + ' — ' + fmtDate(e);
-  }
-  function periodLabel() {
-    if (period === 'day') return fmtDate(date);
-    if (period === 'week') return weekRange(date);
-    return `${date.getFullYear()}年${date.getMonth() + 1}月`;
-  }
-  function renderPeriod() {
-    document.querySelectorAll('[data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === period));
-    document.getElementById('dateLabel').textContent = periodLabel();
-    document.getElementById('pageTitle').textContent = `张明 · ${PERIOD_TITLE[period]}`;
-    document.title = `张明 · ${PERIOD_TITLE[period]}`;
-    document.getElementById('keyTitle').textContent = KEY_TITLE[period];
-    document.getElementById('todoTitle').textContent = TODO_TITLE[period];
-    document.getElementById('planTitle').textContent = PLAN_TITLE[period];
-    document.getElementById('draftHint').innerHTML = DRAFT[period] + '<span class="lnk" data-toast="打开日报草稿">查看</span>';
-    document.getElementById('kpiMeta').textContent = `截止 ${String(date.getMonth() + 1)}/${date.getDate()} · 月度进度 57%`;
-    renderTodos(); renderPlans();
-  }
-  function setDate(step) {
-    if (period === 'day') date.setDate(date.getDate() + step);
-    else if (period === 'week') date.setDate(date.getDate() + step * 7);
-    else date.setMonth(date.getMonth() + step);
-    renderPeriod();
-  }
-  document.getElementById('prevDate').onclick = () => setDate(-1);
-  document.getElementById('nextDate').onclick = () => setDate(1);
-  document.querySelectorAll('[data-period]').forEach(btn => btn.onclick = () => { period = btn.dataset.period; renderPeriod(); });
+const DATA = { day: DAY, week: WEEK, month: MONTH };
+const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 
-  document.addEventListener('click', e => {
-    const el = e.target.closest('[data-toast]');
-    if (el) { showToast(el.dataset.toast); return; }
-    const row = e.target.closest('.todo');
-    if (row && !e.target.closest('.fb')) {
-      const i = +row.dataset.i; todos[i].done = !todos[i].done; renderTodos();
-      showToast(todos[i].done ? '已标记完成 · 日报同步更新' : '已取消完成标记');
-    }
-  });
+let period = 'day';
+let date = new Date(2026, 10, 17);
 
-  function openView(name) { document.getElementById('reportPage').classList.add('hidden'); document.getElementById(name + 'Page').classList.add('active'); scrollTo(0, 0) }
-  function closeView() { document.querySelectorAll('.subpage').forEach(x => x.classList.remove('active')); document.getElementById('reportPage').classList.remove('hidden'); scrollTo(0, 0) }
-  document.querySelectorAll('[data-view]').forEach(x => x.onclick = () => openView(x.dataset.view));
-  document.querySelectorAll('[data-back-sub]').forEach(x => x.onclick = closeView);
-  document.getElementById('backBtn').onclick = () => parent.postMessage({ type: 'closeManagerReport', back: true }, '*');
+/* ---------- 工具 ---------- */
+const toast = document.getElementById('toast'); let toastTimer;
+function showToast(text) { toast.textContent = text; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800); }
+function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
+function isoWeek(dt) { const d = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day + 3); const first = new Date(Date.UTC(d.getUTCFullYear(), 0, 4)); const fd = (first.getUTCDay() + 6) % 7; first.setUTCDate(first.getUTCDate() - fd + 3); return { year: d.getUTCFullYear(), week: 1 + Math.round((d - first) / 6048e5) } }
+function weekRange(d) {
+  const s = new Date(d); const day = (s.getDay() + 6) % 7; s.setDate(s.getDate() - day);
+  const e = new Date(s); e.setDate(s.getDate() + 6);
+  return `${s.getMonth() + 1}/${s.getDate()}–${e.getMonth() + 1}/${e.getDate()}`;
+}
+function periodLabel() {
+  if (period === 'day') return fmtDate(date);
+  if (period === 'week') return `${isoWeek(date).year}年第${isoWeek(date).week}周 · ${weekRange(date)}`;
+  return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+}
+function hhmm() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') }
 
+/* ---------- 计划存储 ---------- */
+const STORE_KEY = 'wgtManagerPlanV1';
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { return {}; } }
+function saveStore(o) { try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {} }
+let savedMap = loadStore();
+function planKey() {
+  if (period === 'day') return 'day:' + fmtDate(date);
+  if (period === 'week') { const w = isoWeek(date); return 'week:' + w.year + '-W' + w.week; }
+  return 'month:' + date.getFullYear() + '-' + (date.getMonth() + 1);
+}
+function defaultPlan() {
+  const items = [];
+  DATA[period].todos.forEach((t, i) => { if (!t.done) items.push({ id: 'c' + i, ti: i, src: 'carry', text: t.t }); });
+  DATA[period].suggest.forEach((s, i) => items.push({ id: 'a' + i, src: 'add', text: s }));
+  return items;
+}
+function currentItems() {
+  const rec = savedMap[planKey()];
+  if (rec && rec.items && rec.items.length) return rec.items;
+  return defaultPlan();
+}
+
+/* ---------- 渲染：重点任务 / 关键数据 / 考核 ---------- */
+function renderKeys() {
+  const d = DATA[period];
+  document.getElementById('keyTitle').textContent = d.keyTitle;
+  document.getElementById('keyList').innerHTML = d.priorities.map((p, i) => `
+    <div class="priority"><span class="num ${p.cls}">${String(i + 1).padStart(2, '0')}</span>
+      <div><div class="priority-title">${p.title}</div><div class="priority-meta">${p.meta}</div></div>
+      <span class="pill ${p.pillCls}">${p.pill}</span></div>`).join('');
+}
+function renderStats() {
+  const d = DATA[period];
+  document.getElementById('statTitle').textContent = d.statTitle;
+  document.getElementById('statMeta').textContent = d.statMeta;
+  document.getElementById('statGrid').innerHTML = d.stats.map(s => `<div class="stat-item"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
+  const note = document.getElementById('statNote');
+  if (d.summary) { note.hidden = false; note.innerHTML = d.summary; } else { note.hidden = true; note.innerHTML = ''; }
+}
+function renderKpi() {
+  const d = DATA[period];
+  document.getElementById('kpiMeta').textContent = d.kpiMeta;
+  document.getElementById('kpiList').innerHTML = d.kpi.map(k => `
+    <div class="kpi"><span class="kpi-label">${k[0]}</span>
+      <div class="kpi-track"><div class="kpi-bar" style="width:${k[1]}%"></div></div>
+      <span class="kpi-val">${k[1]}%</span></div>`).join('');
+  document.getElementById('aiTip').innerHTML = d.aiTip;
+}
+
+/* ---------- 渲染：待办 ---------- */
+function renderTodos() {
+  const d = DATA[period];
+  document.getElementById('todoTitle').textContent = d.todoTitle;
+  document.getElementById('todoList').innerHTML = d.todos.map((x, i) => `
+    <div class="todo ${x.done ? 'done' : ''}" data-i="${i}">
+      <span class="box"><i></i></span>
+      <div><div class="todo-title">${x.t}</div>${x.m ? `<div class="todo-meta">${x.m}</div>` : ''}</div>
+      <div class="todo-right">${x.chip ? `<span class="chip ${x.chipCls || ''}">${x.chip}</span>` : ''}${x.done ? '' : '<button class="fb" data-toast="已打开反馈录入">反馈</button>'}</div>
+    </div>`).join('');
+  const n = d.todos.filter(x => x.done).length;
+  document.getElementById('todoCount').textContent = n + '/' + d.todos.length + ' 项';
+  document.getElementById('todoNote').textContent = `勾选后：完成数 ${n}→${n + 1} · 进度条 · ${d.todoNoteSeg}段落同步更新`;
+  document.getElementById('draftHint').innerHTML = d.draftHint + '<span class="lnk" data-toast="打开日报草稿">查看</span>';
+}
+
+/* ---------- 渲染：计划（只读 / 编辑） ---------- */
+let editing = false;
+let draft = [];
+let doneOpen = false;
+
+function planMeta(items) {
+  const d = DATA[period];
+  const carry = items.filter(x => x.src === 'carry').length;
+  const added = items.length - carry;
+  document.getElementById('planCount').textContent = `未完成 ${carry} 项 + 新增 ${added} 项`;
+  const doneN = d.todos.filter(t => t.done).length;
+  document.getElementById('planHint').innerHTML = `未完成事项自动顺延 · 已完成 ${doneN} 项自动排除 · ${d.target}计划共 ${items.length} 项<span class="lnk" id="planEditLink">编辑</span>`;
+}
+
+function renderPlan() {
+  document.getElementById('planTitle').textContent = DATA[period].planTitle;
+  editing = false;
+  renderPlanRead();
+}
+
+function renderPlanRead() {
+  const items = currentItems();
+  planMeta(items);
+  document.getElementById('planBody').innerHTML = items.length
+    ? items.map((it, i) => `<div class="plan-row">
+        <span class="plan-tag ${it.src}">${it.src === 'carry' ? '顺延' : '新增'}</span>
+        <div class="plan-text">${it.text}</div>
+        <button class="adjust" data-adjust="${i}">调整</button></div>`).join('')
+    : '<div class="ed-empty">暂无计划项</div>';
+  const rec = savedMap[planKey()];
+  const savedEl = document.getElementById('planSaved');
+  if (rec) {
+    savedEl.hidden = false;
+    savedEl.textContent = `已保存 ${rec.savedAt} · ${rec.items.length} 项 · 关闭后重新打开仍会保留`;
+  } else { savedEl.hidden = true; savedEl.textContent = ''; }
+}
+
+function renderEditor(focusIdx) {
+  const d = DATA[period];
+  const todos = d.todos;
+  const undone = todos.map((t, i) => ({ t, i })).filter(x => !x.t.done);
+  const done = todos.map((t, i) => ({ t, i })).filter(x => x.t.done);
+  const carrySet = draft.filter(x => x.src === 'carry').map(x => x.ti);
+
+  const undoHTML = undone.length ? undone.map(({ t, i }) => `
+    <div class="ed-item ${carrySet.indexOf(i) >= 0 ? 'on' : ''}" data-carry="${i}">
+      <span class="cbx"><i></i></span>
+      <div>${t.t}${t.chip ? `<div class="ed-tagline">${t.chip}</div>` : ''}</div>
+    </div>`).join('') : '<div class="ed-empty">本期无未完成任务</div>';
+
+  const doneHTML = done.length ? done.map(({ t }) => `
+    <div class="ed-item off"><span class="cbx"></span>
+      <div>${t.t}<div class="ed-tagline">已完成 · 不带入${d.target}计划</div></div>
+    </div>`).join('') : '<div class="ed-empty">本期无已完成任务</div>';
+
+  const listHTML = draft.length ? draft.map((it, i) => `
+    <div class="pe-row">
+      <span class="plan-tag ${it.src}">${it.src === 'carry' ? '顺延' : '新增'}</span>
+      <input data-text="${i}" value="${it.text.replace(/"/g, '&quot;')}" placeholder="填写${d.target}安排">
+      <button class="del" data-del="${i}" aria-label="删除">×</button>
+    </div>`).join('') : '<div class="ed-empty">勾选未完成任务或新增安排后，计划清单会出现在这里</div>';
+
+  document.getElementById('planBody').innerHTML = `
+    <div class="ed-sec">
+      <div class="ed-head"><span>未完成任务</span><small>${undone.length} 项可带入 · 勾选后进入${d.target}计划</small></div>
+      ${undoHTML}
+    </div>
+    <div class="ed-sec">
+      <div class="ed-head"><span>已完成任务</span><small>${done.length} 项已自动排除</small><button class="ed-toggle" id="edDoneToggle">${doneOpen ? '收起' : '查看'}</button></div>
+      <div ${doneOpen ? '' : 'hidden'}>${doneHTML}</div>
+    </div>
+    <div class="ed-sec">
+      <div class="ed-head"><span>新增安排</span><small>支持手动补充${d.target}工作</small></div>
+      <div class="ed-add">
+        <input class="ed-input" id="edInput" placeholder="例如：回访幸福里 3 户宽带临期客户">
+        <button id="edAddBtn">添加</button>
+      </div>
+    </div>
+    <div class="ed-sec">
+      <div class="ed-head"><span>${d.target}计划清单</span><small>可直接修改文字 · 共 ${draft.length} 项</small></div>
+      ${listHTML}
+    </div>
+    <div class="ed-actions">
+      <button class="ghost" id="edCancel">取消</button>
+      <button class="primary" id="edSave">保存计划</button>
+    </div>`;
+  document.getElementById('planSaved').hidden = true;
+  const link = document.getElementById('planEditLink');
+  if (link) link.style.display = 'none';
+
+  if (focusIdx !== undefined && focusIdx >= 0) {
+    const inp = document.querySelector(`[data-text="${focusIdx}"]`);
+    if (inp) { inp.focus(); inp.select(); }
+  }
+}
+
+function enterEdit(focusIdx, inputFocus) {
+  if (!editing) draft = currentItems().map(x => Object.assign({}, x));
+  editing = true;
+  doneOpen = false;
+  renderEditor(focusIdx);
+  const card = document.getElementById('planCard');
+  if (card.scrollIntoView) card.scrollIntoView({ block: 'start' });
+  if (inputFocus) { const i = document.getElementById('edInput'); if (i) i.focus(); }
+}
+
+function toggleCarry(ti) {
+  const idx = draft.findIndex(x => x.src === 'carry' && x.ti === ti);
+  if (idx >= 0) draft.splice(idx, 1);
+  else draft.push({ id: 'c' + ti, ti: ti, src: 'carry', text: DATA[period].todos[ti].t });
+  renderEditor();
+}
+
+function addDraft() {
+  const inp = document.getElementById('edInput');
+  const text = (inp.value || '').trim();
+  if (!text) { showToast('请先输入安排内容'); inp.focus(); return; }
+  draft.push({ id: 'a' + Date.now(), src: 'add', text: text });
+  renderEditor();
+  const again = document.getElementById('edInput');
+  if (again) again.focus();
+  showToast('已添加 1 项新增安排');
+}
+
+function commitSave() {
+  const empty = draft.filter(x => !x.text.trim());
+  if (empty.length) { showToast(`有 ${empty.length} 项内容为空，请先填写`); return; }
+  if (!draft.length) { showToast('请至少保留 1 项计划'); return; }
+  savedMap[planKey()] = { items: draft.map(x => Object.assign({}, x)), savedAt: hhmm(), label: periodLabel() };
+  saveStore(savedMap);
+  editing = false;
+  const d = DATA[period];
+  renderPlanRead();
+  showToast(`计划已保存 · ${d.target}共 ${draft.length} 项`);
+}
+
+function regenPlan() {
+  delete savedMap[planKey()];
+  saveStore(savedMap);
+  editing = false;
+  renderPlan();
+  showToast(`已按最新任务重新生成 · 共 ${currentItems().length} 项`);
+}
+
+/* 计划区交互（事件委托：挂整张卡片，因为「编辑计划」链接在 #planHint 里） */
+const planCard = document.getElementById('planCard');
+const planBody = document.getElementById('planBody');
+planCard.addEventListener('click', e => {
+  const carry = e.target.closest('[data-carry]');
+  if (carry) { toggleCarry(+carry.dataset.carry); return; }
+  if (e.target.closest('#edDoneToggle')) { doneOpen = !doneOpen; renderEditor(); return; }
+  if (e.target.closest('#edAddBtn')) { addDraft(); return; }
+  const del = e.target.closest('[data-del]');
+  if (del) { draft.splice(+del.dataset.del, 1); renderEditor(); return; }
+  if (e.target.closest('#edCancel')) { editing = false; renderPlanRead(); return; }
+  if (e.target.closest('#edSave')) { commitSave(); return; }
+  if (e.target.closest('#planEditLink')) { enterEdit(); return; }
+  const adj = e.target.closest('[data-adjust]');
+  if (adj) { enterEdit(+adj.dataset.adjust); return; }
+});
+planCard.addEventListener('input', e => {
+  const inp = e.target.closest('[data-text]');
+  if (inp) { draft[+inp.dataset.text].text = inp.value; }
+});
+planCard.addEventListener('keydown', e => {
+  if (e.target.id === 'edInput' && e.key === 'Enter') { e.preventDefault(); addDraft(); }
+});
+
+/* ---------- 周期切换 ---------- */
+function renderPeriod() {
+  document.querySelectorAll('[data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === period));
+  document.getElementById('dateLabel').textContent = periodLabel();
+  document.getElementById('pageTitle').textContent = `张明 · ${PERIOD_TITLE[period]}`;
+  document.title = `张明 · ${PERIOD_TITLE[period]}`;
+  editing = false;
+  draft = [];
+  doneOpen = false;
+  renderKeys(); renderStats(); renderKpi(); renderTodos();
+  renderPlan();
+  document.getElementById('historyList').innerHTML = DATA[period].history.map(h => `
+    <div class="history-row"><span class="st ${h[2]}">${h[2] === 'done' ? '已提交' : '生成中'}</span><b>${h[0]}</b><p>${h[1]}</p></div>`).join('');
+}
+function setDate(step) {
+  if (period === 'day') date.setDate(date.getDate() + step);
+  else if (period === 'week') date.setDate(date.getDate() + step * 7);
+  else date.setMonth(date.getMonth() + step);
   renderPeriod();
+}
+document.getElementById('prevDate').onclick = () => setDate(-1);
+document.getElementById('nextDate').onclick = () => setDate(1);
+document.querySelectorAll('[data-period]').forEach(btn => btn.onclick = () => { period = btn.dataset.period; renderPeriod(); });
+
+/* 底部三个按钮接上真实操作 */
+document.getElementById('btnRegen').onclick = regenPlan;
+document.getElementById('btnAddManual').onclick = () => enterEdit(-1, true);
+document.getElementById('btnSavePlan').onclick = () => {
+  if (editing) { commitSave(); return; }
+  savedMap[planKey()] = { items: currentItems().map(x => Object.assign({}, x)), savedAt: hhmm(), label: periodLabel() };
+  saveStore(savedMap);
+  renderPlanRead();
+  showToast(`计划已保存 · 共 ${currentItems().length} 项`);
+};
+
+/* 待办勾选 */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-toast]');
+  if (el) { showToast(el.dataset.toast); return; }
+  const row = e.target.closest('.todo');
+  if (row && !e.target.closest('.fb')) {
+    const i = +row.dataset.i;
+    DATA[period].todos[i].done = !DATA[period].todos[i].done;
+    renderTodos();
+    /* 未勾选的待办集合变了 → 若计划尚未保存，同步刷新默认计划 */
+    if (!savedMap[planKey()] && !editing) renderPlan();
+    showToast(DATA[period].todos[i].done ? '已标记完成 · 日报同步更新' : '已取消完成标记');
+  }
+});
+
+/* 子页 / 返回 */
+function openView(name) { document.getElementById('reportPage').classList.add('hidden'); document.getElementById(name + 'Page').classList.add('active'); scrollTo(0, 0) }
+function closeView() { document.querySelectorAll('.subpage').forEach(x => x.classList.remove('active')); document.getElementById('reportPage').classList.remove('hidden'); scrollTo(0, 0) }
+document.querySelectorAll('[data-view]').forEach(x => x.onclick = () => openView(x.dataset.view));
+document.querySelectorAll('[data-back-sub]').forEach(x => x.onclick = closeView);
+document.getElementById('backBtn').onclick = () => parent.postMessage({ type: 'closeManagerReport', back: true }, '*');
+
+renderPeriod();
 </script>
 </body>
 </html>
