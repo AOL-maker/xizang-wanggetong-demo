@@ -517,7 +517,7 @@ function planKey() {
   if (period === 'week') { const w = isoWeek(date); return 'week:' + w.year + '-W' + w.week; }
   return 'month:' + date.getFullYear() + '-' + (date.getMonth() + 1);
 }
-/* 计划来源 = 当日待办工单：默认只展示 2 个（重点任务 + 即将到期），「查看全部」展开全量 */
+/* 计划来源 = 当日待办工单：折叠态只展示已勾选任务，入口数字随勾选数变化；「查看全部」展开全量待办供勾选 */
 function defaultPicked() {
   const t = DATA[period].todos;
   const pick = new Set();
@@ -673,9 +673,8 @@ function submitTicket() {
 document.getElementById('tkBack').onclick = () => { curTicket = -1; closeView(); };
 document.getElementById('tkSubmit').onclick = submitTicket;
 
-/* ---------- 渲染：计划（默认 2 项 + 查看全部） ---------- */
-let expanded = false;          /* 是否展开全部任务 */
-const PEEK = 2;                /* 收起时展示的任务数 */
+/* ---------- 渲染：计划（折叠态只展示已勾选任务 + 查看全部） ---------- */
+let expanded = false;          /* 是否展开全量待办列表 */
 
 /* 待办 → 工单卡片字段（样式对齐工单列表：优先级角标 / 客户行 / 字段行 / 处理时限 / 转派处理） */
 const ORDER_CUST = [
@@ -703,8 +702,8 @@ function planMeta(list) {
   document.getElementById('planCount').textContent = `已选 ${list.length} 项${p1 ? ' · 优先级1 ' + p1 + ' 件' : ''}`;
   const doneN = d.todos.filter(t => t.done).length;
   document.getElementById('planHint').innerHTML = savedMap[planKey()]
-    ? `已保存的${d.target}计划 · 点「编辑」可重新勾选 · 已完成 ${doneN} 项自动排除`
-    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 点「编辑」调整 · 已完成 ${doneN} 项自动排除`;
+    ? `已保存的${d.target}计划 · 展开后点「编辑」可重新勾选 · 已完成 ${doneN} 项自动排除`
+    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 展开后点「编辑」调整 · 已完成 ${doneN} 项自动排除`;
 }
 
 function orderOf(todo, i) {
@@ -765,18 +764,19 @@ function renderPlanRead() {
   const picked = currentPicked();
   const pickedList = sortByPriority([...picked].filter(i => todos[i]));
   const openIdx = todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i);
-  const showIdx = expanded ? sortByPriority(openIdx) : pickedList.slice(0, PEEK);
+  const showIdx = expanded ? sortByPriority(openIdx) : pickedList;
   planMeta(pickedList);
 
   const cardsHTML = showIdx.length
     ? `<div class="ck-list">${showIdx.map(i => orderCard(todos[i], i, picked.has(i), true)).join('')}</div>`
-    : '<div class="ed-empty">尚未勾选待办工单 · 点「查看全部」从待办中勾选</div>';
+    : '<div class="ed-empty">尚未勾选待办工单 · 点「查看全部待办」从待办中勾选</div>';
 
-  const moreHTML = openIdx.length > PEEK
-    ? `<button class="ck-more" id="planMore">
-        <span>${expanded ? '收起任务列表' : '查看全部 ' + openIdx.length + ' 个任务'}</span>
-        <i>${expanded ? '⌃' : '›'}</i></button>`
-    : '';
+  const moreLabel = expanded
+    ? '收起任务列表'
+    : (pickedList.length ? `查看全部 ${pickedList.length} 个任务` : '查看全部待办');
+  const moreHTML = `<button class="ck-more" id="planMore">
+        <span>${moreLabel}</span>
+        <i>${expanded ? '⌃' : '›'}</i></button>`;
 
   /* 按钮区与保存提示默认收起，点「查看全部」展开后才出现 */
   const actions = document.getElementById('planActions');
@@ -791,7 +791,7 @@ function renderPlanRead() {
   } else { savedEl.hidden = true; savedEl.textContent = ''; }
 }
 
-/* 未展开时按优先级取前 2 个展示：优先级1 → 2 → 3，同级按任务顺序 */
+/* 按优先级排序：优先级1 → 2 → 3，同级按任务顺序 */
 function sortByPriority(list) {
   const t = DATA[period].todos;
   const pri = i => (t[i].chipCls === 'sla' ? 1 : t[i].chipCls === 'key' ? 2 : 3);
