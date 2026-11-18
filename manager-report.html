@@ -89,7 +89,7 @@
     .ck-list{display:flex;flex-direction:column;gap:12px}
     .ck-card{position:relative;background:#fff;border:1px solid #e0e8f2;border-radius:12px;padding-bottom:11px;overflow:hidden;box-shadow:0 1px 3px rgba(20,44,80,.05);transition:border-color .15s,box-shadow .15s}
     .ck-card.on{border-color:#b9d7fb;box-shadow:0 0 0 2px #eaf3ff inset,0 1px 3px rgba(20,44,80,.05)}
-    .ck-hd{display:flex;align-items:center;gap:8px;padding:13px 12px 7px;padding-right:58px}
+    .ck-hd{display:flex;align-items:center;gap:8px;padding:13px 12px 7px;padding-right:78px}
     .ck-pick{width:23px;height:23px;border-radius:50%;border:1.5px solid #c9d4e2;background:#fff;display:grid;place-items:center;flex:0 0 auto;padding:0}
     .ck-pick i{width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
     .ck-card.on .ck-pick{background:#0878ee;border-color:#0878ee}
@@ -98,7 +98,7 @@
     .ck-title{flex:1 1 auto;min-width:0;font-size:13.5px;font-weight:700;line-height:1.45;color:#25282d}
     .ck-state{flex:0 0 auto;font-size:10.5px;font-weight:700;color:#0d6fdd;background:#eaf3ff;border-radius:5px;padding:3px 7px;white-space:nowrap}
     .ck-state.done{color:#128a52;background:#eafaf1}
-    .ck-pri{position:absolute;right:0;top:0;font-size:10px;font-weight:800;color:#fff;padding:3px 9px;border-radius:0 11px 0 9px;letter-spacing:.2px}
+    .ck-pri{position:absolute;right:9px;top:9px;font-size:10px;font-weight:800;color:#fff;padding:3px 8px;border-radius:7px;letter-spacing:.2px}
     .ck-pri.p1{background:#e74a3b}.ck-pri.p2{background:#f0912a}.ck-pri.p3{background:#5b8ff0}
     .ck-cust{display:flex;align-items:center;gap:8px;padding:1px 12px 7px}
     .ck-phone{font-size:13px;font-weight:700;color:#2b3038;font-variant-numeric:tabular-nums;letter-spacing:.3px}
@@ -129,11 +129,33 @@
     .ck-card:not(.on) .ck-title{font-weight:600;color:#4a535e}
     .ck-hd{cursor:pointer}
     /* 计划卡内操作按钮 */
-    .plan-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid #f0f3f7}
+    .plan-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid #f0f3f7}
     .plan-actions[hidden]{display:none}
     .plan-actions button{min-height:42px;border-radius:10px;background:#f4f5f7;color:#5a6370;font-size:12.5px;font-weight:700;transition:background .15s}
     .plan-actions button:active{background:#e8ebf0}
-    .plan-actions #btnSavePlan{background:#eef5ff;color:#0d6fdd}
+    .plan-actions #btnPlanEdit{background:#eef5ff;color:#0d6fdd}
+    .plan-actions #btnPlanEdit:active{background:#e0edff}
+    /* 独立子页：编辑 AI 明日计划 */
+    #planEditPage{background:#edf2f9}
+    #planEditPage.active{display:flex;flex-direction:column;min-height:100vh}
+    .pe-head{height:54px;grid-template-columns:54px 1fr 54px;background:#fff;border-bottom:0;flex:0 0 auto}
+    .pe-head h1{font-size:17px;font-weight:500;color:#2b3038}
+    .pe-head button{font-size:26px;color:#a2aab4;min-height:44px;display:grid;place-items:center}
+    .pe-body{flex:1 1 auto;padding:10px 13px 4px}
+    .pe-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:12px;color:#6a7280}
+    .pe-tools b{color:#1f2630;font-weight:700}
+    .pe-tools div{display:flex;gap:6px}
+    .pe-tools button{font-size:11.5px;font-weight:700;color:#0d6fdd;background:#fff;border-radius:7px;padding:5px 10px;min-height:28px;box-shadow:0 1px 2px rgba(20,44,80,.06)}
+    .pe-tools button:active{background:#eef5ff}
+    .pe-tip{font-size:11px;color:#98a1ac;margin:0 0 10px;line-height:1.55}
+    #peList .ck-acts{display:none}
+    #peList .ck-card{padding-bottom:13px}
+    #peList .ck-hd{cursor:pointer}
+    .pe-footer{flex:0 0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:10px;padding:10px 13px 20px;background:#edf2f9}
+    .pe-footer button{min-height:46px;border-radius:9px;font-size:14.5px;font-weight:700}
+    .pe-footer .ghost{background:#fff;color:#5a6370}
+    .pe-footer .primary{background:#0878ee;color:#fff}
+    .pe-footer .primary:active{background:#0768d0}
     /* 计划：旧编辑态样式（已停用，保留兼容） */
     .ed-sec{margin-top:14px}
     .ed-sec:first-child{margin-top:4px}
@@ -256,6 +278,7 @@
         <div id="planBody"></div>
         <p class="plan-saved" id="planSaved" hidden></p>
         <div class="plan-actions" id="planActions">
+          <button class="ghost" id="btnPlanEdit">编辑</button>
           <button class="ghost" id="btnSavePlan">保存计划</button>
         </div>
       </section>
@@ -284,6 +307,22 @@
       <div class="tk-card" id="tkPeople"></div>
     </div>
     <div class="tk-footer"><button id="tkSubmit">提交</button></div>
+  </section>
+
+  <section class="subpage" id="planEditPage">
+    <header class="sub-head pe-head"><button id="peBack" aria-label="返回">‹</button><h1 id="peTitle">编辑 AI 明日计划</h1><span></span></header>
+    <div class="pe-body">
+      <div class="pe-tools">
+        <span>本期待办 <b id="peTotal">0</b> 项 · 已选 <b id="pePicked">0</b> 项</span>
+        <div><button data-pe-all="1">全选</button><button data-pe-all="0">清空</button></div>
+      </div>
+      <p class="pe-tip" id="peTip">勾选需带入计划的工单 · 已完成任务不在此列表</p>
+      <div id="peList"></div>
+    </div>
+    <div class="pe-footer">
+      <button class="ghost" id="peCancel">取消</button>
+      <button class="primary" id="peSave">保存计划</button>
+    </div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
@@ -664,8 +703,8 @@ function planMeta(list) {
   document.getElementById('planCount').textContent = `已选 ${list.length} 项${p1 ? ' · 优先级1 ' + p1 + ' 件' : ''}`;
   const doneN = d.todos.filter(t => t.done).length;
   document.getElementById('planHint').innerHTML = savedMap[planKey()]
-    ? `已保存的${d.target}计划 · 点「查看全部」可继续勾选或取消 · 已完成 ${doneN} 项自动排除`
-    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 点圈可勾选或取消 · 已完成 ${doneN} 项自动排除`;
+    ? `已保存的${d.target}计划 · 点「编辑」可重新勾选 · 已完成 ${doneN} 项自动排除`
+    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 点「编辑」调整 · 已完成 ${doneN} 项自动排除`;
 }
 
 function orderOf(todo, i) {
@@ -772,6 +811,77 @@ function togglePick(ti) {
   showToast(on ? `已加入${DATA[period].target}计划 · 共 ${items.length} 项` : `已取消勾选 · 共 ${items.length} 项`);
 }
 
+/* ---------- 独立子页：编辑 AI 明日计划（全量待办多选） ---------- */
+let peDraft = new Set();
+let peScroll = 0;
+
+/* 可编辑范围 = 本期未完成待办，按优先级排序 */
+function peOpenList() {
+  const todos = DATA[period].todos;
+  return sortByPriority(todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i));
+}
+
+function renderPlanEdit() {
+  const todos = DATA[period].todos;
+  const open = peOpenList();
+  document.getElementById('peTitle').textContent = `编辑 ${DATA[period].planTitle}`;
+  document.getElementById('peTotal').textContent = open.length;
+  document.getElementById('pePicked').textContent = peDraft.size;
+  document.getElementById('peTip').innerHTML = `勾选需带入${DATA[period].target}计划的工单 · 已完成任务不在此列表`;
+  document.getElementById('peList').innerHTML = open.length
+    ? `<div class="ck-list">${open.map(i => orderCard(todos[i], i, peDraft.has(i), true)).join('')}</div>`
+    : '<div class="ed-empty">本期没有可加入计划的待办工单</div>';
+}
+
+function openPlanEdit() {
+  peScroll = window.scrollY || 0;
+  peDraft = new Set([...currentPicked()].filter(i => {
+    const t = DATA[period].todos[i];
+    return t && !t.done;
+  }));
+  renderPlanEdit();
+  openView('planEdit');
+  window.scrollTo(0, 0);
+}
+
+function closePlanEdit(restore) {
+  closeView();
+  if (restore) window.scrollTo(0, peScroll || 0);
+}
+
+document.getElementById('peBack').onclick = () => closePlanEdit(true);
+document.getElementById('peCancel').onclick = () => closePlanEdit(true);
+document.getElementById('peSave').onclick = () => {
+  const d = DATA[period];
+  const items = [...peDraft].sort((a, b) => a - b).filter(i => d.todos[i])
+    .map(i => ({ ti: i, text: d.todos[i].t }));
+  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel(), cleared: items.length === 0 };
+  saveStore(savedMap);
+  expanded = false;
+  renderPlanRead();
+  notifyParent();
+  closePlanEdit(true);
+  showToast(`计划已保存 · ${d.target}共 ${items.length} 项`);
+};
+document.getElementById('planEditPage').addEventListener('click', e => {
+  const all = e.target.closest('[data-pe-all]');
+  if (all) {
+    peDraft = all.dataset.peAll === '1' ? new Set(peOpenList()) : new Set();
+    renderPlanEdit();
+    return;
+  }
+  const hit = e.target.closest('.ck-hd') || e.target.closest('.ck-pick');
+  const row = hit && hit.closest('[data-ti]');
+  if (row) {
+    const ti = +row.dataset.ti;
+    if (peDraft.has(ti)) peDraft.delete(ti); else peDraft.add(ti);
+    renderPlanEdit();
+    return;
+  }
+  const call = e.target.closest('[data-call]');
+  if (call) showToast('正在呼叫客户 · 号码已隐藏中间四位');
+});
+
 /* 计划区交互（事件委托：勾选工单 / 展开收起 / 处理进工单详情） */
 const planCard = document.getElementById('planCard');
 planCard.addEventListener('click', e => {
@@ -782,6 +892,7 @@ planCard.addEventListener('click', e => {
   const call = e.target.closest('[data-call]');
   if (call) { showToast('正在呼叫客户 · 号码已隐藏中间四位'); return; }
   if (e.target.closest('#planMore')) { expanded = !expanded; renderPlanRead(); return; }
+  if (e.target.closest('#btnPlanEdit')) { openPlanEdit(); return; }
   if (e.target.closest('#btnSavePlan')) { return; }
   const hit = e.target.closest('.ck-hd') || e.target.closest('.ck-pick');
   const row = hit && hit.closest('[data-ti]');
