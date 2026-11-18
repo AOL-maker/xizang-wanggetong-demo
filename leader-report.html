@@ -466,7 +466,10 @@ window.__WGT_CARD_STATS = (function () {
       { v: String((d.priorities || []).length), l: PRE[p] + '重点事项' }
     ];
   }
-  return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+  /* 每次读取都按当前 DATA 重算 */
+  return function () {
+    return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+  };
 })();
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 const TEAM_PAGE_TITLE = { day: '团队日报完整汇总', week: '团队周报完整汇总', month: '团队月报完整汇总' };

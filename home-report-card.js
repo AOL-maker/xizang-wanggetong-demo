@@ -24,6 +24,7 @@
     if (!f || !f.contentWindow) return null;
     try {
       var s = f.contentWindow.__WGT_CARD_STATS;
+      if (typeof s === 'function') s = s();          /* 报告页按当前数据实时重算 */
       return (s && s.day && s.week && s.month) ? s : null;
     } catch (e) {
       return null;

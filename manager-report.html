@@ -358,7 +358,10 @@ window.__WGT_CARD_STATS = (function () {
       { v: String(left), l: PRE[p] + '待跟进事项' }
     ];
   }
-  return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+  /* 每次读取都按当前 DATA 重算（待办勾选会改 done），保证卡片与报告实时一致 */
+  return function () {
+    return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+  };
 })();
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 
