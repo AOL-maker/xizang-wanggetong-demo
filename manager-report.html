@@ -342,6 +342,24 @@ const MONTH = {
 };
 
 const DATA = { day: DAY, week: WEEK, month: MONTH };
+
+/* 工作台「AI 日报 / 周报 / 月报」卡片三宫格数据
+   —— 由父页面 home-report-card.js 读取，保证卡片数字与本报告口径完全一致 */
+window.__WGT_CARD_STATS = (function () {
+  const PRE = { day: '今日', week: '本周', month: '本月' };
+  function pack(d, p) {
+    const total = d.todos.length;
+    const done = d.todos.filter(t => t.done).length;
+    const left = total - done;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    return [
+      { v: String(done), l: PRE[p] + '有效完成' },
+      { v: pct + '%', l: PRE[p] + '计划进度' },
+      { v: String(left), l: PRE[p] + '待跟进事项' }
+    ];
+  }
+  return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+})();
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 
 let period = 'day';
@@ -414,6 +432,11 @@ function renderKpi() {
 }
 
 /* ---------- 渲染：待办 ---------- */
+/* 通知父页面（工作台卡片）刷新三宫格数据 */
+function notifyParent() {
+  try { if (parent && parent !== window) parent.postMessage({ type: 'wgtReportStats', period: period }, '*'); } catch (e) {}
+}
+
 function renderTodos() {
   const d = DATA[period];
   document.getElementById('todoTitle').textContent = d.todoTitle;
@@ -427,6 +450,7 @@ function renderTodos() {
   document.getElementById('todoCount').textContent = n + '/' + d.todos.length + ' 项';
   document.getElementById('todoNote').textContent = `勾选后：完成数 ${n}→${n + 1} · 进度条 · ${d.todoNoteSeg}段落同步更新`;
   document.getElementById('draftHint').innerHTML = d.draftHint + '<span class="lnk" data-toast="打开日报草稿">查看</span>';
+  notifyParent();
 }
 
 /* ---------- 渲染：计划（只读 / 编辑） ---------- */
@@ -565,6 +589,7 @@ function commitSave() {
   const d = DATA[period];
   renderPlanRead();
   showToast(`计划已保存 · ${d.target}共 ${draft.length} 项`);
+  notifyParent();
 }
 
 /* 计划区交互（事件委托：挂整张卡片，因为「编辑」按钮与调整链接都在卡片内） */
@@ -604,6 +629,7 @@ function renderPeriod() {
   renderPlan();
   document.getElementById('historyList').innerHTML = DATA[period].history.map(h => `
     <div class="history-row"><span class="st ${h[2]}">${h[2] === 'done' ? '已提交' : '生成中'}</span><b>${h[0]}</b><p>${h[1]}</p></div>`).join('');
+  notifyParent();
 }
 function setDate(step) {
   if (period === 'day') date.setDate(date.getDate() + step);

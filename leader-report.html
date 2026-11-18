@@ -452,6 +452,22 @@ const MONTH = {
 };
 
 const DATA = { day: DAY, week: WEEK, month: MONTH };
+
+/* 工作台「AI 日报 / 周报 / 月报」卡片三宫格数据
+   —— 由父页面 home-report-card.js 读取，保证卡片数字与本报告口径完全一致 */
+window.__WGT_CARD_STATS = (function () {
+  const PRE = { day: '今日', week: '本周', month: '本月' };
+  function pack(d, p) {
+    const lag = (d.metrics || []).filter(m => m[5] === true).length;
+    const anom = d.anomalyTotal || (d.anomalies || []).length;
+    return [
+      { v: String(anom), l: PRE[p] + '需关注异常' },
+      { v: String(lag), l: PRE[p] + '目标进度落后' },
+      { v: String((d.priorities || []).length), l: PRE[p] + '重点事项' }
+    ];
+  }
+  return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+})();
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 const TEAM_PAGE_TITLE = { day: '团队日报完整汇总', week: '团队周报完整汇总', month: '团队月报完整汇总' };
 
@@ -615,6 +631,7 @@ function renderAll() {
   document.getElementById('speechBody').style.display = 'flex';
   document.getElementById('editSpeech').style.display = 'grid';
   document.getElementById('speechCard').classList.remove('collapsed');
+  try { if (parent && parent !== window) parent.postMessage({ type: 'wgtReportStats' }, '*'); } catch (e) {}
 }
 
 function setDate(step) {
