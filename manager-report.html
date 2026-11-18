@@ -121,13 +121,20 @@
     .ck-tools span{font-size:11px;color:#7b838d}
     .ck-tools span b{color:#0d6fdd}
     .ck-tools .mini{font-size:11px;font-weight:700;color:#0d6fdd;background:#eef5ff;border-radius:6px;padding:5px 9px;min-height:28px}
-    /* 计划卡内的操作按钮（编辑 / 保存计划） */
-    .plan-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid #f0f3f7}
+    /* 查看全部 / 收起入口 */
+    .ck-more{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;margin-top:12px;background:#f4f9ff;border:1px solid #dbeafc;border-radius:10px;font-size:12.5px;font-weight:700;color:#0d6fdd}
+    .ck-more:active{background:#e8f3ff}
+    .ck-more i{font-style:normal;font-size:14px;line-height:1;color:#5b8ff0}
+    /* 展开后未勾选的任务：弱化标题，勾选圈可点 */
+    .ck-card:not(.on) .ck-title{font-weight:600;color:#4a535e}
+    .ck-hd{cursor:pointer}
+    /* 计划卡内操作按钮 */
+    .plan-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:14px;padding-top:14px;border-top:1px solid #f0f3f7}
     .plan-actions[hidden]{display:none}
     .plan-actions button{min-height:42px;border-radius:10px;background:#f4f5f7;color:#5a6370;font-size:12.5px;font-weight:700;transition:background .15s}
     .plan-actions button:active{background:#e8ebf0}
     .plan-actions #btnSavePlan{background:#eef5ff;color:#0d6fdd}
-    /* 计划（编辑） */
+    /* 计划：旧编辑态样式（已停用，保留兼容） */
     .ed-sec{margin-top:14px}
     .ed-sec:first-child{margin-top:4px}
     .ed-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:800;color:#3a4550;margin-bottom:4px}
@@ -249,7 +256,6 @@
         <div id="planBody"></div>
         <p class="plan-saved" id="planSaved" hidden></p>
         <div class="plan-actions" id="planActions">
-          <button class="ghost" id="btnEdit">编辑</button>
           <button class="ghost" id="btnSavePlan">保存计划</button>
         </div>
       </section>
@@ -472,7 +478,7 @@ function planKey() {
   if (period === 'week') { const w = isoWeek(date); return 'week:' + w.year + '-W' + w.week; }
   return 'month:' + date.getFullYear() + '-' + (date.getMonth() + 1);
 }
-/* 计划来源 = 当日待办工单：默认带出「重点任务」+「即将到期」，编辑时展示全量待办供勾选 */
+/* 计划来源 = 当日待办工单：默认只展示 2 个（重点任务 + 即将到期），「查看全部」展开全量 */
 function defaultPicked() {
   const t = DATA[period].todos;
   const pick = new Set();
@@ -482,9 +488,9 @@ function defaultPicked() {
 }
 function currentPicked() {
   const rec = savedMap[planKey()];
-  if (rec && rec.items && rec.items.length) {
+  if (rec && Array.isArray(rec.items)) {
     const ti = rec.items.map(x => x.ti).filter(i => typeof i === 'number');
-    if (ti.length) return new Set(ti);
+    if (ti.length || rec.cleared) return new Set(ti);
   }
   return defaultPicked();
 }
@@ -620,7 +626,7 @@ function submitTicket() {
   curTicket = -1;
   closeView();
   renderTodos();
-  if (!savedMap[planKey()] && !editing) renderPlan();
+  renderPlan();
   notifyParent();
   showToast('反馈已提交 · 该重点任务已标记完成');
 }
@@ -628,10 +634,9 @@ function submitTicket() {
 document.getElementById('tkBack').onclick = () => { curTicket = -1; closeView(); };
 document.getElementById('tkSubmit').onclick = submitTicket;
 
-/* ---------- 渲染：计划（只读 / 编辑） ---------- */
-let editing = false;
-let draftPick = new Set();
-let doneOpen = false;
+/* ---------- 渲染：计划（默认 2 项 + 查看全部） ---------- */
+let expanded = false;          /* 是否展开全部任务 */
+const PEEK = 2;                /* 收起时展示的任务数 */
 
 /* 待办 → 工单卡片字段（样式对齐工单列表：优先级角标 / 客户行 / 字段行 / 处理时限 / 转派处理） */
 const ORDER_CUST = [
@@ -659,8 +664,8 @@ function planMeta(list) {
   document.getElementById('planCount').textContent = `已选 ${list.length} 项${p1 ? ' · 优先级1 ' + p1 + ' 件' : ''}`;
   const doneN = d.todos.filter(t => t.done).length;
   document.getElementById('planHint').innerHTML = savedMap[planKey()]
-    ? `已保存的${d.target}计划 · 点击「编辑」可重新从待办工单中勾选 · 已完成 ${doneN} 项自动排除`
-    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 已完成 ${doneN} 项自动排除`;
+    ? `已保存的${d.target}计划 · 点「查看全部」可继续勾选或取消 · 已完成 ${doneN} 项自动排除`
+    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 点圈可勾选或取消 · 已完成 ${doneN} 项自动排除`;
 }
 
 function orderOf(todo, i) {
@@ -713,83 +718,61 @@ function orderCard(todo, i, on, editable) {
 
 function renderPlan() {
   document.getElementById('planTitle').textContent = DATA[period].planTitle;
-  editing = false;
   renderPlanRead();
 }
 
 function renderPlanRead() {
   const todos = DATA[period].todos;
-  const list = [...currentPicked()].filter(i => todos[i]).sort((a, b) => a - b);
-  planMeta(list);
+  const picked = currentPicked();
+  const pickedList = sortByPriority([...picked].filter(i => todos[i]));
+  const openIdx = todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i);
+  const showIdx = expanded ? sortByPriority(openIdx) : pickedList.slice(0, PEEK);
+  planMeta(pickedList);
+
+  const cardsHTML = showIdx.length
+    ? `<div class="ck-list">${showIdx.map(i => orderCard(todos[i], i, picked.has(i), true)).join('')}</div>`
+    : '<div class="ed-empty">尚未勾选待办工单 · 点「查看全部」从待办中勾选</div>';
+
+  const moreHTML = openIdx.length > PEEK
+    ? `<button class="ck-more" id="planMore">
+        <span>${expanded ? '收起任务列表' : '查看全部 ' + openIdx.length + ' 个任务'}</span>
+        <i>${expanded ? '⌃' : '›'}</i></button>`
+    : '';
+
   const actions = document.getElementById('planActions');
   if (actions) actions.hidden = false;
-  document.getElementById('planBody').innerHTML = list.length
-    ? `<div class="ck-list">${list.map(i => orderCard(todos[i], i, true, false)).join('')}</div>`
-    : '<div class="ed-empty">尚未勾选待办工单 · 点击「编辑」从待办列表中勾选</div>';
+  document.getElementById('planBody').innerHTML = cardsHTML + moreHTML;
+
   const rec = savedMap[planKey()];
   const savedEl = document.getElementById('planSaved');
   if (rec) {
     savedEl.hidden = false;
-    savedEl.textContent = `已保存 ${rec.savedAt} · ${list.length} 项 · 关闭后重新打开仍会保留`;
+    savedEl.textContent = `已保存 ${rec.savedAt} · 当前 ${pickedList.length} 项 · 关闭后重新打开仍会保留`;
   } else { savedEl.hidden = true; savedEl.textContent = ''; }
 }
 
-function renderEditor() {
-  const d = DATA[period];
-  const todos = d.todos;
-  const open = todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i);
-
-  const listHTML = open.length
-    ? `<div class="ck-list">${open.map(i => orderCard(todos[i], i, draftPick.has(i), true)).join('')}</div>`
-    : '<div class="ed-empty">本期无未完成待办工单</div>';
-
-  document.getElementById('planBody').innerHTML = `
-    <div class="ck-tools">
-      <span>全量待办 <b>${open.length}</b> 项</span>
-      <div><button class="mini" data-all="1">全选</button> <button class="mini" data-all="0">清空</button></div>
-    </div>
-    ${listHTML}
-    <div class="ed-actions">
-      <button class="ghost" id="edCancel">取消</button>
-      <button class="primary" id="edSave">保存计划</button>
-    </div>`;
-  document.getElementById('planSaved').hidden = true;
-  const actions = document.getElementById('planActions');
-  if (actions) actions.hidden = true;
-  /* 编辑过程表头实时跟随勾选数 */
-  const p1 = [...draftPick].filter(i => todos[i] && todos[i].chipCls === 'sla').length;
-  document.getElementById('planCount').textContent = `已选 ${draftPick.size} 项${p1 ? ' · 优先级1 ' + p1 + ' 件' : ''}`;
-  document.getElementById('planHint').innerHTML = `勾选需带入${d.target}计划的工单 · 默认已带出重点任务与即将到期任务 · 已完成 ${todos.filter(t => t.done).length} 项自动排除`;
+/* 未展开时按优先级取前 2 个展示：优先级1 → 2 → 3，同级按任务顺序 */
+function sortByPriority(list) {
+  const t = DATA[period].todos;
+  const pri = i => (t[i].chipCls === 'sla' ? 1 : t[i].chipCls === 'key' ? 2 : 3);
+  return list.slice().sort((a, b) => pri(a) - pri(b) || a - b);
 }
 
-function enterEdit() {
-  draftPick = new Set(currentPicked());
-  editing = true;
-  doneOpen = false;
-  renderEditor();
-  const card = document.getElementById('planCard');
-  if (card.scrollIntoView) card.scrollIntoView({ block: 'start' });
-}
-
+/* 勾选 / 取消勾选：即时生效并持久化，无需进入编辑态 */
 function togglePick(ti) {
-  if (draftPick.has(ti)) draftPick.delete(ti); else draftPick.add(ti);
-  renderEditor();
-}
-
-function commitSave() {
-  if (!draftPick.size) { showToast('请至少勾选 1 项待办工单'); return; }
-  const d = DATA[period];
-  const items = [...draftPick].sort((a, b) => a - b)
-    .filter(i => d.todos[i]).map(i => ({ ti: i, text: d.todos[i].t }));
-  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel() };
+  const t = DATA[period].todos;
+  const picked = new Set(currentPicked());
+  const on = !picked.has(ti);
+  if (on) picked.add(ti); else picked.delete(ti);
+  const items = [...picked].sort((a, b) => a - b).filter(i => t[i]).map(i => ({ ti: i, text: t[i].t }));
+  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel(), cleared: items.length === 0 };
   saveStore(savedMap);
-  editing = false;
   renderPlanRead();
-  showToast(`计划已保存 · ${d.target}共 ${items.length} 项`);
   notifyParent();
+  showToast(on ? `已加入${DATA[period].target}计划 · 共 ${items.length} 项` : `已取消勾选 · 共 ${items.length} 项`);
 }
 
-/* 计划区交互（事件委托：勾选工单 / 全选清空 / 处理进工单详情） */
+/* 计划区交互（事件委托：勾选工单 / 展开收起 / 处理进工单详情） */
 const planCard = document.getElementById('planCard');
 planCard.addEventListener('click', e => {
   const hd = e.target.closest('[data-hd]');
@@ -798,20 +781,11 @@ planCard.addEventListener('click', e => {
   if (tr) { showToast('工单已转派 · 等待接收人确认'); return; }
   const call = e.target.closest('[data-call]');
   if (call) { showToast('正在呼叫客户 · 号码已隐藏中间四位'); return; }
-  if (e.target.closest('#edCancel')) { editing = false; renderPlanRead(); return; }
-  if (e.target.closest('#edSave')) { commitSave(); return; }
-  if (e.target.closest('#btnEdit')) { enterEdit(); return; }
-  const all = e.target.closest('[data-all]');
-  if (all) {
-    const d = DATA[period];
-    draftPick = all.dataset.all === '1'
-      ? new Set(d.todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i))
-      : new Set();
-    renderEditor();
-    return;
-  }
-  const row = e.target.closest('[data-ti]');
-  if (row && editing) { togglePick(+row.dataset.ti); return; }
+  if (e.target.closest('#planMore')) { expanded = !expanded; renderPlanRead(); return; }
+  if (e.target.closest('#btnSavePlan')) { return; }
+  const hit = e.target.closest('.ck-hd') || e.target.closest('.ck-pick');
+  const row = hit && hit.closest('[data-ti]');
+  if (row) { togglePick(+row.dataset.ti); }
 });
 
 /* ---------- 周期切换 ---------- */
@@ -820,9 +794,7 @@ function renderPeriod() {
   document.getElementById('dateLabel').textContent = periodLabel();
   document.getElementById('pageTitle').textContent = `张明 · ${PERIOD_TITLE[period]}`;
   document.title = `张明 · ${PERIOD_TITLE[period]}`;
-  editing = false;
-  draftPick = new Set();
-  doneOpen = false;
+  expanded = false;
   renderKeys(); renderStats(); renderKpi(); renderTodos();
   renderPlan();
   document.getElementById('historyList').innerHTML = DATA[period].history.map(h => `
@@ -839,13 +811,11 @@ document.getElementById('prevDate').onclick = () => setDate(-1);
 document.getElementById('nextDate').onclick = () => setDate(1);
 document.querySelectorAll('[data-period]').forEach(btn => btn.onclick = () => { period = btn.dataset.period; renderPeriod(); });
 
-/* 计划卡内的按钮接上真实操作 */
-document.getElementById('btnEdit').onclick = () => enterEdit();
+/* 计划卡底部「保存计划」 */
 document.getElementById('btnSavePlan').onclick = () => {
-  if (editing) { commitSave(); return; }
   const d = DATA[period];
   const items = [...currentPicked()].sort((a, b) => a - b).filter(i => d.todos[i]).map(i => ({ ti: i, text: d.todos[i].t }));
-  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel() };
+  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel(), cleared: items.length === 0 };
   saveStore(savedMap);
   renderPlanRead();
   showToast(`计划已保存 · ${d.target}共 ${items.length} 项`);
@@ -865,7 +835,7 @@ document.addEventListener('click', e => {
     markDone(period, i, next);
     renderTodos();
     /* 未勾选的待办集合变了 → 若计划尚未保存，同步刷新默认计划 */
-    if (!savedMap[planKey()] && !editing) renderPlan();
+    renderPlan();
     showToast(next ? '已标记完成 · 日报同步更新' : '已取消完成标记');
   }
 });
