@@ -517,7 +517,7 @@ function planKey() {
   if (period === 'week') { const w = isoWeek(date); return 'week:' + w.year + '-W' + w.week; }
   return 'month:' + date.getFullYear() + '-' + (date.getMonth() + 1);
 }
-/* 计划来源 = 当日待办工单：折叠态只展示已勾选任务，入口数字随勾选数变化；「查看全部」展开全量待办供勾选 */
+/* 计划来源 = 当日待办工单：报告页只展示已勾选任务，入口数字随勾选数变化；「查看全部」展开操作区（编辑/保存），全量待办仅在编辑页 */
 function defaultPicked() {
   const t = DATA[period].todos;
   const pick = new Set();
@@ -673,7 +673,7 @@ function submitTicket() {
 document.getElementById('tkBack').onclick = () => { curTicket = -1; closeView(); };
 document.getElementById('tkSubmit').onclick = submitTicket;
 
-/* ---------- 渲染：计划（折叠态只展示已勾选任务 + 查看全部） ---------- */
+/* ---------- 渲染：计划（报告页只展示已勾选任务，勾选在编辑页） ---------- */
 let expanded = false;          /* 是否展开全量待办列表 */
 
 /* 待办 → 工单卡片字段（样式对齐工单列表：优先级角标 / 客户行 / 字段行 / 处理时限 / 转派处理） */
@@ -702,8 +702,8 @@ function planMeta(list) {
   document.getElementById('planCount').textContent = `已选 ${list.length} 项${p1 ? ' · 优先级1 ' + p1 + ' 件' : ''}`;
   const doneN = d.todos.filter(t => t.done).length;
   document.getElementById('planHint').innerHTML = savedMap[planKey()]
-    ? `已保存的${d.target}计划 · 展开后点「编辑」可重新勾选 · 已完成 ${doneN} 项自动排除`
-    : `从待办工单中勾选 · 默认带出<b>重点任务</b>与<b>即将到期</b>任务 · 展开后点「编辑」调整 · 已完成 ${doneN} 项自动排除`;
+    ? `已保存的${d.target}计划 · 展开后点「编辑」重新勾选 · 已完成 ${doneN} 项排除`
+    : `默认带出<b>重点</b>与<b>临期</b>任务 · 展开后点「编辑」勾选 · 已完成 ${doneN} 项排除`;
 }
 
 function orderOf(todo, i) {
@@ -763,16 +763,16 @@ function renderPlanRead() {
   const todos = DATA[period].todos;
   const picked = currentPicked();
   const pickedList = sortByPriority([...picked].filter(i => todos[i]));
-  const openIdx = todos.map((t, i) => ({ t, i })).filter(x => !x.t.done).map(x => x.i);
-  const showIdx = expanded ? sortByPriority(openIdx) : pickedList;
+  /* 报告页（含展开态）只展示已勾选任务；全量待办在「编辑 AI 明日计划」页勾选 */
+  const showIdx = pickedList;
   planMeta(pickedList);
 
   const cardsHTML = showIdx.length
-    ? `<div class="ck-list">${showIdx.map(i => orderCard(todos[i], i, picked.has(i), true)).join('')}</div>`
-    : '<div class="ed-empty">尚未勾选待办工单 · 点「查看全部待办」从待办中勾选</div>';
+    ? `<div class="ck-list">${showIdx.map(i => orderCard(todos[i], i, picked.has(i), false)).join('')}</div>`
+    : '<div class="ed-empty">尚未勾选待办工单 · 点「查看全部待办」后点「编辑」从待办中勾选</div>';
 
   const moreLabel = expanded
-    ? '收起任务列表'
+    ? '收起'
     : (pickedList.length ? `查看全部 ${pickedList.length} 个任务` : '查看全部待办');
   const moreHTML = `<button class="ck-more" id="planMore">
         <span>${moreLabel}</span>
@@ -796,20 +796,6 @@ function sortByPriority(list) {
   const t = DATA[period].todos;
   const pri = i => (t[i].chipCls === 'sla' ? 1 : t[i].chipCls === 'key' ? 2 : 3);
   return list.slice().sort((a, b) => pri(a) - pri(b) || a - b);
-}
-
-/* 勾选 / 取消勾选：即时生效并持久化，无需进入编辑态 */
-function togglePick(ti) {
-  const t = DATA[period].todos;
-  const picked = new Set(currentPicked());
-  const on = !picked.has(ti);
-  if (on) picked.add(ti); else picked.delete(ti);
-  const items = [...picked].sort((a, b) => a - b).filter(i => t[i]).map(i => ({ ti: i, text: t[i].t }));
-  savedMap[planKey()] = { items: items, savedAt: hhmm(), label: periodLabel(), cleared: items.length === 0 };
-  saveStore(savedMap);
-  renderPlanRead();
-  notifyParent();
-  showToast(on ? `已加入${DATA[period].target}计划 · 共 ${items.length} 项` : `已取消勾选 · 共 ${items.length} 项`);
 }
 
 /* ---------- 独立子页：编辑 AI 明日计划（全量待办多选） ---------- */
@@ -890,7 +876,7 @@ document.getElementById('planEditPage').addEventListener('click', e => {
   if (call) showToast('正在呼叫客户 · 号码已隐藏中间四位');
 });
 
-/* 计划区交互（事件委托：勾选工单 / 展开收起 / 处理进工单详情） */
+/* 计划区交互（事件委托：展开收起 / 处理进工单详情） */
 const planCard = document.getElementById('planCard');
 planCard.addEventListener('click', e => {
   const hd = e.target.closest('[data-hd]');
@@ -902,9 +888,6 @@ planCard.addEventListener('click', e => {
   if (e.target.closest('#planMore')) { expanded = !expanded; renderPlanRead(); return; }
   if (e.target.closest('#btnPlanEdit')) { openPlanEdit(); return; }
   if (e.target.closest('#btnSavePlan')) { return; }
-  const hit = e.target.closest('.ck-hd') || e.target.closest('.ck-pick');
-  const row = hit && hit.closest('[data-ti]');
-  if (row) { togglePick(+row.dataset.ti); }
 });
 
 /* ---------- 周期切换 ---------- */
