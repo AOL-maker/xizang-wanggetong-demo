@@ -73,6 +73,18 @@
     }
   }, true);
 
+  /* 触屏/按下即开层：比 click 更早，避免原生跳转先画一帧旧页 */
+  ['pointerdown', 'touchstart'].forEach(function (evt) {
+    document.addEventListener(evt, function (event) {
+      if (currentRole() !== '网格经理' || opened) return;
+      var node = event.target;
+      for (var i = 0; i < 4 && node; i += 1, node = node.parentElement) {
+        var t = (node.innerText || '').trim();
+        if (/查看 AI\s*[日周月]报与工作建议/.test(t)) { openManagerReport(); return; }
+      }
+    }, true);
+  });
+
   /* 角色可能稍后才写入 localStorage（登录/切换角色）→ 每秒补一次预热 */
   preload();
   setInterval(function () {

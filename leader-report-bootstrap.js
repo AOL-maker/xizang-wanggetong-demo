@@ -70,6 +70,18 @@
     }
   }, true);
 
+  /* 触屏/按下即开层：比 click 更早，避免原生跳转先画一帧旧页 */
+  ['pointerdown', 'touchstart'].forEach(function (evt) {
+    document.addEventListener(evt, function (event) {
+      if (currentRole() !== '网格长' || opened) return;
+      var node = event.target;
+      for (var i = 0; i < 4 && node; i += 1, node = node.parentElement) {
+        var t = (node.innerText || '').trim();
+        if (/查看 AI\s*[日周月]报与工作建议/.test(t)) { openLeaderReport(); return; }
+      }
+    }, true);
+  });
+
   preload();
   setInterval(function () {
     preload();
