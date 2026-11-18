@@ -778,13 +778,14 @@ function renderPlanRead() {
         <i>${expanded ? '⌃' : '›'}</i></button>`
     : '';
 
+  /* 按钮区与保存提示默认收起，点「查看全部」展开后才出现 */
   const actions = document.getElementById('planActions');
-  if (actions) actions.hidden = false;
+  if (actions) actions.hidden = !expanded;
   document.getElementById('planBody').innerHTML = cardsHTML + moreHTML;
 
   const rec = savedMap[planKey()];
   const savedEl = document.getElementById('planSaved');
-  if (rec) {
+  if (rec && expanded) {
     savedEl.hidden = false;
     savedEl.textContent = `已保存 ${rec.savedAt} · 当前 ${pickedList.length} 项 · 关闭后重新打开仍会保留`;
   } else { savedEl.hidden = true; savedEl.textContent = ''; }
@@ -849,9 +850,8 @@ function closePlanEdit(restore) {
   if (restore) window.scrollTo(0, peScroll || 0);
 }
 
-document.getElementById('peBack').onclick = () => closePlanEdit(true);
-document.getElementById('peCancel').onclick = () => closePlanEdit(true);
-document.getElementById('peSave').onclick = () => {
+/* 保存草稿：写库 → 回报告页 → 立即刷新 AI 计划区域 */
+function savePlanDraft() {
   const d = DATA[period];
   const items = [...peDraft].sort((a, b) => a - b).filter(i => d.todos[i])
     .map(i => ({ ti: i, text: d.todos[i].t }));
@@ -862,6 +862,14 @@ document.getElementById('peSave').onclick = () => {
   notifyParent();
   closePlanEdit(true);
   showToast(`计划已保存 · ${d.target}共 ${items.length} 项`);
+}
+
+/* 返回箭头 = 保存并返回（与列表内勾选即时生效保持一致）；底部「取消」才是放弃修改 */
+document.getElementById('peBack').onclick = () => savePlanDraft();
+document.getElementById('peSave').onclick = () => savePlanDraft();
+document.getElementById('peCancel').onclick = () => {
+  closePlanEdit(true);
+  showToast('已取消编辑 · 计划未改动');
 };
 document.getElementById('planEditPage').addEventListener('click', e => {
   const all = e.target.closest('[data-pe-all]');
