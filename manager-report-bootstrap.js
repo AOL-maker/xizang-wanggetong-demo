@@ -19,7 +19,7 @@
   function preload() {
     if (frame.getAttribute('data-loaded') === '1') return;
     frame.setAttribute('data-loaded', '1');
-    frame.src = './manager-report.html?v=6';
+    frame.src = './manager-report.html?v=7';
   }
 
   function openManagerReport() {
