@@ -57,7 +57,26 @@
     return out;
   }
 
+  /* 卡片副标题（"2026-11-20 · 我的工作日报" / "昨日 2026-11-19 · 智能晨会简报"）
+     —— 原生 bundle 用系统当天日期拼，必须按报告基准日覆盖，否则和报告页差一截 */
+  var CAP_RE = /^(昨日 )?\d{4}-\d{2}-\d{2}( — \d{4}-\d{2}-\d{2})? · /;
+  function paintCaption(mod, text) {
+    if (!text) return 0;
+    var els = mod.querySelectorAll('div,span,p');
+    var n = 0;
+    for (var i = 0; i < els.length; i += 1) {
+      var el = els[i];
+      if (el.children.length) continue;
+      var t = (el.textContent || '').trim();
+      if (!CAP_RE.test(t) || t === text) continue;
+      el.textContent = text;
+      n += 1;
+    }
+    return n;
+  }
+
   function paint() {
+    try { paintPlanClock(); } catch (e) {}
     var role = currentRole();
     var stats = statsOf(role);
     if (!stats) return 0;
@@ -66,7 +85,9 @@
     for (var m = 0; m < mods.length; m += 1) {
       var mod = mods[m];
       if (!mod.getClientRects().length) continue;   /* RN 会保留多份隐藏副本 */
-      var arr = stats[activePeriod(mod)] || [];
+      var p = activePeriod(mod);
+      var arr = stats[p] || [];
+      if (stats.caption) written += paintCaption(mod, stats.caption[p]);
       var btns = statButtons(mod);
       for (var i = 0; i < btns.length && i < arr.length; i += 1) {
         var ds = btns[i].querySelectorAll('div');
@@ -79,6 +100,28 @@
       }
     }
     return written;
+  }
+
+  /* 「今日作业安排」模块里的截止 / 逾期时间同样按系统当前时间算，
+     演示基准日是 11/27，这里一并对齐（否则 11/20 会露馅） */
+  var PLAN_RULES = [
+    [/^已逾期 · \d{1,2}\/\d{1,2} \d{1,2}:\d{2}$/, '已逾期 · 11/27 14:00'],
+    [/^截止 \d{1,2}\/\d{1,2} \d{1,2}:\d{2}$/, '截止 11/27 17:00']
+  ];
+  function paintPlanClock() {
+    var mods = document.querySelectorAll('[data-testid="home-module-plan"]');
+    for (var m = 0; m < mods.length; m += 1) {
+      if (!mods[m].getClientRects().length) continue;
+      var els = mods[m].querySelectorAll('div,span');
+      for (var i = 0; i < els.length; i += 1) {
+        var el = els[i];
+        if (el.children.length) continue;
+        var t = (el.textContent || '').trim();
+        for (var r = 0; r < PLAN_RULES.length; r += 1) {
+          if (PLAN_RULES[r][0].test(t) && t !== PLAN_RULES[r][1]) { el.textContent = PLAN_RULES[r][1]; break; }
+        }
+      }
+    }
   }
 
   var timer = null;

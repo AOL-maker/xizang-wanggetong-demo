@@ -480,9 +480,26 @@ window.__WGT_CARD_STATS = (function () {
       { v: String(left), l: PRE[p] + '待跟进事项' }
     ];
   }
+  /* 卡片副标题（原生 bundle 用系统当天日期算，会和工作台对不上）——按报告基准日重算 */
+  function iso(x) { return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` }
+  function cap(p) {
+    const d = date;
+    if (p === 'day') return `${iso(d)} · 我的工作日报`;
+    if (p === 'week') {
+      const s = new Date(d); s.setDate(s.getDate() - ((s.getDay() + 6) % 7));
+      const e = new Date(s); e.setDate(s.getDate() + 6);
+      return `${iso(s)} — ${iso(e)} · 个人周报`;
+    }
+    const first = new Date(d.getFullYear(), d.getMonth(), 1);
+    const last = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+    return `${iso(first)} — ${iso(last)} · 个人月度复盘`;
+  }
   /* 每次读取都按当前 DATA 重算（待办勾选会改 done），保证卡片与报告实时一致 */
   return function () {
-    return { day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month') };
+    return {
+      day: pack(DAY, 'day'), week: pack(WEEK, 'week'), month: pack(MONTH, 'month'),
+      caption: { day: cap('day'), week: cap('week'), month: cap('month') }
+    };
   };
 })();
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
