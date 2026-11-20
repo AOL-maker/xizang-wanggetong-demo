@@ -245,7 +245,7 @@
     <header class="topbar"><button class="back" id="backBtn" aria-label="返回">‹</button><div class="title" id="pageTitle">张明 · 日报</div><button class="records" data-view="history">报告记录 ›</button></header>
     <div class="filters">
       <div class="segments" role="tablist"><button class="segment active" data-period="day">日报</button><button class="segment" data-period="week">周报</button><button class="segment" data-period="month">月报</button></div>
-      <div class="date-nav"><button id="prevDate" aria-label="上一期">‹</button><span id="dateLabel">2026-11-17</span><button id="nextDate" aria-label="下一期">›</button></div>
+      <div class="date-nav"><button id="prevDate" aria-label="上一期">‹</button><span id="dateLabel">2026-11-27</span><button id="nextDate" aria-label="下一期">›</button></div>
     </div>
     <div class="content">
       <section class="card">
@@ -260,14 +260,14 @@
       </section>
 
       <section class="card">
-        <div class="section-head"><h2>个人考核完成进度</h2><span class="head-meta" id="kpiMeta">截止 11/17 · 月度进度 57%</span></div>
+        <div class="section-head"><h2>个人考核完成进度</h2><span class="head-meta" id="kpiMeta">截止 11/27 · 月度进度 90%</span></div>
         <div id="kpiList"></div>
         <div class="ai-tip" id="aiTip"></div>
       </section>
 
       <section class="card">
         <div class="section-head"><h2 id="todoTitle">今日待办 · 重点任务</h2><span class="head-count" id="todoCount">5/10 项</span></div>
-        <p class="hint" id="draftHint">日报草稿 17:50 已自动生成 · 数据来自任务/拜访/商机/工单<span class="lnk" data-toast="打开日报草稿">查看</span></p>
+        <p class="hint" id="draftHint">日报草稿 15:40 已自动生成 · 数据来自任务/拜访/商机/工单<span class="lnk" data-toast="打开日报草稿">查看</span></p>
         <div id="todoList"></div>
         <p class="note" id="todoNote">勾选后：完成数 5→6 · 进度条 · 日报【今日完成】段落同步更新</p>
       </section>
@@ -329,25 +329,25 @@
 <script>
 /* ============================================================
    数据层：日报 / 周报 / 月报各一套，口径互相对得上
-   - 日报：11/17 当日，宽带 3/4、5G 1/2、拜访 5 次
-   - 周报：第 47 周（11/16–11/22）截至 11/17，宽带 9/12、5G 3/4、拜访 18 次
-   - 月报：11 月截至 11/17，宽带 31/60、5G 18/36、拜访 96 次
+   - 日报：11/27 当日，宽带 3/4、5G 1/2、拜访 5 次
+   - 周报：第 48 周（11/23–11/29）截至 11/27，宽带 10/12、5G 3/4、拜访 21 次
+   - 月报：11 月截至 11/27，宽带 47/60、5G 28/36、拜访 148 次
    ============================================================ */
 const DAY = {
   keyTitle: '今日重点任务 · 3 项',
   priorities: [
-    { cls: 'red', title: '宽带新增缺口 8 单', meta: '完成率低于网格均值 23% · 团队宽带整体缺口 128 户', pill: 'P0 紧急', pillCls: 'p0' },
-    { cls: 'orange', title: '投诉工单 3 个今日响应', meta: '12:00 前必须完成首次响应 · 团队 3 张 SLA 投诉分派给我', pill: 'SLA', pillCls: 'sla' },
-    { cls: 'blue', title: '刘总集团商机停滞 7 天', meta: '网格长今日协同推进 · 建议今日跟进 · 目标 3 万收入', pill: '高价值', pillCls: 'high' }
+    { cls: 'red', title: '宽带新增今日缺 1 单 · 月度缺口 13 户', meta: '今日 3/4，完成率低于网格均值 23% · 剩余 3 天需日均 4.3 户', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '投诉工单 3 个今日响应', meta: '18:00 前必须完成首次响应 · 团队 3 张 SLA 投诉分派给我', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '刘总集团商机停滞 17 天', meta: '网格长今日协同推进 · 建议今日跟进 · 目标 3 万收入', pill: '高价值', pillCls: 'high' }
   ],
   statTitle: '本期关键数据',
   statMeta: '今日 · 数据来自任务/拜访/商机/工单',
   stats: [['3/4', '宽带新增'], ['1/2', '5G 套包'], ['5 次', '拜访'], ['1 个', '商机成交']],
-  kpiMeta: '截止 11/17 · 月度进度 57%',
-  kpi: [['收入', 94], ['客户规模', 65], ['业务发展', 40], ['社区融合', 50], ['集团客户', 100], ['渠道拓展', 60]],
-  aiTip: '<b>AI 提醒</b><br>客户规模 65%、业务发展 40% 双落后，建议下午集中跑<span class="lnk">金阳花园片区</span>，重点挖潜宽带 + 5G 套餐（团队 SKU 仅 2-3%，是最大缺口）',
+  kpiMeta: '截止 11/27 · 月度进度 90%',
+  kpi: [['收入', 95], ['客户规模', 70], ['业务发展', 60], ['社区融合', 64], ['集团客户', 100], ['渠道拓展', 70]],
+  aiTip: '<b>AI 提醒</b><br>业务发展 60% 距月度目标差 40 个点，宽带缺口 13 户、5G 缺口 8 单是主因，且仅剩 3 天。建议今日叠加<span class="lnk">金阳花园晚间驻点</span>，用宽带+5G 组合打包冲量',
   todoTitle: '今日待办 · 重点任务',
-  draftHint: '日报草稿 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  draftHint: '日报草稿 15:40 已自动生成 · 数据来自任务/拜访/商机/工单',
   todoNoteSeg: '日报【今日完成】',
   todos: [
     { t: '拜访小区物业洽谈宽带团购', m: '成交 3 户', done: true },
@@ -366,11 +366,11 @@ const DAY = {
   target: '明日',
   suggest: ['晨会指派：陪同拜访刘总集团', 'AI 推荐：3 户宽带临期回访（金阳花园）'],
   history: [
-    ['张明 · 日报', '2026-11-17 · 已提交', 'done'],
-    ['张明 · 日报', '2026-11-16 · 已提交', 'done'],
-    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
-    ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
-    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 日报', '2026-11-27 · 生成中（草稿）', 'doing'],
+    ['张明 · 日报', '2026-11-26 · 已提交', 'done'],
+    ['张明 · 周报', '2026年第48周 · 生成中（截至 11/27）', 'doing'],
+    ['张明 · 周报', '2026年第47周（11/16–11/22）· 已提交', 'done'],
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/27）', 'doing'],
     ['张明 · 月报', '2026年10月 · 已提交', 'done']
   ]
 };
@@ -378,19 +378,19 @@ const DAY = {
 const WEEK = {
   keyTitle: '本周重点任务 · 3 项',
   priorities: [
-    { cls: 'red', title: '宽带新增周缺口 3 单', meta: '本周 9/12，完成 75%，日均 4.5 户低于个人日均目标 6 户', pill: 'P0 紧急', pillCls: 'p0' },
-    { cls: 'orange', title: '5G 套包周内补 1 单', meta: '本周 3/4，完成 75%，剩余 6 天需日均 0.2 单即可达成', pill: 'SLA', pillCls: 'sla' },
-    { cls: 'blue', title: '金阳花园异网降价应对', meta: '竞对 11/16 起月费降 20 元 · 本人负责 1 场驻点 · 存量 42 户', pill: '高价值', pillCls: 'high' }
+    { cls: 'red', title: '宽带新增周缺口 2 单', meta: '本周 10/12，完成 83%，剩余 2 天需再补 2 户，日均 1 户', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '5G 套包周内补 1 单', meta: '本周 3/4，完成 75%，剩余 2 天需补 1 单即可达成', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '金阳花园异网降价应对', meta: '竞对 11/23 起月费降 20 元 · 本人负责 1 场驻点 · 存量 42 户', pill: '高价值', pillCls: 'high' }
   ],
   statTitle: '本期关键数据',
-  statMeta: '本周（11/16–11/17）累计 · 已过 2/7 天',
-  stats: [['9/12', '宽带新增'], ['3/4', '5G 套包'], ['18 次', '拜访'], ['2 个', '商机成交']],
-  summary: '<b>本周小结</b>：11/16–11/17 累计宽带 9 户（日均 4.5 户，个人日均目标 6 户），5G 套包 3 单，拜访 18 次已达周目标 14 次的 129%；SLA 工单 1 件待闭环（11/19 到期）。周完成率 90%，网格 10 人中排第 6。',
-  kpiMeta: '截止 11/17 · 周进度 2/7 天',
-  kpi: [['收入', 88], ['客户规模', 62], ['业务发展', 55], ['社区融合', 70], ['集团客户', 100], ['渠道拓展', 75]],
-  aiTip: '<b>AI 提醒</b><br>收入 88% 节奏正常，业务发展 55% 落后 11 个点，主因 5G 套包仅 3 单、SKU 转化 2.4%。建议周二、周四各排 1 场<span class="lnk">金阳花园驻点</span>，叠加宽带+5G 组合推荐',
+  statMeta: '本周（11/23–11/27）累计 · 已过 5/7 天',
+  stats: [['10/12', '宽带新增'], ['3/4', '5G 套包'], ['21 次', '拜访'], ['2 个', '商机成交']],
+  summary: '<b>本周小结</b>：11/23–11/27 累计宽带 10 户（日均 2.0 户，个人日均目标 3 户），5G 套包 3 单，拜访 21 次已达周目标 14 次的 150%；SLA 工单 1 件待闭环（11/29 到期）。周完成率 83%，网格 10 人中排第 6。',
+  kpiMeta: '截止 11/27 · 周进度 5/7 天',
+  kpi: [['收入', 93], ['客户规模', 66], ['业务发展', 62], ['社区融合', 74], ['集团客户', 100], ['渠道拓展', 78]],
+  aiTip: '<b>AI 提醒</b><br>收入 93% 节奏正常，业务发展 62% 落后 8 个点，主因 5G 套包仅 3 单、SKU 转化 2.6%。建议今日加排 1 场<span class="lnk">金阳花园晚间驻点</span>，周六做最后一轮补单',
   todoTitle: '本周待办 · 重点任务',
-  draftHint: '周报草稿 周五 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  draftHint: '周报草稿 周五 15:40 已自动生成 · 数据来自任务/拜访/商机/工单',
   todoNoteSeg: '周报【本周完成】',
   todos: [
     { t: '周一晨会 · 周目标确认', m: '已完成', done: true },
@@ -402,19 +402,19 @@ const WEEK = {
     { t: '欠费催缴 9 笔', m: '已完成 · 回收 6,420 元', done: true },
     { t: '周拜访记录补录', m: '已完成', done: true },
     { t: '5G 套包补 1 单', m: '', chip: '重点', chipCls: 'key', done: false },
-    { t: '工单 #C2081 二次上门', m: '', chip: 'SLA 11/19', chipCls: 'sla', done: false },
+    { t: '工单 #C2081 二次上门', m: '', chip: 'SLA 11/29', chipCls: 'sla', done: false },
     { t: '幸福里 12 户到期客户预回访', m: '已完成 7/12 户', chip: '', done: false },
     { t: '商机补录：餐饮连锁（停滞 5 天）', m: '', done: false }
   ],
   planTitle: 'AI 下周计划',
   target: '下周',
-  suggest: ['晨会指派：金阳花园第 3 场驻点（周三 15:00）', 'AI 推荐：5 户 5G 套包临期客户触达'],
+  suggest: ['晨会指派：金阳花园第 3 场驻点（周六 15:00）', 'AI 推荐：5 户 5G 套包临期客户触达'],
   history: [
-    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 周报', '2026年第48周 · 生成中（截至 11/27）', 'doing'],
+    ['张明 · 周报', '2026年第47周（11/16–11/22）· 已提交', 'done'],
     ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
-    ['张明 · 周报', '2026年第45周（11/2–11/8）· 已提交', 'done'],
-    ['张明 · 日报', '2026-11-17 · 已提交', 'done'],
-    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 日报', '2026-11-27 · 生成中（草稿）', 'doing'],
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/27）', 'doing'],
     ['张明 · 月报', '2026年10月 · 已提交', 'done']
   ]
 };
@@ -422,19 +422,19 @@ const WEEK = {
 const MONTH = {
   keyTitle: '本月重点任务 · 3 项',
   priorities: [
-    { cls: 'red', title: '月度宽带缺口 29 户', meta: '31/60，完成 52%，剩余 13 天需日均 2.3 户（当前日均 1.8 户）', pill: 'P0 紧急', pillCls: 'p0' },
-    { cls: 'orange', title: '幸福里存量保有专项', meta: '负责 12 户到期客户预回访，已完成 7 户，剩余 5 户本周清零', pill: 'SLA', pillCls: 'sla' },
-    { cls: 'blue', title: '5G 套包月内补 18 单', meta: '18/36，完成 50%，SKU 转化 2.6% 低于网格 3.1%', pill: '高价值', pillCls: 'high' }
+    { cls: 'red', title: '月度宽带缺口 13 户 · 月末冲刺', meta: '47/60，完成 78%，剩余 3 天需日均 4.3 户（当前日均 1.7 户）', pill: 'P0 紧急', pillCls: 'p0' },
+    { cls: 'orange', title: '幸福里存量保有专项', meta: '负责 12 户到期客户预回访，已完成 7 户，剩余 5 户需 11/30 前清零', pill: 'SLA', pillCls: 'sla' },
+    { cls: 'blue', title: '5G 套包月内补 8 单', meta: '28/36，完成 78%，剩余 3 天需日均 2.7 单，SKU 转化 2.6% 低于网格 3.1%', pill: '高价值', pillCls: 'high' }
   ],
   statTitle: '本期关键数据',
-  statMeta: '11/1–11/17 累计 · 已过 17/30 天',
-  stats: [['31/60', '宽带新增'], ['18/36', '5G 套包'], ['96 次', '拜访'], ['7 个', '商机成交']],
-  summary: '<b>本月小结</b>：11/1–11/17 累计宽带 31 户（日均 1.8 户，目标 3 户）、5G 套包 18 单（50%）、拜访 96 次（覆盖率 87%）；收入完成 91% 为最强项，业务发展 52% 为最大短板，缺口 29 户宽带 + 18 单 5G。月度综合完成率 91%，网格 10 人中排第 6。',
-  kpiMeta: '截止 11/17 · 月度进度 57%',
-  kpi: [['收入', 91], ['客户规模', 68], ['业务发展', 52], ['社区融合', 60], ['集团客户', 100], ['渠道拓展', 66]],
-  aiTip: '<b>AI 提醒</b><br>业务发展 52% 距月度目标差 48 个点，宽带缺口 29 户、5G 缺口 18 单是主因。按剩余 13 天测算，需日均 2.3 户宽带 + 1.4 单 5G，建议把<span class="lnk">幸福里 5 户到期客户</span>并入本周驻点清单',
+  statMeta: '11/1–11/27 累计 · 已过 27/30 天',
+  stats: [['47/60', '宽带新增'], ['28/36', '5G 套包'], ['148 次', '拜访'], ['11 个', '商机成交']],
+  summary: '<b>本月小结</b>：11/1–11/27 累计宽带 47 户（日均 1.7 户，目标 3 户）、5G 套包 28 单（78%）、拜访 148 次（覆盖率 88%）；收入完成 95% 为最强项，业务发展 60% 为最大短板，缺口 13 户宽带 + 8 单 5G。月度综合完成率 92%，网格 10 人中排第 6。',
+  kpiMeta: '截止 11/27 · 月度进度 90%',
+  kpi: [['收入', 95], ['客户规模', 70], ['业务发展', 60], ['社区融合', 66], ['集团客户', 100], ['渠道拓展', 72]],
+  aiTip: '<b>AI 提醒</b><br>业务发展 60% 距月度目标差 40 个点，宽带缺口 13 户、5G 缺口 8 单是主因。按剩余 3 天测算，需日均 4.3 户宽带 + 2.7 单 5G，建议把<span class="lnk">幸福里 5 户到期客户</span>并入周末驻点清单',
   todoTitle: '本月待办 · 重点任务',
-  draftHint: '月报草稿 月末 17:50 已自动生成 · 数据来自任务/拜访/商机/工单',
+  draftHint: '月报草稿 15:40 已自动生成 · 数据来自任务/拜访/商机/工单',
   todoNoteSeg: '月报【本月完成】',
   todos: [
     { t: '月度经营目标分解与公示', m: '已完成', done: true },
@@ -445,7 +445,7 @@ const MONTH = {
     { t: '渠道网点巡检 3 次', m: '已完成', done: true },
     { t: '月度培训 2 场（5G + 宽带）', m: '已完成', done: true },
     { t: '幸福里到期客户预回访 12 户', m: '已完成 7/12 户', chip: '重点', chipCls: 'key', done: false },
-    { t: '5G 套包月内补 18 单', m: '', chip: '缺口', chipCls: 'sla', done: false },
+    { t: '5G 套包月内补 8 单', m: '', chip: '缺口', chipCls: 'sla', done: false },
     { t: '客户建档 4 户未完成', m: '', done: false },
     { t: '幸福里异网应对方案落地', m: '', done: false },
     { t: '商机补录 3 条', m: '', done: false }
@@ -454,12 +454,12 @@ const MONTH = {
   target: '下月',
   suggest: ['月度例会指派：幸福里存量保有专项', 'AI 推荐：12 户融合到期客户续约回访'],
   history: [
-    ['张明 · 月报', '2026年11月 · 生成中（截至 11/17）', 'doing'],
+    ['张明 · 月报', '2026年11月 · 生成中（截至 11/27）', 'doing'],
     ['张明 · 月报', '2026年10月 · 已提交', 'done'],
     ['张明 · 月报', '2026年9月 · 已提交', 'done'],
-    ['张明 · 周报', '2026年第47周 · 生成中（截至 11/17）', 'doing'],
-    ['张明 · 周报', '2026年第46周（11/9–11/15）· 已提交', 'done'],
-    ['张明 · 日报', '2026-11-17 · 已提交', 'done']
+    ['张明 · 周报', '2026年第48周 · 生成中（截至 11/27）', 'doing'],
+    ['张明 · 周报', '2026年第47周（11/16–11/22）· 已提交', 'done'],
+    ['张明 · 日报', '2026-11-27 · 生成中（草稿）', 'doing']
   ]
 };
 
@@ -488,7 +488,7 @@ window.__WGT_CARD_STATS = (function () {
 const PERIOD_TITLE = { day: '日报', week: '周报', month: '月报' };
 
 let period = 'day';
-let date = new Date(2026, 10, 17);
+let date = new Date(2026, 10, 27);
 
 /* ---------- 工具 ---------- */
 const toast = document.getElementById('toast'); let toastTimer;
@@ -694,7 +694,16 @@ const ORDER_RULES = [
   { re: /晨会|培训|会议|例会/, sub: '内部事务', cust: false },
   { re: /补录/, sub: '数据补录', cust: false }
 ];
-const ORDER_CREATED = ['2026-11-17 09:20:11', '2026-11-16 14:05:32', '2026-11-15 10:41:09', '2026-11-14 16:22:48'];
+const ORDER_CREATED = ['2026-11-27 09:20:11', '2026-11-26 14:05:32', '2026-11-25 10:41:09', '2026-11-24 16:22:48'];
+/* 演示时刻固定在 11/27 15:00，工单到达时长 / 剩余处理时长由创建时间与截止时间实时推算，保证前后一致 */
+const DEMO_NOW = new Date(2026, 10, 27, 15, 0).getTime();
+function toTs(s) { return new Date(String(s).replace(' ', 'T')).getTime(); }
+function durLabel(ms) {
+  if (!isFinite(ms) || ms <= 0) return '0 小时';
+  const h = Math.round(ms / 3600000);
+  const d = Math.floor(h / 24), rh = h % 24;
+  return d ? `${d} 天${rh ? ' ' + rh + ' 小时' : ''}` : `${h} 小时`;
+}
 
 function planMeta(list) {
   const d = DATA[period];
@@ -710,19 +719,22 @@ function orderOf(todo, i) {
   const rule = ORDER_RULES.find(x => x.re.test(todo.t)) || { sub: '综合支撑', cust: true };
   const c = ORDER_CUST[i % ORDER_CUST.length];
   const pri = todo.chipCls === 'sla' ? 1 : todo.chipCls === 'key' ? 2 : 3;
+  const created = ORDER_CREATED[i % ORDER_CREATED.length];
+  const due = pri === 1 ? '2026-11-27 18:00:00' : pri === 2 ? '2026-11-29 18:00:00' : '2026-11-30 12:00:00';
+  const cTs = toTs(created), dTs = toTs(due);
   const sla = todo.done
     ? '工单已处理完成，处理反馈已归档'
-    : pri === 1 ? '工单已到达 4 小时，剩余处理时长 1 天 8 小时'
-    : pri === 2 ? '工单已到达 2 天 4 小时，剩余处理时长 48 小时'
-    : '工单已到达 1 天 2 小时，剩余处理时长 3 天';
+    : dTs < DEMO_NOW
+      ? `工单已超时 ${durLabel(DEMO_NOW - dTs)}，需立即闭环`
+      : `工单已到达 ${durLabel(DEMO_NOW - cTs)}，剩余处理时长 ${durLabel(dTs - DEMO_NOW)}`;
   return {
     no: 'QA-897-897-' + String(100552 + i).padStart(8, '0'),
     sub: rule.sub,
     cust: rule.cust,
     cus: c,
     pri: pri,
-    created: ORDER_CREATED[i % ORDER_CREATED.length],
-    due: pri === 1 ? '2026-11-17 18:00:00' : pri === 2 ? '2026-11-19 18:00:00' : '2026-11-20 12:00:00',
+    created: created,
+    due: due,
     sla: sla
   };
 }
