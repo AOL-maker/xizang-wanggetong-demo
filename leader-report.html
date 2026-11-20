@@ -470,15 +470,15 @@ window.__WGT_CARD_STATS = (function () {
   function capIso(x) { return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` }
   function cap(p) {
     const d = date;
-    if (p === 'day') { const y = new Date(d); y.setDate(y.getDate() - 1); return `昨日 ${capIso(y)} · 智能晨会简报`; }
+    if (p === 'day') return `${capIso(d)} 智能晨会简报`;
     if (p === 'week') {
       const s = new Date(d); s.setDate(s.getDate() - ((s.getDay() + 6) % 7));
       const e = new Date(s); e.setDate(s.getDate() + 6);
-      return `${capIso(s)} — ${capIso(e)} · 网格周报`;
+      return `${capIso(s)} — ${capIso(e)} 网格周报`;
     }
     const first = new Date(d.getFullYear(), d.getMonth(), 1);
     const last = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-    return `${capIso(first)} — ${capIso(last)} · 网格月度复盘`;
+    return `${capIso(first)} — ${capIso(last)} 网格月度复盘`;
   }
   /* 每次读取都按当前 DATA 重算 */
   return function () {

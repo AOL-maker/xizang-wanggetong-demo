@@ -57,9 +57,11 @@
     return out;
   }
 
-  /* 卡片副标题（"2026-11-20 · 我的工作日报" / "昨日 2026-11-19 · 智能晨会简报"）
-     —— 原生 bundle 用系统当天日期拼，必须按报告基准日覆盖，否则和报告页差一截 */
-  var CAP_RE = /^(昨日 )?\d{4}-\d{2}-\d{2}( — \d{4}-\d{2}-\d{2})? · /;
+  /* 卡片副标题（原生 "2026-11-20 · 我的工作日报" / "昨日 2026-11-19 · 智能晨会简报"）
+     —— 原生 bundle 用系统当天日期拼，必须按报告基准日覆盖，否则和报告页差一截。
+     原生只在首次渲染时拼一次，切 日报/周报/月报 不会重算，所以覆盖过的节点要打标记，
+     之后切周期才能继续改写（否则文本已不含 "·"，正则再也匹配不到）。 */
+  var CAP_RE = /^(昨日 )?\d{4}-\d{2}-\d{2}( — \d{4}-\d{2}-\d{2})? ?·/;
   function paintCaption(mod, text) {
     if (!text) return 0;
     var els = mod.querySelectorAll('div,span,p');
@@ -68,8 +70,13 @@
       var el = els[i];
       if (el.children.length) continue;
       var t = (el.textContent || '').trim();
-      if (!CAP_RE.test(t) || t === text) continue;
+      var marked = el.getAttribute('data-wgt-cap') === '1';
+      if (!marked && !CAP_RE.test(t)) continue;
+      /* 节点被原生复用成别的文案时放弃标记，避免误改 */
+      if (marked && !/^(昨日 )?\d{4}-\d{2}-\d{2}/.test(t)) { el.removeAttribute('data-wgt-cap'); continue; }
+      if (t === text) { el.setAttribute('data-wgt-cap', '1'); continue; }
       el.textContent = text;
+      el.setAttribute('data-wgt-cap', '1');
       n += 1;
     }
     return n;

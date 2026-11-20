@@ -484,15 +484,15 @@ window.__WGT_CARD_STATS = (function () {
   function iso(x) { return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}` }
   function cap(p) {
     const d = date;
-    if (p === 'day') return `${iso(d)} · 我的工作日报`;
+    if (p === 'day') return `${iso(d)} 我的工作日报`;
     if (p === 'week') {
       const s = new Date(d); s.setDate(s.getDate() - ((s.getDay() + 6) % 7));
       const e = new Date(s); e.setDate(s.getDate() + 6);
-      return `${iso(s)} — ${iso(e)} · 个人周报`;
+      return `${iso(s)} — ${iso(e)} 个人周报`;
     }
     const first = new Date(d.getFullYear(), d.getMonth(), 1);
     const last = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-    return `${iso(first)} — ${iso(last)} · 个人月度复盘`;
+    return `${iso(first)} — ${iso(last)} 个人月度复盘`;
   }
   /* 每次读取都按当前 DATA 重算（待办勾选会改 done），保证卡片与报告实时一致 */
   return function () {
